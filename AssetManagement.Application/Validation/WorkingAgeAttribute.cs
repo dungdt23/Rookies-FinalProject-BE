@@ -21,7 +21,7 @@ public class WorkingAgeAttribute : ValidationAttribute
 
         if (age < 18)
         {
-            return new ValidationResult("Date of birth imply user is less than 18 years old");
+            return new ValidationResult("User is under 18. Please select a different date.");
         }
 
 
