@@ -20,7 +20,7 @@ public class NamingAttribute : ValidationAttribute
 
         if (!ALPHABETIC_WHITESPACE_REGEX.IsMatch(stringValue))
         {
-            return new ValidationResult("The name should contrain alphabetic characters");
+            return new ValidationResult("The name should contain alphabetic characters");
         }
 
         return ValidationResult.Success;

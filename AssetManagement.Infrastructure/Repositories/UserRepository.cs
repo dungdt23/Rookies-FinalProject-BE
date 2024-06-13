@@ -2,7 +2,6 @@ using AssetManagement.Application.Filters;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Infrastructure.Migrations;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace AssetManagement.Infrastructure.Repositories;
@@ -46,9 +45,16 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         IQueryable<User> query = _context.Users
             .Include(x => x.Type)
             .Include(x => x.Location);
+
         if (index.HasValue && size.HasValue)
         {
             query = query.Skip((index.Value - 1) * size.Value).Take(size.Value);
+        }
+
+        if (filter.UserType.HasValue)
+        {
+            var type = Enum.GetName(typeof(UserType), filter.UserType.Value);
+            query = query.Where(x => x.Type.TypeName.Equals(type));
         }
 
         var searchString = filter.SearchString;
@@ -56,7 +62,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         query = query.Where(x =>
         (string.IsNullOrEmpty(searchString) || (!string.IsNullOrEmpty(searchString)
         && (x.UserName.Contains(searchString) || x.FirstName.Contains(searchString) || x.StaffCode.Contains(searchString)))));
-        var x = _context.Users;
+
 
         var users = await query.ToListAsync();
 

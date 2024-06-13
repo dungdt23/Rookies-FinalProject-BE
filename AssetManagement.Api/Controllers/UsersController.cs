@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AssetManagement.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("users")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;

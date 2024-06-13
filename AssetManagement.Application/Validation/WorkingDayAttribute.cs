@@ -14,7 +14,7 @@ public class WorkingDayAttribute : ValidationAttribute
         var dayOfWeek = (int)dateValue.DayOfWeek;
         if (dayOfWeek == 0 || dayOfWeek == 6)
         {
-            return new ValidationResult("Join date cannot be in Saturnday or Sunday");
+            return new ValidationResult("Joined date is Saturday or Sunday. Please select a different date.");
         }
 
         return ValidationResult.Success;

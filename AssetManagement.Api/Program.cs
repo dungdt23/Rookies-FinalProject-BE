@@ -1,4 +1,5 @@
 
+using AssetManagement.Api.ValidateModel;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Mappings;
@@ -25,13 +26,22 @@ namespace AssetManagement.Api
 
 
             builder.Services.AddScoped<IUserService, UserService>();
-            
 
-            builder.Services.AddControllers();
+            //Add ValidationModelAsService
+            builder.Services.AddScoped<ValidateModelFilter>();
+
+            builder.Services.AddControllers(options =>
+            {
+                //Add custom validation error
+                options.Filters.Add<ValidateModelFilter>();
+            }).ConfigureApiBehaviorOptions(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddControllers();
 
             // Mapping profile between dtos and entities
             builder.Services.AddAutoMapper(typeof(MappingProfile));
