@@ -12,5 +12,6 @@ namespace AssetManagement.Application.Dtos.ResponseDtos
         public DateTime JoinedDate { get; set; }
         public TypeGender TypeGender { get; set; }
         public string Type { get; set; }
+        public string Location { get; set; }
     }
 }

@@ -71,10 +71,10 @@ public class UserService : IUserService
         Func<User, object> condition = x => x.StaffCode;
         switch (filter.FieldFilter)
         {
-            case UserFilterConstant.FullNameFilter:
+            case FieldType.FullName:
                 condition = x => (x.FirstName + " " + x.LastName);
                 break;
-            case UserFilterConstant.JoinedDateFilter:
+            case FieldType.JoinedDate:
                 condition = x => x.JoinedDate;
                 break;
         }
@@ -83,7 +83,7 @@ public class UserService : IUserService
         return new ApiResponse
         {
             Data = userDtos,
-            Message = (userDtos.Count() == 0) ? "Get user list successfully!" : "List user is empty"
+            Message = (userDtos.Count() != 0) ? "Get user list successfully!" : "List user is empty"
         };
     }
 
