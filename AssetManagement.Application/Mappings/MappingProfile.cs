@@ -12,7 +12,9 @@ namespace AssetManagement.Application.Mappings
         {
             // Mapping User
             CreateMap<CreateUserForm, User>();
-            CreateMap<User, ResponseUserDto>();
+            CreateMap<User, ResponseUserDto>()
+                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location.LocationName))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.TypeName));
         }
     }
 }
