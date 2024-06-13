@@ -23,6 +23,7 @@ public class CreateUserForm
 
     [Required]
     [WorkingDay]
+    [LaterThanDateOfBirth(nameof(DateOfBirth))]
     public DateTime JoinedDate { get; set; }
 
     [Required]
