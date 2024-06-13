@@ -3,6 +3,7 @@ using AssetManagement.Application.IRepositories;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Infrastructure.Migrations;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace AssetManagement.Infrastructure.Repositories;
 
@@ -46,10 +47,6 @@ public class UserRepository : GenericRepository<User>, IUserRepository
             .Include(x => x.Type)
             .Include(x => x.Location);
 
-        if (index.HasValue && size.HasValue)
-        {
-            query = query.Skip((index.Value - 1) * size.Value).Take(size.Value);
-        }
 
         if (filter.UserType.HasValue)
         {
@@ -57,14 +54,20 @@ public class UserRepository : GenericRepository<User>, IUserRepository
             query = query.Where(x => x.Type.TypeName.Equals(type));
         }
 
+        //handle search 
         var searchString = filter.SearchString;
 
         query = query.Where(x =>
         (string.IsNullOrEmpty(searchString) || (!string.IsNullOrEmpty(searchString)
         && (x.UserName.Contains(searchString) || x.FirstName.Contains(searchString) || x.StaffCode.Contains(searchString)))));
 
+        //handle pagination
+        if (index.HasValue && size.HasValue)
+        {
+            query = query.Skip((index.Value - 1) * size.Value).Take(size.Value);
+        }
 
-        var users = await query.ToListAsync();
+        var users = await query.Where(x => !x.IsDeleted).ToListAsync();
 
 
         // check if ascending or descending
@@ -77,5 +80,20 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         {
             return users.OrderByDescending(condition).ThenBy(x => x.StaffCode);
         }
+    }
+    public async Task<int> GetTotalCountAsync(UserFilter filter)
+    {
+        IQueryable<User> query = _context.Users.Where(x => !x.IsDeleted);
+        if (filter.UserType.HasValue)
+        {
+            var type = Enum.GetName(typeof(UserType), filter.UserType.Value);
+            query = query.Where(x => x.Type.TypeName.Equals(type));
+        }
+        var searchString = filter.SearchString;
+
+        query = query.Where(x =>
+        (string.IsNullOrEmpty(searchString) || (!string.IsNullOrEmpty(searchString)
+        && (x.UserName.Contains(searchString) || x.FirstName.Contains(searchString) || x.StaffCode.Contains(searchString)))));
+        return await query.CountAsync();
     }
 }
