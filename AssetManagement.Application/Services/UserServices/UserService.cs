@@ -1,25 +1,27 @@
-using System.Security.Cryptography;
-using System.Text;
 using AssetManagement.Application.ApiResponses;
 using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Models;
-using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace AssetManagement.Application.Services.UserServices;
 
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IGenericRepository<Assignment> _assignmentRepository;
     private readonly IMapper _mapper;
-    public UserService(IUserRepository userRepository, IMapper mapper)
+    public UserService(IUserRepository userRepository, IGenericRepository<Assignment> assignmentRepository,IMapper mapper)
     {
         _userRepository = userRepository;
+        _assignmentRepository = assignmentRepository;
         _mapper = mapper;   
     }
 
@@ -63,8 +65,6 @@ public class UserService : IUserService
             };
             
         }
-
-
     }
     public async Task<PagedResponse<ResponseUserDto>> GetAllAsync(UserFilter filter, int? index, int? size)
     {
@@ -97,5 +97,31 @@ public class UserService : IUserService
             user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
         return user;
+    }
+    public async Task<ApiResponse> DisableUser(Guid id)
+    {
+        var user = await _userRepository.GetByCondition(x => x.Id == id && !x.IsDeleted)
+            .Include(x => x.ReceivedAssignments).FirstOrDefaultAsync();
+        if (user == null) return new ApiResponse
+        {
+            Message = "User not found or no long active!",
+            StatusCode = StatusCodes.Status500InternalServerError
+        };
+        var userValidAssignment = user.ReceivedAssignments
+            .Where(x => x.State != Domain.Enums.TypeAssignmentState.Rejected && !x.IsDeleted);
+        //check if user have any valid asignment
+        if (userValidAssignment.Count() == 0)
+        {
+            await _userRepository.DeleteAsync(id);
+            return new ApiResponse
+            {
+                Message = "Disable user successfully!"
+            };
+        }
+        else
+            return new ApiResponse
+            {
+                Message = "Can't disable user because user still has valid assignments"
+            };
     }
 }

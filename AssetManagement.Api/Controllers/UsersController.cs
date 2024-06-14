@@ -38,4 +38,14 @@ public class UsersController : ControllerBase
         }
         return Ok(result);
     }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var result = await _userService.DisableUser(id);
+        if (result.StatusCode == StatusCodes.Status500InternalServerError)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, result);
+        }
+        return Ok(result);
+    }
 }

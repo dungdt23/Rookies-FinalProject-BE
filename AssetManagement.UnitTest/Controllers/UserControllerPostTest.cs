@@ -142,4 +142,67 @@ public class UserControllerPostTest
         okResult.StatusCode.Should().Be(StatusCodes.Status200OK);
         okResult.Value.Should().BeEquivalentTo(response);
     }
+    [Test]
+    public async Task DisableUser_ShouldReturnInternalServerError_WhenUserNotFoundOrInactive()
+    {
+        // Arrange
+        var response = new ApiResponse
+        {
+            Message = "User not found or no long active!",
+            StatusCode = StatusCodes.Status500InternalServerError
+        };
+
+        _userServiceMock.Setup(s => s.DisableUser(It.IsAny<Guid>())).ReturnsAsync(response);
+
+        // Act
+        var result = await _usersController.Delete(Guid.NewGuid());
+
+        // Assert
+        var errorResult = result as ObjectResult;
+        errorResult.Should().NotBeNull();
+        errorResult.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+        errorResult.Value.Should().BeEquivalentTo(response);
+    }
+
+    [Test]
+    public async Task DisableUser_ShouldReturnOk_WhenUserIsDisabledSuccessfully()
+    {
+        // Arrange
+        var response = new ApiResponse
+        {
+            Message = "Disable user successfully!",
+            StatusCode = StatusCodes.Status200OK
+        };
+
+        _userServiceMock.Setup(s => s.DisableUser(It.IsAny<Guid>())).ReturnsAsync(response);
+
+        // Act
+        var result = await _usersController.Delete(Guid.NewGuid());
+
+        // Assert
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult.StatusCode.Should().Be(StatusCodes.Status200OK);
+        okResult.Value.Should().BeEquivalentTo(response);
+    }
+
+    [Test]
+    public async Task DisableUser_ShouldReturnBadRequest_WhenUserHasValidAssignments()
+    {
+        // Arrange
+        var response = new ApiResponse
+        {
+            Message = "Can't disable user because user still has valid assignments",
+            StatusCode = StatusCodes.Status500InternalServerError
+        };
+
+        _userServiceMock.Setup(s => s.DisableUser(It.IsAny<Guid>())).ReturnsAsync(response);
+
+        // Act
+        var result = await _usersController.Delete(Guid.NewGuid());
+
+        // Assert
+        var okResult = result as ObjectResult;
+        okResult.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+    }
 }

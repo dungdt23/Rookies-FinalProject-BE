@@ -15,16 +15,19 @@ namespace AssetManagement.UnitTest.Services;
 public class UserServiceCreateAsyncTest
 {
     private Mock<IUserRepository> _userRepositoryMock;
+    private Mock<IGenericRepository<Assignment>> _assignmentRepositoryMock;
     private Mock<IMapper> _mapperMock;
     private UserService _userService;
     private Mock<User> _userMock;
     private Mock<CreateUserForm> _createFormMock;
+
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         _userRepositoryMock = new Mock<IUserRepository>();
+        _assignmentRepositoryMock = new Mock<IGenericRepository<Assignment>>();
         _mapperMock = new Mock<IMapper>();
-        _userService = new UserService(_userRepositoryMock.Object, _mapperMock.Object);
+        _userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object, _mapperMock.Object);
     }
 
     [SetUp]
