@@ -9,17 +9,15 @@ namespace AssetManagement.Domain.Entities
         [Key]
         public override Guid Id { get; set; } = Guid.NewGuid();
         [Required]
+        [MaxLength(200)]
         public string AssetCode { get; set; }
         [Required]
-        [MaxLength(100)]
+        [MaxLength(200)]
         public string AssetName { get; set; }
-        [Required]
-        [MaxLength(4)]
-        [MinLength(2)]
-        public string Prefix {get; set; }   
         [Required]
         public Guid CategoryId { get; set; }
         [Required]
+        [MaxLength(500)]
         public string Specification { get; set; }
         [Required]
         public DateTime InstalledDate {  get; set; }

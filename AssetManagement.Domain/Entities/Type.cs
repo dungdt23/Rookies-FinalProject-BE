@@ -8,11 +8,11 @@ namespace AssetManagement.Domain.Entities
         [Key]
         public override Guid Id { get; set; } = Guid.NewGuid();
         [Required]
-        [MaxLength(100)]
-        public required string TypeName { get; set; }
+        [MaxLength(200)]
+        public  string TypeName { get; set; }
         [Required]
-        [MaxLength(150)]
-        public required string Description { get; set; }
+        [MaxLength(200)]
+        public  string Description { get; set; }
 
         public ICollection<User> Users { get; set; }
         
