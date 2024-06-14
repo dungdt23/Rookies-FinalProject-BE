@@ -43,7 +43,7 @@ public static class ApplicationExtension
                 int dateOfBirthRange = (DateTime.Today.AddYears(-18) - startDate).Days;
 
 
-                for (int i = 0; i < 50; i++)
+                for (int i = 0; i < 300; i++)
                 {
                     string firstName = firstNames[random.Next(firstNames.Count)];
                     string lastName = lastNames[random.Next(lastNames.Count)];
