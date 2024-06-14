@@ -14,6 +14,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     public UserRepository(AssetManagementDBContext context) : base(context)
     {
         _context = context;
+        _dbSet = context.Set<User>();
     }
 
     public string GenerateStaffCode()

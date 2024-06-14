@@ -16,18 +16,6 @@ public class UsersController : ControllerBase
         _userService = userService;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Post([FromBody] CreateUserForm createUserForm)
-    {
-        var result = await _userService.CreateAsync(createUserForm);
-        if (result.StatusCode == StatusCodes.Status500InternalServerError)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, result);
-        }
-
-        return Ok(result);
-    }
-
     [HttpGet]
     public async Task<IActionResult> Get([FromQuery] UserFilter filter, int index, int size)
     {
@@ -39,4 +27,29 @@ public class UsersController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpPost]
+    public async Task<IActionResult> Post([FromBody] CreateUpdateUserForm createUserForm)
+    {
+        var result = await _userService.CreateAsync(createUserForm);
+        if (result.StatusCode == StatusCodes.Status500InternalServerError)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, result);
+        }
+
+        return Ok(result);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Put(Guid id, [FromBody] CreateUpdateUserForm updateUserForm)
+    {
+        var result = await _userService.UpdateAsync(id, updateUserForm);
+        if (result.StatusCode == StatusCodes.Status500InternalServerError)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, result);
+        }
+
+        return Ok(result);
+    }
+
 }

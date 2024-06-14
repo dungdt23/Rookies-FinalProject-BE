@@ -18,7 +18,7 @@ public class UserServiceCreateAsyncTest
     private Mock<IMapper> _mapperMock;
     private UserService _userService;
     private Mock<User> _userMock;
-    private Mock<CreateUserForm> _createFormMock;
+    private Mock<CreateUpdateUserForm> _createFormMock;
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
@@ -29,7 +29,7 @@ public class UserServiceCreateAsyncTest
 
     [SetUp]
     public void Setup(){
-        _createFormMock = new Mock<CreateUserForm>();
+        _createFormMock = new Mock<CreateUpdateUserForm>();
         _userMock = new Mock<User>();
     }
 
@@ -42,7 +42,7 @@ public class UserServiceCreateAsyncTest
         _userMock.Object.FirstName = "Nguyen Viet Bao";
         _userMock.Object.LastName = "Son";
 
-        _mapperMock.Setup(m => m.Map<User>(It.IsAny<CreateUserForm>())).Returns(_userMock.Object);
+        _mapperMock.Setup(m => m.Map<User>(It.IsAny<CreateUpdateUserForm>())).Returns(_userMock.Object);
         _userRepositoryMock.Setup(r => r.GenerateStaffCode()).Returns(generatedStaffCode);
         _userRepositoryMock.Setup(r => r.GenerateUserName(It.IsAny<string>())).Returns(generatedUserName);
         _userRepositoryMock.Setup(r => r.AddAsync(It.IsAny<User>())).ReturnsAsync(1);
@@ -67,7 +67,7 @@ public class UserServiceCreateAsyncTest
 		_userMock.Object.FirstName = "Nguyen Viet Bao";
 		_userMock.Object.LastName = "Son";
 
-		_mapperMock.Setup(m => m.Map<User>(It.IsAny<CreateUserForm>())).Returns(_userMock.Object);
+		_mapperMock.Setup(m => m.Map<User>(It.IsAny<CreateUpdateUserForm>())).Returns(_userMock.Object);
 		_userRepositoryMock.Setup(r => r.GenerateStaffCode()).Returns(generatedStaffCode);
 		_userRepositoryMock.Setup(r => r.GenerateUserName(It.IsAny<string>())).Returns(generatedUserName);
 		_userRepositoryMock.Setup(r => r.AddAsync(It.IsAny<User>())).ReturnsAsync(0);

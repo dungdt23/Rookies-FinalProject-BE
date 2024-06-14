@@ -15,7 +15,7 @@ public class UserControllerPostTest
 {
 	private Mock<IUserService> _userServiceMock;
 	private UsersController _usersController;
-	private Mock<CreateUserForm> _createUserFormMock;
+	private Mock<CreateUpdateUserForm> _createUserFormMock;
 	private Mock<User> _userMock;
 
 	[OneTimeSetUp]
@@ -29,7 +29,7 @@ public class UserControllerPostTest
 	public void SetUp()
 	{
 		_userMock = new Mock<User>();
-		_createUserFormMock = new Mock<CreateUserForm>();
+		_createUserFormMock = new Mock<CreateUpdateUserForm>();
 	}
 
 	[Test]
@@ -43,7 +43,7 @@ public class UserControllerPostTest
 			Data = _userMock.Object
 		};
 
-		_userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUserForm>())).ReturnsAsync(response);
+		_userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
 
 		// Act
 		var result = await _usersController.Post(_createUserFormMock.Object);
@@ -66,7 +66,7 @@ public class UserControllerPostTest
 			Data = _userMock.Object
 		};
 
-		_userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUserForm>())).ReturnsAsync(response);
+		_userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
 
 		// Act
 		var result = await _usersController.Post(_createUserFormMock.Object);
