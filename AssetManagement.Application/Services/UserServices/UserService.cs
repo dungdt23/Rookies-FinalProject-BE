@@ -21,6 +21,7 @@ public class UserService : IUserService
     public UserService(IUserRepository userRepository, IGenericRepository<Assignment> assignmentRepository,IMapper mapper)
     {
         _userRepository = userRepository;
+        _mapper = mapper;
         _assignmentRepository = assignmentRepository;
         _mapper = mapper;   
     }
@@ -34,15 +35,15 @@ public class UserService : IUserService
             result = compute.SequenceEqual(user.PasswordHash);
         }
         return result;
-    } 
+    }
 
 
-    public async Task<ApiResponse> CreateAsync(CreateUserForm form)
+    public async Task<ApiResponse> CreateAsync(CreateUpdateUserForm form)
     {
         var user = _mapper.Map<User>(form);
 
-        user.StaffCode =  _userRepository.GenerateStaffCode();
-        user.UserName =  _userRepository.GenerateUserName($"{user.FirstName.Trim()} {user.LastName.Trim()}");
+        user.StaffCode = _userRepository.GenerateStaffCode();
+        user.UserName = _userRepository.GenerateUserName($"{user.FirstName.Trim()} {user.LastName.Trim()}");
 
         user = EncryptPassword(user, $"{user.UserName}@{user.DateOfBirth:ddMMyyyy}");
 
@@ -51,7 +52,7 @@ public class UserService : IUserService
             return new ApiResponse
             {
                 StatusCode = StatusCodes.Status200OK,
-                Message = "User created successfully",
+                Message = UserApiResponseMessageContraint.UserCreateSuccess,
                 Data = user
             };
         }
@@ -60,10 +61,10 @@ public class UserService : IUserService
             return new ApiResponse
             {
                 StatusCode = StatusCodes.Status500InternalServerError,
-                Message = "There something went wrong while creating user, please try again later",
+                Message = UserApiResponseMessageContraint.UserCreateFail,
                 Data = user
             };
-            
+
         }
     }
     public async Task<PagedResponse<ResponseUserDto>> GetAllAsync(UserFilter filter, int? index, int? size)
@@ -97,6 +98,42 @@ public class UserService : IUserService
             user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
         return user;
+    }
+
+    public async Task<ApiResponse> UpdateAsync(Guid id, CreateUpdateUserForm form)
+    {
+        var user = _userRepository.GetByCondition(u => u.Id == id).FirstOrDefault();
+        if (user == null)
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status404NotFound,
+                Data = id,
+                Message = UserApiResponseMessageContraint.UserNotFound
+            };
+        }
+
+        _mapper.Map(form, user);
+
+        if (await _userRepository.UpdateAsync(user) > 0)
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Data = user,
+                Message = UserApiResponseMessageContraint.UserUpdateSuccess
+            };
+
+        }
+        else
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Data = user,
+                Message = UserApiResponseMessageContraint.UserUpdateFail,
+            };
+        }
     }
     public async Task<ApiResponse> DisableUser(Guid id)
     {
