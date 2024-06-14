@@ -9,47 +9,51 @@ namespace AssetManagement.Api.Controllers;
 [Route("users")]
 public class UsersController : ControllerBase
 {
-    private readonly IUserService _userService;
+	private readonly IUserService _userService;
 
-    public UsersController(IUserService userService)
-    {
-        _userService = userService;
-    }
+	public UsersController(IUserService userService)
+	{
+		_userService = userService;
+	}
 
-    [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] UserFilter filter, int index, int size)
-    {
-        var result = await _userService.GetAllAsync(filter, index, size);
-        if (result.StatusCode == StatusCodes.Status500InternalServerError)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, result);
-        }
+	[HttpGet]
+	public async Task<IActionResult> Get([FromQuery] UserFilter filter, int index, int size)
+	{
+		var result = await _userService.GetAllAsync(filter, index, size);
+		if (result.StatusCode == StatusCodes.Status500InternalServerError)
+		{
+			return StatusCode(StatusCodes.Status500InternalServerError, result);
+		}
 
-        return Ok(result);
-    }
+		return Ok(result);
+	}
 
-    [HttpPost]
-    public async Task<IActionResult> Post([FromBody] CreateUpdateUserForm createUserForm)
-    {
-        var result = await _userService.CreateAsync(createUserForm);
-        if (result.StatusCode == StatusCodes.Status500InternalServerError)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, result);
-        }
+	[HttpPost]
+	public async Task<IActionResult> Post([FromBody] CreateUpdateUserForm createUserForm)
+	{
+		var result = await _userService.CreateAsync(createUserForm);
+		if (result.StatusCode == StatusCodes.Status500InternalServerError)
+		{
+			return StatusCode(StatusCodes.Status500InternalServerError, result);
+		}
 
-        return Ok(result);
-    }
+		return Ok(result);
+	}
 
-    [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Put(Guid id, [FromBody] CreateUpdateUserForm updateUserForm)
-    {
-        var result = await _userService.UpdateAsync(id, updateUserForm);
-        if (result.StatusCode == StatusCodes.Status500InternalServerError)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, result);
-        }
+	[HttpPut("{id:guid}")]
+	public async Task<IActionResult> Put(Guid id, [FromBody] CreateUpdateUserForm updateUserForm)
+	{
+		var result = await _userService.UpdateAsync(id, updateUserForm);
+		if (result.StatusCode == StatusCodes.Status404NotFound)
+		{
+			return NotFound(result);
+		}
+		if (result.StatusCode == StatusCodes.Status500InternalServerError)
+		{
+			return StatusCode(StatusCodes.Status500InternalServerError, result);
+		}
 
-        return Ok(result);
-    }
+		return Ok(result);
+	}
 
 }
