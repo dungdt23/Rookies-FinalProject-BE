@@ -66,7 +66,7 @@ public class UserService : IUserService
 
 
     }
-    public async Task<ApiResponse> GetAllAsync(UserFilter filter, int? index, int? size)
+    public async Task<PagedResponse<ResponseUserDto>> GetAllAsync(UserFilter filter, int? index, int? size)
     {
         Func<User, object> condition = x => x.StaffCode;
         switch (filter.FieldFilter)
@@ -80,10 +80,12 @@ public class UserService : IUserService
         }
         var users = await _userRepository.GetAllAsync(condition, filter, index, size);
         var userDtos = _mapper.Map<IEnumerable<ResponseUserDto>>(users);
-        return new ApiResponse
+        var totalCount = await _userRepository.GetTotalCountAsync(filter);
+        return new PagedResponse<ResponseUserDto>
         {
             Data = userDtos,
-            Message = (userDtos.Count() != 0) ? "Get user list successfully!" : "List user is empty"
+            Message = (userDtos.Count() != 0) ? "Get user list successfully!" : "List user is empty",
+            TotalCount = totalCount
         };
     }
 
