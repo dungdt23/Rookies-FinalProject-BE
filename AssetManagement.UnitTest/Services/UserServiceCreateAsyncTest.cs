@@ -21,7 +21,6 @@ public class UserServiceCreateAsyncTest
     private UserService _userService;
     private Mock<User> _userMock;
     private Mock<CreateUpdateUserForm> _createFormMock;
-    private Mock<CreateUserForm> _createFormMock;
 
     [OneTimeSetUp]
     public void OneTimeSetup()

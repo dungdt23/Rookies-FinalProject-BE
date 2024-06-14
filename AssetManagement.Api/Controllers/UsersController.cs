@@ -16,18 +16,6 @@ public class UsersController : ControllerBase
 		_userService = userService;
 	}
 
-	[HttpGet]
-	public async Task<IActionResult> Get([FromQuery] UserFilter filter, int index, int size)
-	{
-		var result = await _userService.GetAllAsync(filter, index, size);
-		if (result.StatusCode == StatusCodes.Status500InternalServerError)
-		{
-			return StatusCode(StatusCodes.Status500InternalServerError, result);
-		}
-
-		return Ok(result);
-	}
-
 	[HttpPost]
 	public async Task<IActionResult> Post([FromBody] CreateUpdateUserForm createUserForm)
 	{
