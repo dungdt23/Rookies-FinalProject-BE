@@ -27,6 +27,19 @@ namespace AssetManagement.Api
 
             builder.Services.AddScoped<IUserService, UserService>();
 
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader();
+                    });
+            });
+
+
             //Add ValidationModelAsService
             builder.Services.AddScoped<ValidateModelFilter>();
 
@@ -56,6 +69,7 @@ namespace AssetManagement.Api
             // }
 
             app.UseHttpsRedirection();
+            app.UseCors("AllowAllOrigins");
 
             app.UseAuthorization();
 

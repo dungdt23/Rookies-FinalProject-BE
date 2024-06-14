@@ -29,14 +29,13 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] UserFilter filter, int index, int size)
+    public async Task<IActionResult> Get([FromQuery] UserFilter filter, int index = 1, int size = 10)
     {
         var result = await _userService.GetAllAsync(filter, index, size);
         if (result.StatusCode == StatusCodes.Status500InternalServerError)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, result);
         }
-
         return Ok(result);
     }
 }

@@ -1,4 +1,5 @@
 using AssetManagement.Application.ApiResponses;
+using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.Models;
 using AssetManagement.Domain.Entities;
@@ -11,6 +12,5 @@ public interface IUserService
     User EncryptPassword(User user, string password);
 
     bool CheckPassword(User user, string password);
-    Task<ApiResponse> GetAllAsync(UserFilter filter, int? index, int? size);
-
+    Task<PagedResponse<ResponseUserDto>> GetAllAsync(UserFilter filter, int? index, int? size);
 }
