@@ -18,8 +18,8 @@ public static class ApplicationExtension
             dbContext.Database.EnsureCreated();
             if (!dbContext.Types.Any())
             {
-                dbContext.Add(new Domain.Entities.Type { TypeName = "Staff", Description = "Staff of project", CreatedAt = DateTime.Now, IsDeleted = false });
-                dbContext.Add(new Domain.Entities.Type { TypeName = "Admin", Description = "Admin of project", CreatedAt = DateTime.Now, IsDeleted = false });
+                dbContext.Add(new Domain.Entities.Type { TypeName = "Staff", Description = "Staff of system", CreatedAt = DateTime.Now, IsDeleted = false });
+                dbContext.Add(new Domain.Entities.Type { TypeName = "Admin", Description = "Administration of system", CreatedAt = DateTime.Now, IsDeleted = false });
                 dbContext.SaveChanges();
             }
 
