@@ -2,6 +2,7 @@ using AssetManagement.Api.Controllers;
 using AssetManagement.Application.ApiResponses;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Models;
+using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -39,7 +40,7 @@ public class UserControllerPostTest
 		var response = new ApiResponse
 		{
 			StatusCode = StatusCodes.Status200OK,
-			Message = "User created successfully",
+			Message = UserApiResponseMessageContraint.UserCreateSuccess,
 			Data = _userMock.Object
 		};
 
@@ -62,7 +63,7 @@ public class UserControllerPostTest
 		var response = new ApiResponse
 		{
 			StatusCode = StatusCodes.Status500InternalServerError,
-			Message = "There something went wrong while creating user, please try again later",
+			Message = UserApiResponseMessageContraint.UserCreateFail,
 			Data = _userMock.Object
 		};
 

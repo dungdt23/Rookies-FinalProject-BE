@@ -2,6 +2,7 @@ using AssetManagement.Application.ApiResponses;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.Models;
 using AssetManagement.Application.Services.UserServices;
+using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AutoMapper;
@@ -54,7 +55,7 @@ public class UserServiceCreateAsyncTest
         result.Should().NotBeNull();
         result.Should().BeOfType<ApiResponse>();
         result.StatusCode.Should().Be(StatusCodes.Status200OK);
-        result.Message.Should().Be("User created successfully");
+        result.Message.Should().Be(UserApiResponseMessageContraint.UserCreateSuccess);
         result.Data.Should().BeEquivalentTo(_userMock.Object);
     }
 
@@ -79,7 +80,7 @@ public class UserServiceCreateAsyncTest
 		result.Should().NotBeNull();
 		result.Should().BeOfType<ApiResponse>();
 		result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-		result.Message.Should().Be("There something went wrong while creating user, please try again later");
+		result.Message.Should().Be(UserApiResponseMessageContraint.UserCreateFail);
 		result.Data.Should().BeEquivalentTo(_userMock.Object);
 	}
 }
