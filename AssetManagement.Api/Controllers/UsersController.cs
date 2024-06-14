@@ -29,7 +29,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] UserFilter filter, int index, int size = 10)
+    public async Task<IActionResult> Get([FromQuery] UserFilter filter, int index = 1, int size = 10)
     {
         var result = await _userService.GetAllAsync(filter, index, size);
         if (result.StatusCode == StatusCodes.Status500InternalServerError)
