@@ -50,15 +50,15 @@ public class UserServiceUpdateAsyncTest
 						   .Returns(new List<User> { _userMock.Object }.AsQueryable());
 		_mapperMock.Setup(m => m.Map(It.IsAny<CreateUpdateUserForm>(), It.IsAny<User>()))
 								.Callback<CreateUpdateUserForm, User>((src, dest) =>
-		{
-			dest.FirstName = src.FirstName;
-			dest.LastName = src.LastName;
-			dest.DateOfBirth = src.DateOfBirth;
-			dest.Gender = src.Gender;
-			dest.JoinedDate = src.JoinedDate;
-			dest.TypeId = src.TypeId;
-			dest.LocationId = src.LocationId;
-		});
+								{
+									dest.FirstName = src.FirstName;
+									dest.LastName = src.LastName;
+									dest.DateOfBirth = src.DateOfBirth;
+									dest.Gender = src.Gender;
+									dest.JoinedDate = src.JoinedDate;
+									dest.TypeId = src.TypeId;
+									dest.LocationId = src.LocationId;
+								});
 		_userRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<User>())).ReturnsAsync(1);
 
 		// Act
