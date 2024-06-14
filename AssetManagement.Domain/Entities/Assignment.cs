@@ -17,7 +17,7 @@ namespace AssetManagement.Domain.Entities
         public TypeAssignmentState State { get; set; }
         [Required]
         public  DateTime AssignedDate { get; set; }
-        [MaxLength(150)]
+        [MaxLength(500)]
         public string? Note { get; set; }
 
         public User Assigner { get; set; }

@@ -4,6 +4,7 @@ using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Models;
+using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AutoMapper;
 using FluentAssertions;
@@ -18,7 +19,7 @@ public class UserControllerPostTest
 {
 	private Mock<IUserService> _userServiceMock;
 	private UsersController _usersController;
-	private Mock<CreateUserForm> _createUserFormMock;
+	private Mock<CreateUpdateUserForm> _createUserFormMock;
 	private Mock<User> _userMock;
     private Mock<UserFilter> _userFilterMock;
     private Mock<IMapper> _mapperMock;
@@ -36,7 +37,7 @@ public class UserControllerPostTest
 	public void SetUp()
 	{
 		_userMock = new Mock<User>();
-		_createUserFormMock = new Mock<CreateUserForm>();
+		_createUserFormMock = new Mock<CreateUpdateUserForm>();
         _userFilterMock = new Mock<UserFilter>();
     }
 
@@ -47,11 +48,11 @@ public class UserControllerPostTest
 		var response = new ApiResponse
 		{
 			StatusCode = StatusCodes.Status200OK,
-			Message = "User created successfully",
+			Message = UserApiResponseMessageContraint.UserCreateSuccess,
 			Data = _userMock.Object
 		};
 
-		_userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUserForm>())).ReturnsAsync(response);
+		_userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
 
 		// Act
 		var result = await _usersController.Post(_createUserFormMock.Object);
@@ -70,11 +71,11 @@ public class UserControllerPostTest
 		var response = new ApiResponse
 		{
 			StatusCode = StatusCodes.Status500InternalServerError,
-			Message = "There something went wrong while creating user, please try again later",
+			Message = UserApiResponseMessageContraint.UserCreateFail,
 			Data = _userMock.Object
 		};
 
-		_userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUserForm>())).ReturnsAsync(response);
+		_userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
 
 		// Act
 		var result = await _usersController.Post(_createUserFormMock.Object);
@@ -141,5 +142,68 @@ public class UserControllerPostTest
         okResult.Should().NotBeNull();
         okResult.StatusCode.Should().Be(StatusCodes.Status200OK);
         okResult.Value.Should().BeEquivalentTo(response);
+    }
+    [Test]
+    public async Task DisableUser_ShouldReturnInternalServerError_WhenUserNotFoundOrInactive()
+    {
+        // Arrange
+        var response = new ApiResponse
+        {
+            Message = "User not found or no long active!",
+            StatusCode = StatusCodes.Status500InternalServerError
+        };
+
+        _userServiceMock.Setup(s => s.DisableUser(It.IsAny<Guid>())).ReturnsAsync(response);
+
+        // Act
+        var result = await _usersController.Delete(Guid.NewGuid());
+
+        // Assert
+        var errorResult = result as ObjectResult;
+        errorResult.Should().NotBeNull();
+        errorResult.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+        errorResult.Value.Should().BeEquivalentTo(response);
+    }
+
+    [Test]
+    public async Task DisableUser_ShouldReturnOk_WhenUserIsDisabledSuccessfully()
+    {
+        // Arrange
+        var response = new ApiResponse
+        {
+            Message = "Disable user successfully!",
+            StatusCode = StatusCodes.Status200OK
+        };
+
+        _userServiceMock.Setup(s => s.DisableUser(It.IsAny<Guid>())).ReturnsAsync(response);
+
+        // Act
+        var result = await _usersController.Delete(Guid.NewGuid());
+
+        // Assert
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult.StatusCode.Should().Be(StatusCodes.Status200OK);
+        okResult.Value.Should().BeEquivalentTo(response);
+    }
+
+    [Test]
+    public async Task DisableUser_ShouldReturnBadRequest_WhenUserHasValidAssignments()
+    {
+        // Arrange
+        var response = new ApiResponse
+        {
+            Message = "Can't disable user because user still has valid assignments",
+            StatusCode = StatusCodes.Status500InternalServerError
+        };
+
+        _userServiceMock.Setup(s => s.DisableUser(It.IsAny<Guid>())).ReturnsAsync(response);
+
+        // Act
+        var result = await _usersController.Delete(Guid.NewGuid());
+
+        // Assert
+        var okResult = result as ObjectResult;
+        okResult.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
     }
 }

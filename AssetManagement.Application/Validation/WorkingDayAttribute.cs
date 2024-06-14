@@ -11,8 +11,8 @@ public class WorkingDayAttribute : ValidationAttribute
         {
             return new ValidationResult("Incorrect date format");
         }
-        var dayOfWeek = (int)dateValue.DayOfWeek;
-        if (dayOfWeek == 0 || dayOfWeek == 6)
+        var dayOfWeek = dateValue.DayOfWeek;
+        if (dayOfWeek == DayOfWeek.Sunday || dayOfWeek == DayOfWeek.Saturday)
         {
             return new ValidationResult("Joined date is Saturday or Sunday. Please select a different date.");
         }

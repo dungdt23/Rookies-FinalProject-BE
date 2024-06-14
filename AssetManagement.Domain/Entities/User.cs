@@ -9,16 +9,18 @@ namespace AssetManagement.Domain.Entities
         [Key]
         public override Guid Id { get; set; } = Guid.NewGuid();
         [Required]
+        [MaxLength()]
         public  string StaffCode { get; set; }
         [Required]
-        [MaxLength(150)]
+        [MaxLength(200)]
         public string FirstName { get; set; }
         [Required]
-        [MaxLength(150)]
+        [MaxLength(200)]
         public string LastName { get; set; }
         [Required]
-        [MaxLength(150)]
+        [MaxLength(200)]
         public string UserName { get; set; }
+        [MaxLength(200)]
         public string? Email { get; set; }
         [Required]
         public byte[] PasswordHash { get; set; } = new byte[32];

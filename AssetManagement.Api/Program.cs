@@ -1,4 +1,5 @@
 
+using AssetManagement.Api.Extensions;
 using AssetManagement.Api.ValidateModel;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.IServices.IUserServices;
@@ -12,7 +13,7 @@ namespace AssetManagement.Api
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -75,6 +76,8 @@ namespace AssetManagement.Api
 
 
             app.MapControllers();
+
+            await app.SeedData();
 
             app.Run();
         }

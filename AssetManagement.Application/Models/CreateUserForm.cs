@@ -4,7 +4,7 @@ using AssetManagement.Domain.Enums;
 
 namespace AssetManagement.Application.Models;
 
-public class CreateUserForm
+public class CreateUpdateUserForm
 {
     [Required]
     [Naming]

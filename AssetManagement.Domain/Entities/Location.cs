@@ -8,7 +8,7 @@ namespace AssetManagement.Domain.Entities
         [Key]
         public override Guid Id { get; set; } = Guid.NewGuid();
         [Required]
-        [MaxLength(100)]
+        [MaxLength(200)]
         public required string LocationName { get; set; }
         public ICollection<User> Users { get; set; }
     }

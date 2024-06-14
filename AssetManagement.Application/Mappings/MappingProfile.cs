@@ -11,7 +11,7 @@ namespace AssetManagement.Application.Mappings
         public MappingProfile()
         {
             // Mapping User
-            CreateMap<CreateUserForm, User>();
+            CreateMap<CreateUpdateUserForm, User>();
             CreateMap<User, ResponseUserDto>()
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location.LocationName))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.TypeName));
