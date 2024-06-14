@@ -23,4 +23,9 @@
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AssetManagement.Application\AssetManagement.Application.csproj" />
+    <ProjectReference Include="..\AssetManagement.Api\AssetManagement.Api.csproj" />
+  </ItemGroup>
+
 </Project>

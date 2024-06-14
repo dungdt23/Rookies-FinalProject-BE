@@ -2,7 +2,6 @@ using AssetManagement.Application.Filters;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Infrastructure.Migrations;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace AssetManagement.Infrastructure.Repositories;
@@ -15,6 +14,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     public UserRepository(AssetManagementDBContext context) : base(context)
     {
         _context = context;
+        _dbSet = context.Set<User>();
     }
 
     public string GenerateStaffCode()
