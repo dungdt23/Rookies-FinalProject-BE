@@ -1,3 +1,4 @@
+using AssetManagement.Api;
 using AssetManagement.Api.Controllers;
 using AssetManagement.Application.ApiResponses;
 using AssetManagement.Application.Dtos.ResponseDtos;
@@ -10,6 +11,7 @@ using AutoMapper;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace AssetManagement.UnitTest.Controller;
@@ -17,75 +19,77 @@ namespace AssetManagement.UnitTest.Controller;
 [TestFixture]
 public class UserControllerPostTest
 {
-	private Mock<IUserService> _userServiceMock;
-	private UsersController _usersController;
-	private Mock<CreateUpdateUserForm> _createUserFormMock;
-	private Mock<User> _userMock;
+    private Mock<IUserService> _userServiceMock;
+    private Mock<IOptions<AppSetting>> _applicationSettingsMock;
+    private UsersController _usersController;
+    private Mock<CreateUpdateUserForm> _createUserFormMock;
+    private Mock<User> _userMock;
     private Mock<UserFilter> _userFilterMock;
     private Mock<IMapper> _mapperMock;
 
     [OneTimeSetUp]
-	public void OneTimeSetup()
-	{
-		_userServiceMock = new Mock<IUserService>();
-		_usersController = new UsersController(_userServiceMock.Object);
+    public void OneTimeSetup()
+    {
+        _userServiceMock = new Mock<IUserService>();
+        _applicationSettingsMock = new Mock<IOptions<AppSetting>>();
+        _usersController = new UsersController(_userServiceMock.Object, _applicationSettingsMock.Object);
         _mapperMock = new Mock<IMapper>();
 
     }
 
     [SetUp]
-	public void SetUp()
-	{
-		_userMock = new Mock<User>();
-		_createUserFormMock = new Mock<CreateUpdateUserForm>();
+    public void SetUp()
+    {
+        _userMock = new Mock<User>();
+        _createUserFormMock = new Mock<CreateUpdateUserForm>();
         _userFilterMock = new Mock<UserFilter>();
     }
 
     [Test]
-	public async Task Post_ShouldReturnOk_WhenUserIsCreated()
-	{
-		// Arrange
-		var response = new ApiResponse
-		{
-			StatusCode = StatusCodes.Status200OK,
-			Message = UserApiResponseMessageContraint.UserCreateSuccess,
-			Data = _userMock.Object
-		};
+    public async Task Post_ShouldReturnOk_WhenUserIsCreated()
+    {
+        // Arrange
+        var response = new ApiResponse
+        {
+            StatusCode = StatusCodes.Status200OK,
+            Message = UserApiResponseMessageContraint.UserCreateSuccess,
+            Data = _userMock.Object
+        };
 
-		_userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
+        _userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
 
-		// Act
-		var result = await _usersController.Post(_createUserFormMock.Object);
+        // Act
+        var result = await _usersController.Post(_createUserFormMock.Object);
 
-		// Assert
-		var okResult = result as OkObjectResult;
-		okResult.Should().NotBeNull();
-		okResult.StatusCode.Should().Be(StatusCodes.Status200OK);
-		okResult.Value.Should().BeEquivalentTo(response);
-	}
+        // Assert
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult.StatusCode.Should().Be(StatusCodes.Status200OK);
+        okResult.Value.Should().BeEquivalentTo(response);
+    }
 
-	[Test]
-	public async Task Post_ShouldReturnInternalServerError_WhenUserCreationFails()
-	{
-		// Arrange
-		var response = new ApiResponse
-		{
-			StatusCode = StatusCodes.Status500InternalServerError,
-			Message = UserApiResponseMessageContraint.UserCreateFail,
-			Data = _userMock.Object
-		};
+    [Test]
+    public async Task Post_ShouldReturnInternalServerError_WhenUserCreationFails()
+    {
+        // Arrange
+        var response = new ApiResponse
+        {
+            StatusCode = StatusCodes.Status500InternalServerError,
+            Message = UserApiResponseMessageContraint.UserCreateFail,
+            Data = _userMock.Object
+        };
 
-		_userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
+        _userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
 
-		// Act
-		var result = await _usersController.Post(_createUserFormMock.Object);
+        // Act
+        var result = await _usersController.Post(_createUserFormMock.Object);
 
-		// Assert
-		var internalServerErrorResult = result as ObjectResult;
-		internalServerErrorResult.Should().NotBeNull();
-		internalServerErrorResult.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-		internalServerErrorResult.Value.Should().BeEquivalentTo(response);
-	}
+        // Assert
+        var internalServerErrorResult = result as ObjectResult;
+        internalServerErrorResult.Should().NotBeNull();
+        internalServerErrorResult.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+        internalServerErrorResult.Value.Should().BeEquivalentTo(response);
+    }
     [Test]
     public async Task GetAll_ShouldReturnOk_WhenUsersAreRetrieved()
     {

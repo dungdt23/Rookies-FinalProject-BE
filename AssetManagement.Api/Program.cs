@@ -1,4 +1,3 @@
-
 using AssetManagement.Api.Extensions;
 using AssetManagement.Api.ValidateModel;
 using AssetManagement.Application.IRepositories;
@@ -8,6 +7,12 @@ using AssetManagement.Application.Services.UserServices;
 using AssetManagement.Infrastructure.Migrations;
 using AssetManagement.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 
 namespace AssetManagement.Api
 {
@@ -16,8 +21,9 @@ namespace AssetManagement.Api
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            builder.Services.AddDbContext<AssetManagementDBContext>(
+            ConfigurationManager configuration = builder.Configuration;
+			builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("ApplicationSettings"));
+			builder.Services.AddDbContext<AssetManagementDBContext>(
                 options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
             );
 
@@ -55,10 +61,36 @@ namespace AssetManagement.Api
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+                options.OperationFilter<SecurityRequirementsOperationFilter>();
+            });
 
             // Mapping profile between dtos and entities
             builder.Services.AddAutoMapper(typeof(MappingProfile));
+            builder.Services.AddAuthentication(x =>
+        {
+            x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }
+        ).AddJwtBearer(x =>
+        {
+            x.RequireHttpsMetadata = false;
+            x.SaveToken = true;
+            x.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["ApplicationSettings:Secret"])),
+                ValidateIssuer = false,
+                ValidateAudience = false
+            };
+        });
 
             var app = builder.Build();
 
