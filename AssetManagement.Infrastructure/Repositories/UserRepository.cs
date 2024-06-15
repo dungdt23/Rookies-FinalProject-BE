@@ -62,6 +62,18 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         (string.IsNullOrEmpty(searchString) || (!string.IsNullOrEmpty(searchString)
         && (x.UserName.Contains(searchString) || x.FirstName.Contains(searchString) || x.StaffCode.Contains(searchString)))));
 
+
+        if (filter.IsAscending)
+        {
+            // Sort based on the condition and then by StaffCode in ascending order
+            query = (IQueryable<User>)query.OrderBy(condition).ThenBy(x => x.StaffCode);
+        }
+        else
+        {
+            // Sort based on the condition and then by StaffCode in descending order
+            query = (IQueryable<User>)query.OrderByDescending(condition).ThenBy(x => x.StaffCode);
+        }
+
         //handle pagination
         if (index.HasValue && size.HasValue)
         {
@@ -69,18 +81,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         }
 
         var users = await query.Where(x => !x.IsDeleted).ToListAsync();
-
-
-        // check if ascending or descending
-        if (filter.IsAscending)
-        {
-            // except case staff code descending, the rest of cases will ascending default
-            return users.OrderBy(condition).ThenBy(x => x.StaffCode);  
-        }
-        else
-        {
-            return users.OrderByDescending(condition).ThenBy(x => x.StaffCode);
-        }
+        return users;
     }
     public async Task<int> GetTotalCountAsync(UserFilter filter)
     {

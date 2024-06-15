@@ -2,8 +2,14 @@
 using AssetManagement.Api.Extensions;
 using AssetManagement.Api.ValidateModel;
 using AssetManagement.Application.IRepositories;
+using AssetManagement.Application.IServices.ICategoryServices;
+using AssetManagement.Application.IServices.ILocationServices;
+using AssetManagement.Application.IServices.ITypeServices;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Mappings;
+using AssetManagement.Application.Services.CategoryServices;
+using AssetManagement.Application.Services.LocationServices;
+using AssetManagement.Application.Services.TypeServices;
 using AssetManagement.Application.Services.UserServices;
 using AssetManagement.Infrastructure.Migrations;
 using AssetManagement.Infrastructure.Repositories;
@@ -27,6 +33,9 @@ namespace AssetManagement.Api
 
 
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ILocationService, LocationService>();
+            builder.Services.AddScoped<ITypeService, TypeService>();
 
 
             builder.Services.AddCors(options =>
