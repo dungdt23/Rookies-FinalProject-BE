@@ -1,7 +1,4 @@
 ﻿using AssetManagement.Application.IServices.ICategoryServices;
-using AssetManagement.Application.IServices.IUserServices;
-using AssetManagement.Application.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AssetManagement.Api.Controllers
