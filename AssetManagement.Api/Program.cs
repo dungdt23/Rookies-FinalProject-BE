@@ -2,11 +2,13 @@
 using AssetManagement.Api.Extensions;
 using AssetManagement.Api.ValidateModel;
 using AssetManagement.Application.IRepositories;
+using AssetManagement.Application.IServices.IAssetServices;
 using AssetManagement.Application.IServices.ICategoryServices;
 using AssetManagement.Application.IServices.ILocationServices;
 using AssetManagement.Application.IServices.ITypeServices;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Mappings;
+using AssetManagement.Application.Services.AssetServices;
 using AssetManagement.Application.Services.CategoryServices;
 using AssetManagement.Application.Services.LocationServices;
 using AssetManagement.Application.Services.TypeServices;
@@ -30,12 +32,14 @@ namespace AssetManagement.Api
             // Add services to the container.
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IAssetRepository, AssetRepository>();
 
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<ILocationService, LocationService>();
             builder.Services.AddScoped<ITypeService, TypeService>();
+            builder.Services.AddScoped<IAssetService, AssetService>();
 
 
             builder.Services.AddCors(options =>

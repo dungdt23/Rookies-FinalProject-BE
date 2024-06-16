@@ -19,6 +19,11 @@ namespace AssetManagement.Application.Mappings
             CreateMap<Category, ResponseCategoryDto>();
             CreateMap<Domain.Entities.Type, ResponseTypeDto>();
             CreateMap<Location, ResponseLocationDto>();
+            //Mapping Asset
+            CreateMap<Asset, ResponseAssetDto>()
+                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location.LocationName))
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.CategoryName))
+                .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.State.ToString()));
 
         }
     }
