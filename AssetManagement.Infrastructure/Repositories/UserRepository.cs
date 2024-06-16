@@ -3,7 +3,7 @@ using AssetManagement.Application.IRepositories;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Infrastructure.Migrations;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.Linq;
 
 namespace AssetManagement.Infrastructure.Repositories;
 
@@ -46,7 +46,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     {
         IQueryable<User> query = _context.Users
             .Include(x => x.Type)
-            .Include(x => x.Location);
+            .Include(x => x.Location)
+            .Where(x => !x.IsDeleted);
 
 
         if (filter.UserType.HasValue)
@@ -62,25 +63,24 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         (string.IsNullOrEmpty(searchString) || (!string.IsNullOrEmpty(searchString)
         && (x.UserName.Contains(searchString) || x.FirstName.Contains(searchString) || x.StaffCode.Contains(searchString)))));
 
-
+        IEnumerable<User> users = await query.ToListAsync();
         if (filter.IsAscending)
         {
             // Sort based on the condition and then by StaffCode in ascending order
-            query = (IQueryable<User>)query.OrderBy(condition).ThenBy(x => x.StaffCode);
+            users = users.OrderBy(condition).ThenBy(x => x.StaffCode);
         }
         else
         {
             // Sort based on the condition and then by StaffCode in descending order
-            query = (IQueryable<User>)query.OrderByDescending(condition).ThenBy(x => x.StaffCode);
+            users = users.OrderByDescending(condition).ThenBy(x => x.StaffCode);
         }
 
         //handle pagination
         if (index.HasValue && size.HasValue)
         {
-            query = query.Skip((index.Value - 1) * size.Value).Take(size.Value);
+            users = users.Skip((index.Value - 1) * size.Value).Take(size.Value);
         }
 
-        var users = await query.Where(x => !x.IsDeleted).ToListAsync();
         return users;
     }
     public async Task<int> GetTotalCountAsync(UserFilter filter)

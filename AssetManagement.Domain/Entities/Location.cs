@@ -11,5 +11,7 @@ namespace AssetManagement.Domain.Entities
         [MaxLength(200)]
         public required string LocationName { get; set; }
         public ICollection<User> Users { get; set; }
+        public ICollection<Asset> Assets { get; set; }
+
     }
 }

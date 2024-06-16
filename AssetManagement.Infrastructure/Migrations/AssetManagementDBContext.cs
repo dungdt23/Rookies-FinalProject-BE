@@ -33,8 +33,8 @@ namespace AssetManagement.Infrastructure.Migrations
                 entity.HasOne(e => e.Requestor)
                 .WithMany(d => d.RequestedReturnRequests)
                 .HasForeignKey(x => x.RequestorId)
-                .OnDelete(DeleteBehavior.Restrict); 
-                
+                .OnDelete(DeleteBehavior.Restrict);
+
 
                 entity.HasOne(e => e.Responder)
                 .WithMany(d => d.RespondedReturnRequests)
@@ -53,6 +53,10 @@ namespace AssetManagement.Infrastructure.Migrations
                 .WithMany(d => d.Assets)
                 .HasForeignKey(x => x.CategoryId);
 
+                entity.HasOne(e => e.Location)
+                .WithMany(d => d.Assets)
+                .HasForeignKey(x => x.LocationId);
+
             });
 
             modelBuilder.Entity<Assignment>(entity =>
@@ -61,7 +65,7 @@ namespace AssetManagement.Infrastructure.Migrations
                 .WithMany(d => d.AssignedAssignments)
                 .HasForeignKey(x => x.AssignerId)
                 .OnDelete(DeleteBehavior.Restrict);
-                
+
 
                 entity.HasOne(e => e.Assignee)
                 .WithMany(d => d.ReceivedAssignments)
@@ -75,13 +79,13 @@ namespace AssetManagement.Infrastructure.Migrations
 
             });
         }
-        public DbSet<Asset> Assets { get; set;}
-        public DbSet<Assignment> Assignments { get; set;}
-        public DbSet<Category> Categories { get; set;}
+        public DbSet<Asset> Assets { get; set; }
+        public DbSet<Assignment> Assignments { get; set; }
+        public DbSet<Category> Categories { get; set; }
         public DbSet<Location> Locations { get; set; }
-        public DbSet<ReturnRequest> ReturnRequests { get; set;}
-        public DbSet<Domain.Entities.Type> Types { get; set;}
-        public DbSet<User> Users { get; set;}
+        public DbSet<ReturnRequest> ReturnRequests { get; set; }
+        public DbSet<Domain.Entities.Type> Types { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

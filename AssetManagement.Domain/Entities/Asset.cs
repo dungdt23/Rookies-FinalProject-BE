@@ -17,6 +17,9 @@ namespace AssetManagement.Domain.Entities
         [Required]
         public Guid CategoryId { get; set; }
         [Required]
+
+        public Guid LocationId { get; set; }
+        [Required]
         [MaxLength(500)]
         public string Specification { get; set; }
         [Required]
@@ -25,6 +28,8 @@ namespace AssetManagement.Domain.Entities
         public TypeAssetState State { get; set; }
 
         public Category Category { get; set; }
+        public Location Location { get; set; }
+
         public ICollection<Assignment> Assignments { get; set; }
         public ICollection<ReturnRequest> ReturnRequests { get; set; }
     }
