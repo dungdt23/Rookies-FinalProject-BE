@@ -53,7 +53,7 @@ namespace AssetManagement.Application.Services.AssetServices
             var asset = _mapper.Map<Asset>(requestAssetDto);
             var category = await _categoryRepository.GetByCondition(x => x.Id == requestAssetDto.CategoryId)
                 .FirstOrDefaultAsync();
-            var assetCode = await _assetRepository.CreateAssetCode(category.Prefix);
+            var assetCode =  _assetRepository.CreateAssetCode(category.Prefix,category.Id);
             asset.AssetCode = assetCode;
             var status = await _assetRepository.AddAsync(asset);
             if (status == StatusConstant.Success)

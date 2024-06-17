@@ -9,7 +9,6 @@ namespace AssetManagement.Application.Dtos.RequestDtos
         [Required]
         [Naming]
         public string AssetName { get; set; }
-        public string AssetCode { get; set; }
         [Required]
         public Guid CategoryId { get; set; }
         [Required]
