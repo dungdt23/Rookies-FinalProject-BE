@@ -53,6 +53,9 @@ namespace AssetManagement.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Specification")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -67,6 +70,8 @@ namespace AssetManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("LocationId");
 
                     b.ToTable("Assets");
                 });
@@ -344,7 +349,15 @@ namespace AssetManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AssetManagement.Domain.Entities.Location", "Location")
+                        .WithMany("Assets")
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Category");
+
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("AssetManagement.Domain.Entities.Assignment", b =>
@@ -434,6 +447,8 @@ namespace AssetManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("AssetManagement.Domain.Entities.Location", b =>
                 {
+                    b.Navigation("Assets");
+
                     b.Navigation("Users");
                 });
 

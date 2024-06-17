@@ -1,7 +1,9 @@
+using System.Text;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace AssetManagement.Api.Controllers;
 
@@ -10,10 +12,11 @@ namespace AssetManagement.Api.Controllers;
 public class UsersController : ControllerBase
 {
 	private readonly IUserService _userService;
-
-	public UsersController(IUserService userService)
+	private readonly AppSetting _applicationSettings;
+	public UsersController(IUserService userService, IOptions<AppSetting> applicationSettings)
 	{
 		_userService = userService;
+		_applicationSettings = applicationSettings.Value;
 	}
 
 	[HttpPost]
@@ -58,6 +61,32 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Delete(Guid id)
     {
         var result = await _userService.DisableUser(id);
+        if (result.StatusCode == StatusCodes.Status500InternalServerError)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, result);
+        }
+        return Ok(result);
+    }
+
+	[HttpPost("Login")]
+	public async Task<IActionResult> Login([FromBody] LoginForm login)
+	{
+		var key = Encoding.ASCII.GetBytes(_applicationSettings.Secret);
+		var result = await _userService.LoginAsync(login, key);
+		if (result.StatusCode == StatusCodes.Status400BadRequest)
+		{
+			return BadRequest(result);
+		}
+		if (result.StatusCode == StatusCodes.Status500InternalServerError)
+		{
+			return StatusCode(StatusCodes.Status500InternalServerError, result);
+		}
+		return Ok(result);
+	}
+	[HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var result = await _userService.GetById(id);
         if (result.StatusCode == StatusCodes.Status500InternalServerError)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, result);
