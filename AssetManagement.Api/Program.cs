@@ -20,6 +20,8 @@ using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using AssetManagement.Application.IServices.IAssignmentServices;
+using AssetManagement.Application.Services.AssignmentServices;
 
 
 namespace AssetManagement.Api
@@ -46,6 +48,7 @@ namespace AssetManagement.Api
 			builder.Services.AddScoped<ILocationService, LocationService>();
 			builder.Services.AddScoped<ITypeService, TypeService>();
 			builder.Services.AddScoped<IAssetService, AssetService>();
+			builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 
 
 			builder.Services.AddCors(options =>
