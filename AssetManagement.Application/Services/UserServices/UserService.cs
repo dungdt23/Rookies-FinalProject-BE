@@ -178,9 +178,10 @@ public class UserService : IUserService
         }
         else
         {
+            var userDto = _mapper.Map<ResponseUserDto>(user);
             return new ApiResponse
             {
-                Data = user,
+                Data = userDto,
                 Message = "Get user successfully"
             };
         }
