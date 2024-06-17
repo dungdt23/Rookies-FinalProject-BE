@@ -1,4 +1,5 @@
-﻿using AssetManagement.Application.Dtos.ResponseDtos;
+﻿using AssetManagement.Application.Dtos.RequestDtos;
+using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.Models;
 using AssetManagement.Domain.Entities;
 using AutoMapper;
@@ -17,7 +18,10 @@ namespace AssetManagement.Application.Mappings
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.TypeName));
             //Mapping Category
             CreateMap<Category, ResponseCategoryDto>();
+            CreateMap<RequestCategoryDto, Category>();
+            //Mapping Type
             CreateMap<Domain.Entities.Type, ResponseTypeDto>();
+            //Mapping Location
             CreateMap<Location, ResponseLocationDto>();
             //Mapping Asset
             CreateMap<Asset, ResponseAssetDto>()

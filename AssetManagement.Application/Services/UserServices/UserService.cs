@@ -162,4 +162,27 @@ public class UserService : IUserService
                 Message = "Can't disable user because user still has valid assignments"
             };
     }
+    public async Task<ApiResponse> GetById(Guid id)
+    {
+        var user = await _userRepository.GetByCondition(x => x.Id == id)
+            .Include(x => x.Type)
+            .Include(x => x.Location)
+            .FirstOrDefaultAsync();
+        if( user == null)
+        {
+            return new ApiResponse
+            {
+                Message = "User doesn't exist",
+                StatusCode = StatusCodes.Status500InternalServerError
+            };
+        }
+        else
+        {
+            return new ApiResponse
+            {
+                Data = user,
+                Message = "Get user successfully"
+            };
+        }
+    }
 }

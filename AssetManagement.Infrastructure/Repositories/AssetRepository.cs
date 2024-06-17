@@ -14,7 +14,7 @@ namespace AssetManagement.Infrastructure.Repositories
         {
             _context = context;
         }
-        private IQueryable<Asset> ApplyFilter( AssetFilter filter)
+        private IQueryable<Asset> ApplyFilter(AssetFilter filter)
         {
             IQueryable<Asset> query = _context.Assets
                 .Include(x => x.Location)
@@ -51,6 +51,23 @@ namespace AssetManagement.Infrastructure.Repositories
         public async Task<int> GetTotalCountAsync(AssetFilter filter)
         {
             return await ApplyFilter(filter).CountAsync();
+        }
+        public async Task<string> CreateAssetCode(string prefix)
+        {
+            var lastestAssetCode = await _context.Assets
+                .Where(x => x.AssetCode.Substring(0, 2).Equals(prefix))
+                .OrderByDescending(x => int.Parse(x.AssetCode.Substring(2)))
+                .FirstOrDefaultAsync();
+            if (lastestAssetCode == null)
+            {
+                return prefix + "000001";
+            }
+            else
+            {
+                int newNumericPart = int.Parse(lastestAssetCode.AssetCode.Substring(2)) + 1;
+                string newAssetCode = $"{prefix}{newNumericPart:D6}";
+                return newAssetCode;
+            }
         }
     }
 }

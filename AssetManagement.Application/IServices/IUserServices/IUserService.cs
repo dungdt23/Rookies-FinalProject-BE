@@ -14,4 +14,5 @@ public interface IUserService
     bool CheckPassword(User user, string password);
     Task<PagedResponse<ResponseUserDto>> GetAllAsync(UserFilter filter, int? index, int? size);
     Task<ApiResponse> DisableUser(Guid id);
+    Task<ApiResponse> GetById(Guid id);
 }
