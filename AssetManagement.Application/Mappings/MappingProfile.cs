@@ -29,7 +29,8 @@ namespace AssetManagement.Application.Mappings
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location.LocationName))
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.CategoryName))
                 .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.State.ToString()));
-
+            //Mapping Assignment
+            CreateMap<RequestAssignmentDto, Assignment>();
         }
     }
 }
