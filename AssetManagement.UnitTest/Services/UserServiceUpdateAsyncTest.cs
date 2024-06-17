@@ -6,6 +6,7 @@ using AssetManagement.Domain.Entities;
 using AutoMapper;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using MockQueryable.Moq;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -14,6 +15,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Type = AssetManagement.Domain.Entities.Type;
 
 namespace AssetManagement.UnitTest.Services;
 
@@ -49,6 +51,11 @@ public class UserServiceUpdateAsyncTest
 	{
 		// Arrange
 		var id = Guid.NewGuid();
+		var typeMock = new Mock<Type>();
+		var typeListMock = new List<Type> { typeMock.Object };
+		var mockQueryable = typeListMock.AsQueryable().BuildMock();
+
+		_typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
 
 		_userRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
 						   .Returns(new List<User> { _userMock.Object }.AsQueryable());
@@ -59,6 +66,7 @@ public class UserServiceUpdateAsyncTest
 									dest.LastName = src.LastName;
 									dest.DateOfBirth = src.DateOfBirth;
 									dest.Gender = src.Gender;
+									dest.TypeId = typeMock.Object.Id;
 									dest.JoinedDate = src.JoinedDate;
 									dest.LocationId = src.LocationId;
 								});
@@ -75,10 +83,34 @@ public class UserServiceUpdateAsyncTest
 	}
 
 	[Test]
+	public async Task UpdateAsync_ShouldReturnErrorResponse_WhenTypeIsNotFound()
+	{
+		// Arrange
+		var id = Guid.NewGuid();
+		var typeListMock = new List<Type>();
+		var mockQueryable = typeListMock.AsQueryable().BuildMock();
+
+		_typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
+
+		// Act
+		var result = await _userService.UpdateAsync(id, _updateFormMock.Object);
+
+		// Assert
+		result.Should().NotBeNull();
+		result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+		result.Message.Should().Be(UserApiResponseMessageContraint.UserUpdateFail);
+	}
+
+	[Test]
 	public async Task UpdateAsync_ShouldReturnNotFoundResponse_WhenUserIsNotFound()
 	{
 		// Arrange
 		var id = Guid.NewGuid();
+		var typeMock = new Mock<Type>();
+		var typeListMock = new List<Type> { typeMock.Object };
+		var mockQueryable = typeListMock.AsQueryable().BuildMock();
+
+		_typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
 
 		_userRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
 						   .Returns(Enumerable.Empty<User>().AsQueryable());
@@ -97,6 +129,11 @@ public class UserServiceUpdateAsyncTest
 	{
 		// Arrange
 		var id = Guid.NewGuid();
+		var typeMock = new Mock<Type>();
+		var typeListMock = new List<Type> { typeMock.Object };
+		var mockQueryable = typeListMock.AsQueryable().BuildMock();
+
+		_typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
 
 		_userRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
 						   .Returns(new List<User> { _userMock.Object }.AsQueryable());
@@ -107,6 +144,7 @@ public class UserServiceUpdateAsyncTest
 									dest.LastName = src.LastName;
 									dest.DateOfBirth = src.DateOfBirth;
 									dest.Gender = src.Gender;
+									dest.TypeId = typeMock.Object.Id;
 									dest.JoinedDate = src.JoinedDate;
 									dest.LocationId = src.LocationId;
 								});
