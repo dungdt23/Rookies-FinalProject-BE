@@ -3,7 +3,6 @@ using AssetManagement.Application.IRepositories;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Infrastructure.Migrations;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace AssetManagement.Infrastructure.Repositories;
 

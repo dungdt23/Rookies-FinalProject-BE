@@ -79,4 +79,14 @@ public class UsersController : ControllerBase
 		}
 		return Ok(result);
 	}
+	[HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var result = await _userService.GetById(id);
+        if (result.StatusCode == StatusCodes.Status500InternalServerError)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, result);
+        }
+        return Ok(result);
+    }
 }
