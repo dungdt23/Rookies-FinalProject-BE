@@ -14,11 +14,11 @@ using AssetManagement.Application.Services.TypeServices;
 using AssetManagement.Application.Services.UserServices;
 using AssetManagement.Infrastructure.Migrations;
 using AssetManagement.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using AssetManagement.Application.IServices.IAssignmentServices;
 using AssetManagement.Application.Services.AssignmentServices;
@@ -26,6 +26,16 @@ using AssetManagement.Application.Services.AssignmentServices;
 
 namespace AssetManagement.Api
 {
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
+            ConfigurationManager configuration = builder.Configuration;
+            builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("ApplicationSettings"));
+            builder.Services.AddDbContext<AssetManagementDBContext>(
+                options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+            );
 	public class Program
 	{
 		public static async Task Main(string[] args)
@@ -110,6 +120,12 @@ namespace AssetManagement.Api
 
 			var app = builder.Build();
 
+            // Configure the HTTP request pipeline.
+            // if (app.Environment.IsDevelopment())
+            // {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            // }
 			// Configure the HTTP request pipeline.
 			// if (app.Environment.IsDevelopment())
 			// {
