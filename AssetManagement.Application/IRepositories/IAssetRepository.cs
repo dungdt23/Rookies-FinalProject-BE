@@ -7,6 +7,6 @@ namespace AssetManagement.Application.IRepositories
     {
         Task<IEnumerable<Asset>> GetAllAsync(Func<Asset, object> sortCondition, AssetFilter filter, int? index, int? size);
         Task<int> GetTotalCountAsync(AssetFilter filter);
-        Task<string> CreateAssetCode(string prefix);
+        string CreateAssetCode(string prefix, Guid categoryId);
     }
 }

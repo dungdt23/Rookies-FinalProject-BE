@@ -4,6 +4,7 @@ using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Migrations;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace AssetManagement.Infrastructure.Repositories
 {
@@ -26,11 +27,11 @@ namespace AssetManagement.Infrastructure.Repositories
              && x.LocationId == filter.locationId
              && !x.IsDeleted);
             return query;
-        }  
-        public async Task<IEnumerable<Asset>> GetAllAsync(Func<Asset,object> sortCondition, AssetFilter filter, int? index, int? size)
+        }
+        public async Task<IEnumerable<Asset>> GetAllAsync(Func<Asset, object> sortCondition, AssetFilter filter, int? index, int? size)
         {
             IQueryable<Asset> query = ApplyFilter(filter);
-            IEnumerable<Asset> assets = await query.ToListAsync();
+            IEnumerable<Asset> assets = await query.AsNoTracking().ToListAsync();
             if (filter.order == TypeOrder.Ascending)
             {
                 assets.OrderBy(sortCondition);
@@ -52,22 +53,30 @@ namespace AssetManagement.Infrastructure.Repositories
         {
             return await ApplyFilter(filter).CountAsync();
         }
-        public async Task<string> CreateAssetCode(string prefix)
+        public string CreateAssetCode(string prefix,Guid categoryId)
         {
-            var lastestAssetCode = await _context.Assets
-                .Where(x => x.AssetCode.Substring(0, 2).Equals(prefix))
-                .OrderByDescending(x => int.Parse(x.AssetCode.Substring(2)))
-                .FirstOrDefaultAsync();
-            if (lastestAssetCode == null)
-            {
-                return prefix + "000001";
-            }
-            else
-            {
-                int newNumericPart = int.Parse(lastestAssetCode.AssetCode.Substring(2)) + 1;
-                string newAssetCode = $"{prefix}{newNumericPart:D6}";
-                return newAssetCode;
-            }
+            var prefixLength = prefix.Length;
+            //var lastestAssetCode = await _context.Assets
+            //    .Where(x => x.CategoryId == categoryId)
+            //    .OrderByDescending(x => int.Parse(x.AssetCode.Substring(prefixLength)))
+            //    .FirstOrDefaultAsync();
+            var assetCodes = _context.Assets
+                .Where(x => x.CategoryId == categoryId)
+                .Select(x => int.Parse(x.AssetCode.Substring(prefixLength)))
+                .AsEnumerable();
+            var maxAssetCode = _context.Assets.Where(x => x.CategoryId == categoryId).Any() ? assetCodes.Max() : 0;
+            //if (lastestAssetCode == null) 
+            //{
+            //    return prefix + "000001";
+            //}
+            //else
+            //{
+            //    int newNumericPart = int.Parse(lastestAssetCode.AssetCode.Substring(2)) + 1;
+            //    string newAssetCode = $"{prefix}{newNumericPart:D6}";
+            //    return newAssetCode;
+            //}
+            int newNumericPart = maxAssetCode + 1;
+            return $"{prefix}{newNumericPart:D6}";
         }
     }
 }
