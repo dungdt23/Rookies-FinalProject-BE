@@ -1,3 +1,4 @@
+using AssetManagement.Api;
 using AssetManagement.Api.Controllers;
 using AssetManagement.Application.ApiResponses;
 using AssetManagement.Application.IServices.IUserServices;
@@ -7,6 +8,7 @@ using AssetManagement.Domain.Entities;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace AssetManagement.UnitTest.Controllers;
@@ -14,7 +16,8 @@ namespace AssetManagement.UnitTest.Controllers;
 public class UserControllerPutTest
 {
     private Mock<IUserService> _userServiceMock;
-    private UsersController _usersController;
+	private Mock<IOptions<AppSetting>> _applicationSettingsMock;
+	private UsersController _usersController;
     private Mock<CreateUpdateUserForm> _updateUserFormMock;
     private Mock<User> _userMock;
 
@@ -22,8 +25,9 @@ public class UserControllerPutTest
     public void OneTimeSetup()
     {
         _userServiceMock = new Mock<IUserService>();
-        _usersController = new UsersController(_userServiceMock.Object);
-    }
+		_applicationSettingsMock = new Mock<IOptions<AppSetting>>();
+		_usersController = new UsersController(_userServiceMock.Object, _applicationSettingsMock.Object);
+	}
 
     [SetUp]
     public void SetUp()
