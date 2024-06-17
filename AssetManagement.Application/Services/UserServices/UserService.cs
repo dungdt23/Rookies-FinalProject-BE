@@ -124,20 +124,33 @@ public class UserService : IUserService
         return user;
     }
 
-    public async Task<ApiResponse> UpdateAsync(Guid id, CreateUpdateUserForm form)
-    {
-        var user = _userRepository.GetByCondition(u => u.Id == id).FirstOrDefault();
-        if (user == null)
-        {
-            return new ApiResponse
-            {
-                StatusCode = StatusCodes.Status404NotFound,
-                Data = id,
-                Message = UserApiResponseMessageContraint.UserNotFound
-            };
-        }
+	public async Task<ApiResponse> UpdateAsync(Guid id, CreateUpdateUserForm form)
+	{
+		var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
 
-        _mapper.Map(form, user);
+		if (type == null)
+		{
+			return new ApiResponse
+			{
+				StatusCode = StatusCodes.Status500InternalServerError,
+				Message = UserApiResponseMessageContraint.UserUpdateFail,
+				Data = form.Type
+			};
+		}
+
+		var user = _userRepository.GetByCondition(u => u.Id == id).FirstOrDefault();
+		if (user == null)
+		{
+			return new ApiResponse
+			{
+				StatusCode = StatusCodes.Status404NotFound,
+				Data = id,
+				Message = UserApiResponseMessageContraint.UserNotFound
+			};
+		}
+
+		_mapper.Map(form, user);
+		user.TypeId = type.Id;
 
         if (await _userRepository.UpdateAsync(user) > 0)
         {

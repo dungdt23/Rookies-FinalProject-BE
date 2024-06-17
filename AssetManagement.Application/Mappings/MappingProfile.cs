@@ -31,6 +31,8 @@ namespace AssetManagement.Application.Mappings
                 .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.State.ToString()));
             CreateMap<RequestAssetDto, Asset>();
 
+            //Mapping Assignment
+            CreateMap<RequestAssignmentDto, Assignment>();
         }
     }
 }
