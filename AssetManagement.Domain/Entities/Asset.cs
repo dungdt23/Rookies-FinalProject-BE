@@ -25,7 +25,7 @@ namespace AssetManagement.Domain.Entities
         [Required]
         public DateTime InstalledDate {  get; set; }
         [Required]
-        public TypeAssetState State { get; set; }
+        public TypeAssetState State { get; set; } = TypeAssetState.Available;
 
         public Category Category { get; set; }
         public Location Location { get; set; }

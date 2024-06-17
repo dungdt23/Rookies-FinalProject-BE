@@ -6,6 +6,7 @@ using AssetManagement.Domain.Entities;
 using AutoMapper;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using MockQueryable.Moq;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -14,6 +15,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Type = AssetManagement.Domain.Entities.Type;
 
 namespace AssetManagement.UnitTest.Services;
 
@@ -22,6 +24,7 @@ public class UserServiceUpdateAsyncTest
 {
 	private Mock<IUserRepository> _userRepositoryMock;
 	private Mock<IGenericRepository<Assignment>> _assignmentRepositoryMock;
+	private Mock<IGenericRepository<Domain.Entities.Type>> _typeRepositoryMock;
 	private Mock<IMapper> _mapperMock;
 	private UserService _userService;
 	private Mock<User> _userMock;
@@ -30,9 +33,10 @@ public class UserServiceUpdateAsyncTest
 	public void OneTimeSetup()
 	{
 		_userRepositoryMock = new Mock<IUserRepository>();
-		_assignmentRepositoryMock = new Mock<IGenericRepository<Assignment>>();	
+		_assignmentRepositoryMock = new Mock<IGenericRepository<Assignment>>();
+		_typeRepositoryMock = new Mock<IGenericRepository<Domain.Entities.Type>>();
 		_mapperMock = new Mock<IMapper>();
-		_userService = new UserService(_userRepositoryMock.Object,_assignmentRepositoryMock.Object, _mapperMock.Object);
+		_userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object, _typeRepositoryMock.Object, _mapperMock.Object);
 	}
 
 	[SetUp]
@@ -47,6 +51,11 @@ public class UserServiceUpdateAsyncTest
 	{
 		// Arrange
 		var id = Guid.NewGuid();
+		var typeMock = new Mock<Type>();
+		var typeListMock = new List<Type> { typeMock.Object };
+		var mockQueryable = typeListMock.AsQueryable().BuildMock();
+
+		_typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
 
 		_userRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
 						   .Returns(new List<User> { _userMock.Object }.AsQueryable());
@@ -57,8 +66,8 @@ public class UserServiceUpdateAsyncTest
 									dest.LastName = src.LastName;
 									dest.DateOfBirth = src.DateOfBirth;
 									dest.Gender = src.Gender;
+									dest.TypeId = typeMock.Object.Id;
 									dest.JoinedDate = src.JoinedDate;
-									dest.TypeId = src.TypeId;
 									dest.LocationId = src.LocationId;
 								});
 		_userRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<User>())).ReturnsAsync(1);
@@ -74,10 +83,34 @@ public class UserServiceUpdateAsyncTest
 	}
 
 	[Test]
+	public async Task UpdateAsync_ShouldReturnErrorResponse_WhenTypeIsNotFound()
+	{
+		// Arrange
+		var id = Guid.NewGuid();
+		var typeListMock = new List<Type>();
+		var mockQueryable = typeListMock.AsQueryable().BuildMock();
+
+		_typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
+
+		// Act
+		var result = await _userService.UpdateAsync(id, _updateFormMock.Object);
+
+		// Assert
+		result.Should().NotBeNull();
+		result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+		result.Message.Should().Be(UserApiResponseMessageContraint.UserUpdateFail);
+	}
+
+	[Test]
 	public async Task UpdateAsync_ShouldReturnNotFoundResponse_WhenUserIsNotFound()
 	{
 		// Arrange
 		var id = Guid.NewGuid();
+		var typeMock = new Mock<Type>();
+		var typeListMock = new List<Type> { typeMock.Object };
+		var mockQueryable = typeListMock.AsQueryable().BuildMock();
+
+		_typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
 
 		_userRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
 						   .Returns(Enumerable.Empty<User>().AsQueryable());
@@ -96,6 +129,11 @@ public class UserServiceUpdateAsyncTest
 	{
 		// Arrange
 		var id = Guid.NewGuid();
+		var typeMock = new Mock<Type>();
+		var typeListMock = new List<Type> { typeMock.Object };
+		var mockQueryable = typeListMock.AsQueryable().BuildMock();
+
+		_typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
 
 		_userRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
 						   .Returns(new List<User> { _userMock.Object }.AsQueryable());
@@ -106,8 +144,8 @@ public class UserServiceUpdateAsyncTest
 									dest.LastName = src.LastName;
 									dest.DateOfBirth = src.DateOfBirth;
 									dest.Gender = src.Gender;
+									dest.TypeId = typeMock.Object.Id;
 									dest.JoinedDate = src.JoinedDate;
-									dest.TypeId = src.TypeId;
 									dest.LocationId = src.LocationId;
 								});
 		_userRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<User>())).ReturnsAsync(0);

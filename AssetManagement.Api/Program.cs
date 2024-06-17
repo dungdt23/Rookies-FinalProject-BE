@@ -20,10 +20,13 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
+using AssetManagement.Application.IServices.IAssignmentServices;
+using AssetManagement.Application.Services.AssignmentServices;
 
 
 namespace AssetManagement.Api
 {
+
     public class Program
     {
         public static async Task Main(string[] args)
@@ -46,6 +49,7 @@ namespace AssetManagement.Api
             builder.Services.AddScoped<ILocationService, LocationService>();
             builder.Services.AddScoped<ITypeService, TypeService>();
             builder.Services.AddScoped<IAssetService, AssetService>();
+            builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 
 
             builder.Services.AddCors(options =>
@@ -88,25 +92,31 @@ namespace AssetManagement.Api
             // Mapping profile between dtos and entities
             builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddAuthentication(x =>
-        {
-            x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        }
-        ).AddJwtBearer(x =>
-        {
-            x.RequireHttpsMetadata = false;
-            x.SaveToken = true;
-            x.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["ApplicationSettings:Secret"])),
-                ValidateIssuer = false,
-                ValidateAudience = false
-            };
-        });
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }
+            ).AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["ApplicationSettings:Secret"])),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
 
             var app = builder.Build();
 
+            // Configure the HTTP request pipeline.
+            // if (app.Environment.IsDevelopment())
+            // {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            // }
             // Configure the HTTP request pipeline.
             // if (app.Environment.IsDevelopment())
             // {

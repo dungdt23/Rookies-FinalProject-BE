@@ -77,10 +77,6 @@ public class UsersController : ControllerBase
 		{
 			return BadRequest(result);
 		}
-		if (result.StatusCode == StatusCodes.Status500InternalServerError)
-		{
-			return StatusCode(StatusCodes.Status500InternalServerError, result);
-		}
 		return Ok(result);
 	}
 	[HttpGet("{id}")]

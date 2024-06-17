@@ -21,12 +21,17 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IGenericRepository<Assignment> _assignmentRepository;
+    private readonly IGenericRepository<Domain.Entities.Type> _typeRepository;
     private readonly IMapper _mapper;
-    public UserService(IUserRepository userRepository, IGenericRepository<Assignment> assignmentRepository, IMapper mapper)
+    public UserService(IUserRepository userRepository,
+        IGenericRepository<Assignment> assignmentRepository,
+        IGenericRepository<Domain.Entities.Type> typeRepository,
+        IMapper mapper)
     {
         _userRepository = userRepository;
         _mapper = mapper;
         _assignmentRepository = assignmentRepository;
+        _typeRepository = typeRepository;
         _mapper = mapper;
     }
 
@@ -44,10 +49,23 @@ public class UserService : IUserService
 
     public async Task<ApiResponse> CreateAsync(CreateUpdateUserForm form)
     {
+        var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
+
+        if (type == null)
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = UserApiResponseMessageContraint.UserCreateFail,
+                Data = form.Type
+            };
+        }
+
         var user = _mapper.Map<User>(form);
 
         user.StaffCode = _userRepository.GenerateStaffCode();
         user.UserName = _userRepository.GenerateUserName($"{user.FirstName.Trim()} {user.LastName.Trim()}");
+        user.TypeId = type.Id;
         user = EncryptPassword(user, $"{user.UserName}@{user.DateOfBirth:ddMMyyyy}");
 
         if (await _userRepository.AddAsync(user) > 0)
@@ -81,6 +99,9 @@ public class UserService : IUserService
             case FieldType.JoinedDate:
                 condition = x => x.JoinedDate;
                 break;
+            case FieldType.Type:
+                condition = x => x.Type.TypeName;
+                break;
         }
         var users = await _userRepository.GetAllAsync(condition, filter, index, size);
         var userDtos = _mapper.Map<IEnumerable<ResponseUserDto>>(users);
@@ -103,20 +124,33 @@ public class UserService : IUserService
         return user;
     }
 
-    public async Task<ApiResponse> UpdateAsync(Guid id, CreateUpdateUserForm form)
-    {
-        var user = _userRepository.GetByCondition(u => u.Id == id).FirstOrDefault();
-        if (user == null)
-        {
-            return new ApiResponse
-            {
-                StatusCode = StatusCodes.Status404NotFound,
-                Data = id,
-                Message = UserApiResponseMessageContraint.UserNotFound
-            };
-        }
+	public async Task<ApiResponse> UpdateAsync(Guid id, CreateUpdateUserForm form)
+	{
+		var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
 
-        _mapper.Map(form, user);
+		if (type == null)
+		{
+			return new ApiResponse
+			{
+				StatusCode = StatusCodes.Status500InternalServerError,
+				Message = UserApiResponseMessageContraint.UserUpdateFail,
+				Data = form.Type
+			};
+		}
+
+		var user = _userRepository.GetByCondition(u => u.Id == id).FirstOrDefault();
+		if (user == null)
+		{
+			return new ApiResponse
+			{
+				StatusCode = StatusCodes.Status404NotFound,
+				Data = id,
+				Message = UserApiResponseMessageContraint.UserNotFound
+			};
+		}
+
+		_mapper.Map(form, user);
+		user.TypeId = type.Id;
 
         if (await _userRepository.UpdateAsync(user) > 0)
         {
@@ -167,10 +201,7 @@ public class UserService : IUserService
 
     public async Task<ApiResponse> LoginAsync(LoginForm login, byte[] key)
     {
-        var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName)
-                                        .Include(u => u.Type)
-                                        .Include(u => u.Location)
-                                        .FirstOrDefaultAsync();
+        var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName).FirstOrDefaultAsync();
         if (user == null)
         {
             return new ApiResponse
@@ -190,17 +221,15 @@ public class UserService : IUserService
                 Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
             };
         }
+
+        var isFirstTimeLogin = string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
+
         var tokenHandler = new JwtSecurityTokenHandler();
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim("id", user.Id.ToString()),
-                new Claim("username", user.UserName),
-                new Claim("typeId", user.TypeId.ToString()),
-                new Claim("type", user.Type.TypeName),
-                new Claim("locationId", user.LocationId.ToString()),
-                new Claim("location", user.Location.LocationName)
+                new Claim("id", user.Id.ToString())
               }),
             Expires = DateTime.UtcNow.AddDays(7),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
@@ -211,12 +240,12 @@ public class UserService : IUserService
         {
             StatusCode = StatusCodes.Status200OK,
             Message = UserApiResponseMessageContraint.UserLoginSuccess,
-            Data = new
+            Data = new ResponseLoginDto
             {
-                tokenType = "Bearer",
-                token = encrypterToken
+                TokenType = "Bearer",
+                Token = encrypterToken,
+                IsFirstTimeLogin = isFirstTimeLogin
             }
-
         };
     }
 

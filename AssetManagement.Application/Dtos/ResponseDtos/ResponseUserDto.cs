@@ -11,6 +11,8 @@ namespace AssetManagement.Application.Dtos.ResponseDtos
         public string UserName { get; set; }
         public DateTime JoinedDate { get; set; }
         public TypeGender TypeGender { get; set; }
+        public DateTime DateOfBirth { get; set; }
+
         public string Type { get; set; }
         public string Location { get; set; }
     }

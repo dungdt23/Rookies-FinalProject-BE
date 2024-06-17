@@ -8,7 +8,11 @@ using AssetManagement.Domain.Enums;
 using AutoMapper;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using MockQueryable.Moq;
 using Moq;
+using System.Linq.Expressions;
+using Type = AssetManagement.Domain.Entities.Type;
 
 namespace AssetManagement.UnitTest.Services;
 
@@ -17,7 +21,8 @@ public class UserServiceCreateAsyncTest
 {
     private Mock<IUserRepository> _userRepositoryMock;
     private Mock<IGenericRepository<Assignment>> _assignmentRepositoryMock;
-    private Mock<IMapper> _mapperMock;
+	private Mock<IGenericRepository<Domain.Entities.Type>> _typeRepositoryMock;
+	private Mock<IMapper> _mapperMock;
     private UserService _userService;
     private Mock<User> _userMock;
     private Mock<CreateUpdateUserForm> _createFormMock;
@@ -27,8 +32,9 @@ public class UserServiceCreateAsyncTest
     {
         _userRepositoryMock = new Mock<IUserRepository>();
         _assignmentRepositoryMock = new Mock<IGenericRepository<Assignment>>();
-        _mapperMock = new Mock<IMapper>();
-        _userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object, _mapperMock.Object);
+		_typeRepositoryMock = new Mock<IGenericRepository<Domain.Entities.Type>>();
+		_mapperMock = new Mock<IMapper>();
+        _userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object,_typeRepositoryMock.Object, _mapperMock.Object);
     }
 
     [SetUp]
@@ -37,7 +43,8 @@ public class UserServiceCreateAsyncTest
         _userMock = new Mock<User>();
     }
 
-    [Test]
+
+	[Test]
     public async Task CreateAsync_ShouldReturnSuccessResponse_WhenUserIsCreated()
     {
         // Arrange
@@ -46,6 +53,11 @@ public class UserServiceCreateAsyncTest
         _userMock.Object.FirstName = "Nguyen Viet Bao";
         _userMock.Object.LastName = "Son";
 
+        var typeMock = new Mock<Type>();
+        var typeListMock = new List<Type> { typeMock.Object };
+        var mockQueryable = typeListMock.AsQueryable().BuildMock();
+
+        _typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
         _mapperMock.Setup(m => m.Map<User>(It.IsAny<CreateUpdateUserForm>())).Returns(_userMock.Object);
         _userRepositoryMock.Setup(r => r.GenerateStaffCode()).Returns(generatedStaffCode);
         _userRepositoryMock.Setup(r => r.GenerateUserName(It.IsAny<string>())).Returns(generatedUserName);
@@ -62,6 +74,28 @@ public class UserServiceCreateAsyncTest
         result.Data.Should().BeEquivalentTo(_userMock.Object);
     }
 
+    [Test]
+	public async Task CreateAsync_ShouldReturnErrorResponse_WhenTypeDoesNotExist()
+    {
+		// Arrange
+		var invalidTypeName = "invalid";
+		_createFormMock.Object.Type = invalidTypeName;
+		//Create empty list to return type == null
+		var typeListMock = new List<Type>();
+		var mockQueryable = typeListMock.AsQueryable().AsNoTracking().BuildMock();
+
+		_typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
+
+		// Act
+		var result = await _userService.CreateAsync(_createFormMock.Object);
+
+		// Assert
+		result.Should().NotBeNull();
+		result.Should().BeOfType<ApiResponse>();
+		result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+		result.Message.Should().Be(UserApiResponseMessageContraint.UserCreateFail);
+		result.Data.Should().BeEquivalentTo(_createFormMock.Object.Type);
+	}
 	[Test]
 	public async Task CreateAsync_ShouldReturnErrorResponse_WhenUserCreationFails()
     {
@@ -71,6 +105,11 @@ public class UserServiceCreateAsyncTest
 		_userMock.Object.FirstName = "Nguyen Viet Bao";
 		_userMock.Object.LastName = "Son";
 
+		var typeMock = new Mock<Type>();
+		var typeListMock = new List<Type> { typeMock.Object };
+		var mockQueryable = typeListMock.AsQueryable().BuildMock();
+
+		_typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
 		_mapperMock.Setup(m => m.Map<User>(It.IsAny<CreateUpdateUserForm>())).Returns(_userMock.Object);
 		_userRepositoryMock.Setup(r => r.GenerateStaffCode()).Returns(generatedStaffCode);
 		_userRepositoryMock.Setup(r => r.GenerateUserName(It.IsAny<string>())).Returns(generatedUserName);

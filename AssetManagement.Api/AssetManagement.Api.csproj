@@ -6,6 +6,8 @@
 	<_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Bogus" Version="35.5.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" />
 	  <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.6.0" />
 	  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.0" />
 	<PackageReference Include="Microsoft.IdentityModel.Protocols" Version="7.6.0" />

@@ -12,7 +12,8 @@ namespace AssetManagement.Application.Mappings
         public MappingProfile()
         {
             // Mapping User
-            CreateMap<CreateUpdateUserForm, User>();
+            CreateMap<CreateUpdateUserForm, User>()
+                .ForMember(dest => dest.Type, opt => opt.Ignore());
             CreateMap<User, ResponseUserDto>()
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location.LocationName))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.TypeName));
@@ -28,7 +29,10 @@ namespace AssetManagement.Application.Mappings
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location.LocationName))
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.CategoryName))
                 .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.State.ToString()));
+            CreateMap<RequestAssetDto, Asset>();
 
+            //Mapping Assignment
+            CreateMap<RequestAssignmentDto, Assignment>();
         }
     }
 }
