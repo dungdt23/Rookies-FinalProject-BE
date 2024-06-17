@@ -22,6 +22,7 @@ public class UserServiceLoginAsyncTest
 	private readonly string _secret = "This is secret of nashtech assetmanagement project to create jwt token";
 	private Mock<IUserRepository> _userRepositoryMock;
 	private Mock<IGenericRepository<Assignment>> _assignmentRepositoryMock;
+	private Mock<IGenericRepository<Domain.Entities.Type>> _typeRepositoryMock;
 	private Mock<IMapper> _mapperMock;
 	private UserService _userService;
 	private Mock<User> _userMock;
@@ -32,8 +33,9 @@ public class UserServiceLoginAsyncTest
 	{
 		_userRepositoryMock = new Mock<IUserRepository>();
 		_assignmentRepositoryMock = new Mock<IGenericRepository<Assignment>>();
+		_typeRepositoryMock = new Mock<IGenericRepository<Domain.Entities.Type>>();
 		_mapperMock = new Mock<IMapper>();
-		_userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object, _mapperMock.Object);
+		_userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object, _typeRepositoryMock.Object, _mapperMock.Object);
 	}
 
 	[SetUp]
