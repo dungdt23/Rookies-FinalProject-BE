@@ -27,7 +27,7 @@ public class CreateUpdateUserForm
     public DateTime JoinedDate { get; set; }
 
     [Required]
-    public Guid TypeId { get; set; }
+    public string Type { get; set; }
     
     [Required]
 

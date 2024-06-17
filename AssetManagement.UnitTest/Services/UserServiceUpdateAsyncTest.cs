@@ -22,6 +22,7 @@ public class UserServiceUpdateAsyncTest
 {
 	private Mock<IUserRepository> _userRepositoryMock;
 	private Mock<IGenericRepository<Assignment>> _assignmentRepositoryMock;
+	private Mock<IGenericRepository<Domain.Entities.Type>> _typeRepositoryMock;
 	private Mock<IMapper> _mapperMock;
 	private UserService _userService;
 	private Mock<User> _userMock;
@@ -30,9 +31,10 @@ public class UserServiceUpdateAsyncTest
 	public void OneTimeSetup()
 	{
 		_userRepositoryMock = new Mock<IUserRepository>();
-		_assignmentRepositoryMock = new Mock<IGenericRepository<Assignment>>();	
+		_assignmentRepositoryMock = new Mock<IGenericRepository<Assignment>>();
+		_typeRepositoryMock = new Mock<IGenericRepository<Domain.Entities.Type>>();
 		_mapperMock = new Mock<IMapper>();
-		_userService = new UserService(_userRepositoryMock.Object,_assignmentRepositoryMock.Object, _mapperMock.Object);
+		_userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object, _typeRepositoryMock.Object, _mapperMock.Object);
 	}
 
 	[SetUp]
@@ -58,7 +60,6 @@ public class UserServiceUpdateAsyncTest
 									dest.DateOfBirth = src.DateOfBirth;
 									dest.Gender = src.Gender;
 									dest.JoinedDate = src.JoinedDate;
-									dest.TypeId = src.TypeId;
 									dest.LocationId = src.LocationId;
 								});
 		_userRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<User>())).ReturnsAsync(1);
@@ -107,7 +108,6 @@ public class UserServiceUpdateAsyncTest
 									dest.DateOfBirth = src.DateOfBirth;
 									dest.Gender = src.Gender;
 									dest.JoinedDate = src.JoinedDate;
-									dest.TypeId = src.TypeId;
 									dest.LocationId = src.LocationId;
 								});
 		_userRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<User>())).ReturnsAsync(0);
