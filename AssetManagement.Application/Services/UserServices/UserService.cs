@@ -168,10 +168,7 @@ public class UserService : IUserService
 
 	public async Task<ApiResponse> LoginAsync(LoginForm login, byte[] key)
 	{
-		var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName)
-										.Include(u => u.Type)
-										.Include(u => u.Location)
-										.FirstOrDefaultAsync();
+		var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName).FirstOrDefaultAsync();
 		if (user == null)
 		{
 			return new ApiResponse
@@ -191,17 +188,15 @@ public class UserService : IUserService
 				Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
 			};
 		}
+
+		var isFirstTimeLogin = string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
+
 		var tokenHandler = new JwtSecurityTokenHandler();
 		var tokenDescriptor = new SecurityTokenDescriptor
 		{
 			Subject = new ClaimsIdentity(new[]
 			{
-				new Claim("id", user.Id.ToString()),
-				new Claim("username", user.UserName),
-				new Claim("typeId", user.TypeId.ToString()),
-				new Claim("type", user.Type.TypeName),
-				new Claim("locationId", user.LocationId.ToString()),
-				new Claim("location", user.Location.LocationName)
+				new Claim("id", user.Id.ToString())
 			  }),
 			Expires = DateTime.UtcNow.AddDays(7),
 			SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
@@ -212,12 +207,12 @@ public class UserService : IUserService
 		{
 			StatusCode = StatusCodes.Status200OK,
 			Message = UserApiResponseMessageContraint.UserLoginSuccess,
-			Data = new
+			Data = new ResponseLoginDto
 			{
-				tokenType = "Bearer",
-				token = encrypterToken
+				TokenType = "Bearer",
+				Token = encrypterToken,
+				IsFirstTimeLogin = isFirstTimeLogin
 			}
-
 		};
 	}
 

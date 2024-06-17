@@ -7,7 +7,7 @@ public class NamingAttribute : ValidationAttribute
 {
     private const int MIN_LENGTH = 2;
     private const int MAX_LENGTH = 100;
-    private static readonly Regex ALPHABETIC_WHITESPACE_REGEX = new Regex(@"^[a-zA-Z\s]*$", RegexOptions.Compiled);
+    private static readonly Regex ALPHABETIC_WHITESPACE_REGEX = new Regex(@"^[\p{L}\s]*$", RegexOptions.Compiled);
 
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
