@@ -1,12 +1,4 @@
-﻿using AssetManagement.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AssetManagement.Application.Dtos.ResponseDtos
+﻿namespace AssetManagement.Application.Dtos.ResponseDtos
 {
     public class ResponseAssetDto
     {

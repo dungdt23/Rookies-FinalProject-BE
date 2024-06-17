@@ -1,4 +1,5 @@
-﻿using AssetManagement.Application.Filters;
+﻿using AssetManagement.Application.Dtos.RequestDtos;
+using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IAssetServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,36 @@ namespace AssetManagement.Api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
             }
 
+            return Ok(result);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] RequestAssetDto requestAssetDto)
+        {
+            var result = await _assetService.AddAsync(requestAssetDto);
+            if (result.StatusCode == StatusCodes.Status500InternalServerError)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
+            return Ok(result);
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await _assetService.DeleteAsync(id);
+            if (result.StatusCode == StatusCodes.Status500InternalServerError)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
+            return Ok(result);
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(Guid id, [FromBody] RequestAssetDto requestAssetDto)
+        {
+            var result = await _assetService.UpdateAsync(id,requestAssetDto);
+            if (result.StatusCode == StatusCodes.Status500InternalServerError)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
             return Ok(result);
         }
     }
