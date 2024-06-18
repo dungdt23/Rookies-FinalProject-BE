@@ -98,14 +98,12 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			}
 		}
 
+        public Task<PagedResponse<ResponseAssetDto>> GetAllAsync(AssignmentFilter filter, int? index, int? size)
+        {
+            throw new NotImplementedException();
+        }
 
-
-		public Task<PagedResponse<ResponseAssetDto>> GetAllAsync(AssetFilter filter, int? index, int? size)
-		{
-			throw new NotImplementedException();
-		}
-
-		public async Task<ApiResponse> UpdateAsync(Guid id, RequestAssignmentDto request)
+        public async Task<ApiResponse> UpdateAsync(Guid id, RequestAssignmentDto request)
 		{
 			var assignment = await _assignmentRepository.GetByCondition(a => a.Id == id).FirstOrDefaultAsync();
 			if (assignment == null)

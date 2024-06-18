@@ -243,7 +243,7 @@ public class UserService : IUserService
 				new Claim("id", user.Id.ToString()),
 				new Claim("username", user.UserName),
 				new Claim("typeId", user.TypeId.ToString()),
-				new Claim("type", user.Type.TypeName.ToUpper()),
+				new Claim(ClaimTypes.Role, user.Type.TypeName),
 				new Claim("locationId", user.LocationId.ToString()),
 				new Claim("location", user.Location.LocationName)
 			  }),
