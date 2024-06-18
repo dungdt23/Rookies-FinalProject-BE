@@ -7,6 +7,7 @@ using AssetManagement.Application.Models;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AutoMapper;
+using Diacritics.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -63,10 +64,13 @@ public class UserService : IUserService
 
         var user = _mapper.Map<User>(form);
 
-        user.StaffCode = _userRepository.GenerateStaffCode();
-        user.UserName = _userRepository.GenerateUserName($"{user.FirstName.Trim()} {user.LastName.Trim()}");
-        user.TypeId = type.Id;
-        user = EncryptPassword(user, $"{user.UserName}@{user.DateOfBirth:ddMMyyyy}");
+
+		user.StaffCode = _userRepository.GenerateStaffCode();
+		var usernameToGenerate = $"{user.FirstName.Trim()} {user.LastName.Trim()}";
+		var usernameRemovedSymbol = usernameToGenerate.RemoveDiacritics();
+		user.UserName = _userRepository.GenerateUserName(usernameRemovedSymbol);
+		user.TypeId = type.Id;
+		user = EncryptPassword(user, $"{user.UserName}@{user.DateOfBirth:ddMMyyyy}");
 
         if (await _userRepository.AddAsync(user) > 0)
         {
@@ -148,7 +152,7 @@ public class UserService : IUserService
 				Message = UserApiResponseMessageContraint.UserNotFound
 			};
 		}
-
+		form.LocationId = user.LocationId;
 		_mapper.Map(form, user);
 		user.TypeId = type.Id;
 
@@ -199,55 +203,62 @@ public class UserService : IUserService
             };
     }
 
-    public async Task<ApiResponse> LoginAsync(LoginForm login, byte[] key)
-    {
-        var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName).FirstOrDefaultAsync();
-        if (user == null)
-        {
-            return new ApiResponse
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
-                Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
-            };
-        }
-        var match = CheckPassword(user, login.Password);
-        if (!match)
-        {
-            return new ApiResponse
-            {
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
-                Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
-            };
-        }
+
+	public async Task<ApiResponse> LoginAsync(LoginForm login, byte[] key)
+	{
+		var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName)
+										.Include(u => u.Type)
+										.FirstOrDefaultAsync();
+		if (user == null)
+		{
+			return new ApiResponse
+			{
+				StatusCode = StatusCodes.Status400BadRequest,
+				Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
+				Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
+			};
+		}
+		var match = CheckPassword(user, login.Password);
+		if (!match)
+		{
+			return new ApiResponse
+			{
+				StatusCode = StatusCodes.Status400BadRequest,
+				Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
+				Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
+			};
+		}
+
 
         var isFirstTimeLogin = string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim("id", user.Id.ToString())
-              }),
-            Expires = DateTime.UtcNow.AddDays(7),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
-        };
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        var encrypterToken = tokenHandler.WriteToken(token);
-        return new ApiResponse
-        {
-            StatusCode = StatusCodes.Status200OK,
-            Message = UserApiResponseMessageContraint.UserLoginSuccess,
-            Data = new ResponseLoginDto
-            {
-                TokenType = "Bearer",
-                Token = encrypterToken,
-                IsFirstTimeLogin = isFirstTimeLogin
-            }
-        };
-    }
+		var tokenHandler = new JwtSecurityTokenHandler();
+		var tokenDescriptor = new SecurityTokenDescriptor
+		{
+			Subject = new ClaimsIdentity(new[]
+			{
+				new Claim("id", user.Id.ToString()),
+				new Claim(ClaimTypes.Role, user.Type.TypeName.ToUpper()),
+				new Claim("locationId", user.LocationId.ToString())
+			  }),
+			Expires = DateTime.UtcNow.AddDays(7),
+			SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+		};
+		var token = tokenHandler.CreateToken(tokenDescriptor);
+		var encrypterToken = tokenHandler.WriteToken(token);
+		return new ApiResponse
+		{
+			StatusCode = StatusCodes.Status200OK,
+			Message = UserApiResponseMessageContraint.UserLoginSuccess,
+			Data = new ResponseLoginDto
+			{
+				TokenType = "Bearer",
+				Token = encrypterToken,
+				IsFirstTimeLogin = isFirstTimeLogin
+			}
+		};
+	}
+
 
     public async Task<ApiResponse> GetById(Guid id)
     {

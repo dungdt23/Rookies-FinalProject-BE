@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using AssetManagement.Application.Validation;
 using AssetManagement.Domain.Enums;
 
@@ -29,7 +30,7 @@ public class CreateUpdateUserForm
     [Required]
     public string Type { get; set; }
     
-    [Required]
+    [JsonIgnore]
 
     public Guid LocationId { get; set; }
 }

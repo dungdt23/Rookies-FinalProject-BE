@@ -1,5 +1,7 @@
 ﻿using AssetManagement.Application.ApiResponses;
 using AssetManagement.Application.Dtos.RequestDtos;
+using AssetManagement.Application.Dtos.ResponseDtos;
+using AssetManagement.Application.Filters;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.IServices.IAssignmentServices;
 using AssetManagement.Domain.Constants;
@@ -50,5 +52,15 @@ namespace AssetManagement.Application.Services.AssignmentServices
 
 			}
 		}
-	}
+
+		public Task<PagedResponse<ResponseAssetDto>> GetAllAsync(AssetFilter filter, int? index, int? size)
+		{
+			throw new NotImplementedException();
+		}
+
+        public Task<ApiResponse> UpdateAsync(RequestAssignmentDto request)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

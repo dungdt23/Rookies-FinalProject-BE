@@ -1,7 +1,10 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Models;
+using AssetManagement.Domain.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -20,8 +23,17 @@ public class UsersController : ControllerBase
 	}
 
 	[HttpPost]
+	[Authorize(Roles = TypeNameContraint.TypeAdmin)]
 	public async Task<IActionResult> Post([FromBody] CreateUpdateUserForm createUserForm)
 	{
+		//Get claim locationId from bearer token
+		var authorizationHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+		var token = authorizationHeader.Substring("Bearer ".Length).Trim();
+		var handler = new JwtSecurityTokenHandler();
+		var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
+		var locationIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "locationId")?.Value;
+		
+		createUserForm.LocationId = new Guid(locationIdClaim);
 		var result = await _userService.CreateAsync(createUserForm);
 		if (result.StatusCode == StatusCodes.Status500InternalServerError)
 		{
@@ -32,6 +44,7 @@ public class UsersController : ControllerBase
 	}
 
 	[HttpPut("{id:guid}")]
+	[Authorize(Roles = TypeNameContraint.TypeAdmin)]
 	public async Task<IActionResult> Put(Guid id, [FromBody] CreateUpdateUserForm updateUserForm)
 	{
 		var result = await _userService.UpdateAsync(id, updateUserForm);
