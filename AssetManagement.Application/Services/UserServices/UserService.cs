@@ -7,6 +7,7 @@ using AssetManagement.Application.Models;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AutoMapper;
+using Diacritics.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -64,7 +65,9 @@ public class UserService : IUserService
 		var user = _mapper.Map<User>(form);
 
 		user.StaffCode = _userRepository.GenerateStaffCode();
-		user.UserName = _userRepository.GenerateUserName($"{user.FirstName.Trim()} {user.LastName.Trim()}");
+		var usernameToGenerate = $"{user.FirstName.Trim()} {user.LastName.Trim()}";
+		var usernameRemovedSymbol = usernameToGenerate.RemoveDiacritics();
+		user.UserName = _userRepository.GenerateUserName(usernameRemovedSymbol);
 		user.TypeId = type.Id;
 		user = EncryptPassword(user, $"{user.UserName}@{user.DateOfBirth:ddMMyyyy}");
 
@@ -145,7 +148,7 @@ public class UserService : IUserService
 				Message = UserApiResponseMessageContraint.UserNotFound
 			};
 		}
-
+		form.LocationId = user.LocationId;
 		_mapper.Map(form, user);
 		user.TypeId = type.Id;
 
@@ -198,7 +201,9 @@ public class UserService : IUserService
 
 	public async Task<ApiResponse> LoginAsync(LoginForm login, byte[] key)
 	{
-		var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName).FirstOrDefaultAsync();
+		var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName)
+										.Include(u => u.Type)
+										.FirstOrDefaultAsync();
 		if (user == null)
 		{
 			return new ApiResponse
@@ -226,7 +231,9 @@ public class UserService : IUserService
 		{
 			Subject = new ClaimsIdentity(new[]
 			{
-				new Claim("id", user.Id.ToString())
+				new Claim("id", user.Id.ToString()),
+				new Claim(ClaimTypes.Role, user.Type.TypeName.ToUpper()),
+				new Claim("locationId", user.LocationId.ToString())
 			  }),
 			Expires = DateTime.UtcNow.AddDays(7),
 			SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
