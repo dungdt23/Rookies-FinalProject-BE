@@ -1,5 +1,4 @@
 ﻿using AssetManagement.Application.Dtos.RequestDtos;
-using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.Services.AssetServices;
 using AssetManagement.Domain.Constants;
@@ -8,12 +7,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using MockQueryable.Moq;
 using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace AssetManagement.UnitTest.Services
 {
