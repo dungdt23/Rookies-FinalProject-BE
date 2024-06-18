@@ -134,7 +134,8 @@ namespace AssetManagement.Api
 
             app.MapControllers();
 
-            await app.SeedData();
+            await app.DeleteAllDataAsync();
+            await app.SeedDataAsync();
 
             app.Run();
         }
