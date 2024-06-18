@@ -61,7 +61,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         IQueryable<User> query = ApplyFilter(locationId, filter);
         IEnumerable<User> users = await query.Include(x => x.Location)
                                             .Include(x => x.Type)
-                                            .AsNoTracking()
+                                              .AsNoTracking()
                                             .ToListAsync();
         if (filter.IsAscending)
         {

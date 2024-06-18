@@ -44,7 +44,7 @@ public class UserControllerPutTest
 		var response = new ApiResponse
 		{
 			StatusCode = StatusCodes.Status200OK,
-			Message = UserApiResponseMessageContraint.UserUpdateSuccess,
+			Message = UserApiResponseMessageConstant.UserUpdateSuccess,
 			Data = _userMock.Object
 		};
 
@@ -68,7 +68,7 @@ public class UserControllerPutTest
 		var response = new ApiResponse
 		{
 			StatusCode = StatusCodes.Status404NotFound,
-			Message = UserApiResponseMessageContraint.UserNotFound,
+			Message = UserApiResponseMessageConstant.UserNotFound,
 			Data = id
 		};
 
@@ -93,7 +93,7 @@ public class UserControllerPutTest
 		var response = new ApiResponse
 		{
 			StatusCode = StatusCodes.Status500InternalServerError,
-			Message = UserApiResponseMessageContraint.UserUpdateFail,
+			Message = UserApiResponseMessageConstant.UserUpdateFail,
 			Data = _userMock.Object
 		};
 

@@ -1,5 +1,6 @@
 ﻿using AssetManagement.Api.Authorizations;
 using AssetManagement.Application.Dtos.RequestDtos;
+using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IAssignmentServices;
 using AssetManagement.Application.Services.AssignmentServices;
 using AssetManagement.Domain.Constants;
@@ -63,6 +64,18 @@ namespace AssetManagement.Api.Controllers
 			if (result.StatusCode == StatusCodes.Status500InternalServerError)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, result);
+			}
+			return Ok(result);
+		}
+
+		[HttpGet]
+		[Authorize]
+		public async Task<IActionResult> Get([FromQuery] AssignmentFilter filter, int index = 1, int size = 10)
+		{
+			var result = await _assignmentService.GetAllAsync(filter, index, size);
+			if (result.StatusCode == StatusCodes.Status404NotFound)
+			{
+				return NotFound(result);
 			}
 			return Ok(result);
 		}
