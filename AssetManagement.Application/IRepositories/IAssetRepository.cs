@@ -5,8 +5,8 @@ namespace AssetManagement.Application.IRepositories
 {
     public interface IAssetRepository : IGenericRepository<Asset>
     {
-        Task<IEnumerable<Asset>> GetAllAsync(Func<Asset, object> sortCondition, AssetFilter filter, int? index, int? size);
-        Task<int> GetTotalCountAsync(AssetFilter filter);
+        Task<IEnumerable<Asset>> GetAllAsync(Func<Asset, object> sortCondition, Guid locationId, AssetFilter filter, int? index, int? size);
+        Task<int> GetTotalCountAsync(Guid locationId,AssetFilter filter);
         string CreateAssetCode(string prefix, Guid categoryId);
     }
 }

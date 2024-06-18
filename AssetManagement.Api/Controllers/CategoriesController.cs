@@ -18,7 +18,7 @@ namespace AssetManagement.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var result = await _categoryService.GetAllAsync(null,null);
+            var result = await _categoryService.GetAllAsync(null, null);
             if (result.StatusCode == StatusCodes.Status500InternalServerError)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
