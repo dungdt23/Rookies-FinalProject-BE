@@ -1,6 +1,5 @@
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Models;
-using AssetManagement.Application.Services.UserServices;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Migrations;

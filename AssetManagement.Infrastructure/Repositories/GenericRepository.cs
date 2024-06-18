@@ -89,5 +89,6 @@ namespace AssetManagement.Infrastructure.Repositories
         {
             return _dbSet.Where(condition);
         }
+
     }
 }

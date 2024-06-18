@@ -2,12 +2,14 @@ using AssetManagement.Api.Extensions;
 using AssetManagement.Api.ValidateModel;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.IServices.IAssetServices;
+using AssetManagement.Application.IServices.IAssignmentServices;
 using AssetManagement.Application.IServices.ICategoryServices;
 using AssetManagement.Application.IServices.ILocationServices;
 using AssetManagement.Application.IServices.ITypeServices;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Mappings;
 using AssetManagement.Application.Services.AssetServices;
+using AssetManagement.Application.Services.AssignmentServices;
 using AssetManagement.Application.Services.CategoryServices;
 using AssetManagement.Application.Services.LocationServices;
 using AssetManagement.Application.Services.TypeServices;
@@ -20,8 +22,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
-using AssetManagement.Application.IServices.IAssignmentServices;
-using AssetManagement.Application.Services.AssignmentServices;
 
 
 namespace AssetManagement.Api
