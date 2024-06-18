@@ -19,9 +19,9 @@ namespace AssetManagement.Api.Controllers
 
         [HttpGet]
         [Authorize(Roles = TypeNameContraint.TypeAdmin)]
-        public async Task<IActionResult> Get([FromQuery]AssetFilter filter, int index = 1, int size = 10)
+        public async Task<IActionResult> Get([FromQuery] AssetFilter filter, int index = 1, int size = 10)
         {
-            var result = await _assetService.GetAllAsync(filter, index,  size);
+            var result = await _assetService.GetAllAsync(filter, index, size);
             if (result.StatusCode == StatusCodes.Status500InternalServerError)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
@@ -55,7 +55,7 @@ namespace AssetManagement.Api.Controllers
         [Authorize(Roles = TypeNameContraint.TypeAdmin)]
         public async Task<IActionResult> Put(Guid id, [FromBody] RequestAssetDto requestAssetDto)
         {
-            var result = await _assetService.UpdateAsync(id,requestAssetDto);
+            var result = await _assetService.UpdateAsync(id, requestAssetDto);
             if (result.StatusCode == StatusCodes.Status500InternalServerError)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
