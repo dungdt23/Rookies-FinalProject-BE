@@ -124,6 +124,8 @@ namespace AssetManagement.Api
             app.UseSwaggerUI();
             // }
 
+            app.MigrationDatabase();
+
             app.UseHttpsRedirection();
             app.UseCors("AllowAllOrigins");
 
@@ -132,7 +134,8 @@ namespace AssetManagement.Api
 
             app.MapControllers();
 
-            await app.SeedData();
+            await app.DeleteAllDataAsync();
+            await app.SeedDataAsync();
 
             app.Run();
         }
