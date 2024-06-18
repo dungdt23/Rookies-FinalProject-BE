@@ -41,9 +41,9 @@ public class UserRepository : GenericRepository<User>, IUserRepository
 
         return userName;
     }
-    private IQueryable<User> ApplyFilter(UserFilter filter)
+    private IQueryable<User> ApplyFilter(Guid locationId, UserFilter filter)
     {
-        IQueryable<User> query = _context.Users.Where(x => !x.IsDeleted && x.LocationId == filter.locationId);
+        IQueryable<User> query = _context.Users.Where(x => !x.IsDeleted && x.LocationId == locationId);
         if (filter.UserType.HasValue)
         {
             var type = Enum.GetName(typeof(UserType), filter.UserType.Value);
@@ -56,9 +56,9 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         && (x.UserName.Contains(searchString) || x.FirstName.Contains(searchString) || x.StaffCode.Contains(searchString)))));
         return query;
     }
-    public async Task<IEnumerable<User>> GetAllAsync(Func<User, object> condition, UserFilter filter, int? index, int? size)
+    public async Task<IEnumerable<User>> GetAllAsync(Func<User, object> condition,Guid locationId,UserFilter filter, int? index, int? size)
     {
-        IQueryable<User> query = ApplyFilter(filter);
+        IQueryable<User> query = ApplyFilter(locationId, filter);
         IEnumerable<User> users = await query.Include(x => x.Location)
                                             .Include(x => x.Type)
                                             .AsNoTracking()
@@ -82,8 +82,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
 
         return users;
     }
-    public async Task<int> GetTotalCountAsync(UserFilter filter)
+    public async Task<int> GetTotalCountAsync(Guid locationId, UserFilter filter)
     {
-        return await ApplyFilter(filter).CountAsync();
+        return await ApplyFilter(locationId, filter).CountAsync();
     }
 }

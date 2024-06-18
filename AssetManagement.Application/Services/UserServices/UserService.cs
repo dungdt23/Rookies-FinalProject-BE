@@ -92,7 +92,7 @@ public class UserService : IUserService
 
         }
     }
-    public async Task<PagedResponse<ResponseUserDto>> GetAllAsync(UserFilter filter, int? index, int? size)
+    public async Task<PagedResponse<ResponseUserDto>> GetAllAsync(Guid locationId, UserFilter filter, int? index, int? size)
     {
         Func<User, object> condition = x => x.StaffCode;
         switch (filter.FieldFilter)
@@ -107,9 +107,9 @@ public class UserService : IUserService
                 condition = x => x.Type.TypeName;
                 break;
         }
-        var users = await _userRepository.GetAllAsync(condition, filter, index, size);
+        var users = await _userRepository.GetAllAsync(condition, locationId, filter, index, size);
         var userDtos = _mapper.Map<IEnumerable<ResponseUserDto>>(users);
-        var totalCount = await _userRepository.GetTotalCountAsync(filter);
+        var totalCount = await _userRepository.GetTotalCountAsync(locationId, filter);
         return new PagedResponse<ResponseUserDto>
         {
             Data = userDtos,
@@ -200,70 +200,70 @@ public class UserService : IUserService
             return new ApiResponse
             {
                 Message = "Can't disable user because user still has valid assignments",
-                StatusCode= StatusCodes.Status409Conflict
+                StatusCode = StatusCodes.Status409Conflict
             };
     }
 
 
 
-	public async Task<ApiResponse> LoginAsync(LoginForm login, byte[] key)
-	{
-		var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName)
-										.Include(u => u.Type)
-										.Include(u => u.Location)
-										.FirstOrDefaultAsync();
-		if (user == null)
-		{
-			return new ApiResponse
-			{
-				StatusCode = StatusCodes.Status400BadRequest,
-				Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
-				Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
-			};
-		}
-		var match = CheckPassword(user, login.Password);
-		if (!match)
-		{
-			return new ApiResponse
-			{
-				StatusCode = StatusCodes.Status400BadRequest,
-				Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
-				Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
-			};
-		}
+    public async Task<ApiResponse> LoginAsync(LoginForm login, byte[] key)
+    {
+        var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName)
+                                        .Include(u => u.Type)
+                                        .Include(u => u.Location)
+                                        .FirstOrDefaultAsync();
+        if (user == null)
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
+                Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
+            };
+        }
+        var match = CheckPassword(user, login.Password);
+        if (!match)
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
+                Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
+            };
+        }
 
 
-		var IsPasswordChanged = string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
+        var IsPasswordChanged = string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
 
-		var tokenHandler = new JwtSecurityTokenHandler();
-		var tokenDescriptor = new SecurityTokenDescriptor
-		{
-			Subject = new ClaimsIdentity(new[]
-			{
-				new Claim("id", user.Id.ToString()),
-				new Claim("username", user.UserName),
-				new Claim("typeId", user.TypeId.ToString()),
-				new Claim("type", user.Type.TypeName.ToUpper()),
-				new Claim("locationId", user.LocationId.ToString()),
-				new Claim("location", user.Location.LocationName)
-			  }),
-			Expires = DateTime.UtcNow.AddDays(7),
-			SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
-		};
-		var token = tokenHandler.CreateToken(tokenDescriptor);
-		var encrypterToken = tokenHandler.WriteToken(token);
-		return new ApiResponse
-		{
-			StatusCode = StatusCodes.Status200OK,
-			Message = UserApiResponseMessageContraint.UserLoginSuccess,
-			Data = new ResponseLoginDto
-			{
-				TokenType = "Bearer",
-				Token = encrypterToken,
-				IsPasswordChanged = IsPasswordChanged
-			}
-		};
-	}
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim("id", user.Id.ToString()),
+                new Claim("username", user.UserName),
+                new Claim("typeId", user.TypeId.ToString()),
+                new Claim("type", user.Type.TypeName.ToUpper()),
+                new Claim("locationId", user.LocationId.ToString()),
+                new Claim("location", user.Location.LocationName)
+              }),
+            Expires = DateTime.UtcNow.AddDays(7),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+        };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var encrypterToken = tokenHandler.WriteToken(token);
+        return new ApiResponse
+        {
+            StatusCode = StatusCodes.Status200OK,
+            Message = UserApiResponseMessageContraint.UserLoginSuccess,
+            Data = new ResponseLoginDto
+            {
+                TokenType = "Bearer",
+                Token = encrypterToken,
+                IsPasswordChanged = IsPasswordChanged
+            }
+        };
+    }
 
 
     public async Task<ApiResponse> GetById(Guid id)

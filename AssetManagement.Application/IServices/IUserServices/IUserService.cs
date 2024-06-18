@@ -13,7 +13,7 @@ public interface IUserService
     Task<ApiResponse> UpdateAsync(Guid id, CreateUpdateUserForm form);
     User EncryptPassword(User user, string password);
     bool CheckPassword(User user, string password);
-    Task<PagedResponse<ResponseUserDto>> GetAllAsync(UserFilter filter, int? index, int? size);
+    Task<PagedResponse<ResponseUserDto>> GetAllAsync(Guid locationId, UserFilter filter, int? index, int? size);
     Task<ApiResponse> DisableUser(Guid id);
     Task<ApiResponse> GetById(Guid id);
 }

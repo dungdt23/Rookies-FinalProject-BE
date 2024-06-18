@@ -23,7 +23,7 @@ namespace AssetManagement.Application.Services.AssetServices
             _categoryRepository = categoryRepository;
             _mapper = mapper;
         }
-        public async Task<PagedResponse<ResponseAssetDto>> GetAllAsync(AssetFilter filter, int? index, int? size)
+        public async Task<PagedResponse<ResponseAssetDto>> GetAllAsync(Guid locationId, AssetFilter filter, int? index, int? size)
         {
             Func<Asset, object> sortConditon = x => x.AssetCode;
             switch (filter.sort)
@@ -38,9 +38,9 @@ namespace AssetManagement.Application.Services.AssetServices
                     sortConditon = x => nameof(x.State) == nameof(AssetSort.State);
                     break;
             }
-            var assets = await _assetRepository.GetAllAsync(sortConditon, filter, index, size);
+            var assets = await _assetRepository.GetAllAsync(sortConditon, locationId, filter, index, size);
             var assetDtos = _mapper.Map<IEnumerable<ResponseAssetDto>>(assets);
-            var totalCount = await _assetRepository.GetTotalCountAsync(filter);
+            var totalCount = await _assetRepository.GetTotalCountAsync(locationId, filter);
             return new PagedResponse<ResponseAssetDto>
             {
                 Data = assetDtos,

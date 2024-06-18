@@ -1,6 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using AssetManagement.Api.Authorizations;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Models;
@@ -8,6 +5,7 @@ using AssetManagement.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Text;
 
 namespace AssetManagement.Api.Controllers;
 
@@ -59,7 +57,9 @@ public class UsersController : ControllerBase
     [Authorize(Roles = TypeNameContraint.TypeAdmin)]
     public async Task<IActionResult> Get([FromQuery] UserFilter filter, int index = 1, int size = 10)
     {
-        var result = await _userService.GetAllAsync(filter, index, size);
+        var locationIdClaim = HttpContext.GetClaim("locationId");
+        var locationId = new Guid(locationIdClaim);
+        var result = await _userService.GetAllAsync(locationId,filter, index, size);
         if (result.StatusCode == StatusCodes.Status500InternalServerError)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, result);
