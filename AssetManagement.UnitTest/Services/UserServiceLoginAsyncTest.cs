@@ -76,7 +76,7 @@ public class UserServiceLoginAsyncTest
 		var data = result.Data as ResponseLoginDto;
 		data.TokenType.Should().Be("Bearer");
 		data.Token.Should().NotBeNullOrEmpty();
-		data.IsFirstTimeLogin.Should().Be(true);
+		data.IsPasswordChanged.Should().Be(true);
 	}
 
 	[Test]
