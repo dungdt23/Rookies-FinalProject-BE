@@ -43,7 +43,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     }
     private IQueryable<User> ApplyFilter(UserFilter filter)
     {
-        IQueryable<User> query = _context.Users.Where(x => !x.IsDeleted);
+        IQueryable<User> query = _context.Users.Where(x => !x.IsDeleted && x.LocationId == filter.locationId);
         if (filter.UserType.HasValue)
         {
             var type = Enum.GetName(typeof(UserType), filter.UserType.Value);

@@ -2,6 +2,7 @@
 {
     public class UserFilter
     {
+        public Guid locationId { get; set; }
         public UserType? UserType { get; set; }
         public string? SearchString { get; set; }
         public bool IsAscending { get; set; }  = true;
