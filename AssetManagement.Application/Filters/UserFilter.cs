@@ -1,7 +1,4 @@
-﻿using AssetManagement.Domain.Constants;
-using AssetManagement.Domain.Entities;
-
-namespace AssetManagement.Application.Filters
+﻿namespace AssetManagement.Application.Filters
 {
     public class UserFilter
     {
@@ -20,7 +17,8 @@ namespace AssetManagement.Application.Filters
     {
         StaffCode = 1,
         FullName = 2,
-        JoinedDate = 3
+        JoinedDate = 3,
+        Type = 4
     }
 
 }

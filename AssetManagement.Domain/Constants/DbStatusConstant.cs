@@ -1,4 +1,4 @@
-﻿namespace AssetManagement.Infrastructure.Constants
+﻿namespace AssetManagement.Domain.Constants
 {
     public static class RecordStatus
     {

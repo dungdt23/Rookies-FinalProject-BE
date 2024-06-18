@@ -2,23 +2,25 @@ using AssetManagement.Api.Extensions;
 using AssetManagement.Api.ValidateModel;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.IServices.IAssetServices;
+using AssetManagement.Application.IServices.IAssignmentServices;
 using AssetManagement.Application.IServices.ICategoryServices;
 using AssetManagement.Application.IServices.ILocationServices;
 using AssetManagement.Application.IServices.ITypeServices;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Mappings;
 using AssetManagement.Application.Services.AssetServices;
+using AssetManagement.Application.Services.AssignmentServices;
 using AssetManagement.Application.Services.CategoryServices;
 using AssetManagement.Application.Services.LocationServices;
 using AssetManagement.Application.Services.TypeServices;
 using AssetManagement.Application.Services.UserServices;
 using AssetManagement.Infrastructure.Migrations;
 using AssetManagement.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using AssetManagement.Application.IServices.IAssignmentServices;
 using AssetManagement.Application.Services.AssignmentServices;
@@ -27,108 +29,118 @@ using AssetManagement.Api.Middlewares;
 
 namespace AssetManagement.Api
 {
-	public class Program
-	{
-		public static async Task Main(string[] args)
-		{
-			var builder = WebApplication.CreateBuilder(args);
-			ConfigurationManager configuration = builder.Configuration;
-			builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("ApplicationSettings"));
-			builder.Services.AddDbContext<AssetManagementDBContext>(
-				options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-			);
 
-			// Add services to the container.
-			builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-			builder.Services.AddScoped<IUserRepository, UserRepository>();
-			builder.Services.AddScoped<IAssetRepository, AssetRepository>();
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
+            ConfigurationManager configuration = builder.Configuration;
+            builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("ApplicationSettings"));
+            builder.Services.AddDbContext<AssetManagementDBContext>(
+                options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+            );
 
-
-			builder.Services.AddScoped<IUserService, UserService>();
-			builder.Services.AddScoped<ICategoryService, CategoryService>();
-			builder.Services.AddScoped<ILocationService, LocationService>();
-			builder.Services.AddScoped<ITypeService, TypeService>();
-			builder.Services.AddScoped<IAssetService, AssetService>();
-			builder.Services.AddScoped<IAssignmentService, AssignmentService>();
+            // Add services to the container.
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IAssetRepository, AssetRepository>();
 
 
-			builder.Services.AddCors(options =>
-			{
-				options.AddPolicy("AllowAllOrigins",
-					builder =>
-					{
-						builder.AllowAnyOrigin()
-							   .AllowAnyMethod()
-							   .AllowAnyHeader();
-					});
-			});
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ILocationService, LocationService>();
+            builder.Services.AddScoped<ITypeService, TypeService>();
+            builder.Services.AddScoped<IAssetService, AssetService>();
+            builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 
 
-			//Add ValidationModelAsService
-			builder.Services.AddScoped<ValidateModelFilter>();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader();
+                    });
+            });
 
-			builder.Services.AddControllers(options =>
-			{
-				//Add custom validation error
-				options.Filters.Add<ValidateModelFilter>();
-			}).ConfigureApiBehaviorOptions(options =>
-			{
-				options.SuppressModelStateInvalidFilter = true;
-			});
 
-			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-			builder.Services.AddEndpointsApiExplorer();
-			builder.Services.AddSwaggerGen(options =>
-			{
-				options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-				{
-					In = ParameterLocation.Header,
-					Name = "Authorization",
-					Type = SecuritySchemeType.ApiKey
-				});
-				options.OperationFilter<SecurityRequirementsOperationFilter>();
-			});
+            //Add ValidationModelAsService
+            builder.Services.AddScoped<ValidateModelFilter>();
 
-			// Mapping profile between dtos and entities
-			builder.Services.AddAutoMapper(typeof(MappingProfile));
-			builder.Services.AddAuthentication(x =>
-			{
-				x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-				x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-			}
-			).AddJwtBearer(x =>
-			{
-				x.RequireHttpsMetadata = false;
-				x.SaveToken = true;
-				x.TokenValidationParameters = new TokenValidationParameters
-				{
-					ValidateIssuerSigningKey = true,
-					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["ApplicationSettings:Secret"])),
-					ValidateIssuer = false,
-					ValidateAudience = false
-				};
-			});
+            builder.Services.AddControllers(options =>
+            {
+                //Add custom validation error
+                options.Filters.Add<ValidateModelFilter>();
+            }).ConfigureApiBehaviorOptions(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
-			var app = builder.Build();
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+                options.OperationFilter<SecurityRequirementsOperationFilter>();
+            });
 
-			// Configure the HTTP request pipeline.
-			// if (app.Environment.IsDevelopment())
-			// {
-			app.UseSwagger();
-			app.UseSwaggerUI();
-			// }
+            // Mapping profile between dtos and entities
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
+            builder.Services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }
+            ).AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["ApplicationSettings:Secret"])),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
 
-			app.UseHttpsRedirection();
-			app.UseCors("AllowAllOrigins");
+            var app = builder.Build();
+
+            // Configure the HTTP request pipeline.
+            // if (app.Environment.IsDevelopment())
+            // {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            // }
+            // Configure the HTTP request pipeline.
+            // if (app.Environment.IsDevelopment())
+            // {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            // }
+
+            app.MigrationDatabase();
+
+            app.UseHttpsRedirection();
+            app.UseCors("AllowAllOrigins");
 
 			app.UseAuthentication();
 			app.UseAuthorization();
 
-			app.MapControllers();
+            app.MapControllers();
 
-			await app.SeedData();
+            await app.DeleteAllDataAsync();
+            await app.SeedDataAsync();
 
-			app.Run();
-		}
-	}
+            app.Run();
+        }
+    }
 }
