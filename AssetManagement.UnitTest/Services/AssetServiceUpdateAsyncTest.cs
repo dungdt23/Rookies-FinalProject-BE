@@ -5,6 +5,7 @@ using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AutoMapper;
+using MockQueryable.Moq;
 using Moq;
 using System.Linq.Expressions;
 
@@ -32,10 +33,15 @@ namespace AssetManagement.UnitTest.Services
             // Arrange
             var id = Guid.NewGuid();
             var requestDto = new RequestAssetDto();
+
+
             var asset = new Asset { Id = id, AssetName = "Laptop Dell", AssetCode = "LA000001", CreatedAt = DateTime.Now, IsDeleted = false };
 
+            var typeListMock = new List<Asset> { asset };
+            var mockQueryable = typeListMock.AsQueryable().BuildMock();
+
             _mockAssetRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<Asset, bool>>>()))
-                .Returns(new List<Asset> { asset }.AsQueryable());
+                .Returns(mockQueryable);
 
             var updateAsset = new Asset { Id = id, AssetName = "Laptop Lenovo", AssetCode = "LA000001", CreatedAt = DateTime.Now, IsDeleted = false };
 
@@ -59,9 +65,10 @@ namespace AssetManagement.UnitTest.Services
             var id = Guid.NewGuid();
             var requestDto = new RequestAssetDto();
             var asset = new Asset { Id = id, AssetName = "Laptop Dell", AssetCode = "LA000001", CreatedAt = DateTime.Now, IsDeleted = false };
-
+            var typeListMock = new List<Asset> { asset };
+            var mockQueryable = typeListMock.AsQueryable().BuildMock();
             _mockAssetRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<Asset, bool>>>()))
-                .Returns(new List<Asset> { asset }.AsQueryable());
+                .Returns(mockQueryable);
 
             var updateAsset = new Asset { Id = id, AssetName = "Laptop Lenovo", AssetCode = "LA000001", CreatedAt = DateTime.Now, IsDeleted = false };
 
@@ -84,9 +91,10 @@ namespace AssetManagement.UnitTest.Services
             // Arrange
             var id = Guid.NewGuid();
             var requestDto = new RequestAssetDto();
-
+            var typeListMock = new List<Asset> { };
+            var mockQueryable = typeListMock.AsQueryable().BuildMock();
             _mockAssetRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<Asset, bool>>>()))
-                .Returns(new List<Asset> { }.AsQueryable());
+                .Returns(mockQueryable);
 
             // Act
             var result = await _assetService.UpdateAsync(id, requestDto);
@@ -102,9 +110,10 @@ namespace AssetManagement.UnitTest.Services
             var id = Guid.NewGuid();
             var requestDto = new RequestAssetDto();
             var asset = new Asset { Id = id, AssetName = "Laptop Dell", State = TypeAssetState.Assigned, AssetCode = "LA000001", CreatedAt = DateTime.Now, IsDeleted = false };
-
+            var typeListMock = new List<Asset> { asset };
+            var mockQueryable = typeListMock.AsQueryable().BuildMock();
             _mockAssetRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<Asset, bool>>>()))
-                .Returns(new List<Asset> { }.AsQueryable());
+                .Returns(mockQueryable);
 
             // Act
             var result = await _assetService.UpdateAsync(id, requestDto);
