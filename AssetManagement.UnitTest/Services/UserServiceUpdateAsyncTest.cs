@@ -16,6 +16,7 @@ namespace AssetManagement.UnitTest.Services;
 [TestFixture]
 public class UserServiceUpdateAsyncTest
 {
+
 	private Mock<IUserRepository> _userRepositoryMock;
 	private Mock<IGenericRepository<Assignment>> _assignmentRepositoryMock;
 	private Mock<IGenericRepository<Domain.Entities.Type>> _typeRepositoryMock;
@@ -153,5 +154,6 @@ public class UserServiceUpdateAsyncTest
 		result.Message.Should().Be(UserApiResponseMessageConstant.UserUpdateFail);
 		result.Data.Should().BeEquivalentTo(_userMock.Object, options => options.ExcludingMissingMembers());
 	}
+
 }
 

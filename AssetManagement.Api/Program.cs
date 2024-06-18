@@ -128,7 +128,7 @@ namespace AssetManagement.Api
             app.UseSwaggerUI();
             // }
 
-            app.MigrationDatabase();
+            //app.MigrationDatabase();
 
             app.UseHttpsRedirection();
             app.UseCors("AllowAllOrigins");

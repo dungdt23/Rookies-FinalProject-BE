@@ -11,6 +11,7 @@ using Moq;
 namespace AssetManagement.UnitTest.Services
 {
     [TestFixture]
+
 	public class AssignmentServiceCreateAsyncTest
 	{
 		private  Mock<IAssignmentRepository> _assignmentRepositoryMock;
@@ -27,22 +28,24 @@ namespace AssetManagement.UnitTest.Services
 			_assignmentService = new AssignmentService(_assignmentRepositoryMock.Object, _mapperMock.Object);
 		}
 
-		[SetUp]
-		public void SetUp()
-		{
-			_requestDtoMock = new Mock<RequestAssignmentDto>();
-			_assignmentMock = new Mock<Assignment>();
-		}
 
-		[Test]
-		public async Task CreateAsync_ShouldReturnOk_WhenAssignmentIsCreatedSuccessfully()
-		{
-			// Arrange
-			_mapperMock.Setup(m => m.Map<Assignment>(It.IsAny<RequestAssignmentDto>())).Returns(_assignmentMock.Object);
-			_assignmentRepositoryMock.Setup(ar => ar.AddAsync(It.IsAny<Assignment>())).ReturnsAsync(1);
+        [SetUp]
+        public void SetUp()
+        {
+            _requestDtoMock = new Mock<RequestAssignmentDto>();
+            _assignmentMock = new Mock<Assignment>();
+        }
 
-			// Act
-			var result = await _assignmentService.CreateAsync(_requestDtoMock.Object);
+        [Test]
+        public async Task CreateAsync_ShouldReturnOk_WhenAssignmentIsCreatedSuccessfully()
+        {
+            // Arrange
+            _mapperMock.Setup(m => m.Map<Assignment>(It.IsAny<RequestAssignmentDto>())).Returns(_assignmentMock.Object);
+            _assignmentRepositoryMock.Setup(ar => ar.AddAsync(It.IsAny<Assignment>())).ReturnsAsync(1);
+
+            // Act
+            var result = await _assignmentService.CreateAsync(_requestDtoMock.Object);
+
 
 			// Assert
 			result.StatusCode.Should().Be(StatusCodes.Status200OK);
@@ -50,15 +53,17 @@ namespace AssetManagement.UnitTest.Services
 			result.Data.Should().Be(_assignmentMock.Object);
 		}
 
-		[Test]
-		public async Task CreateAsync_ShouldReturnStatus500InternalServerError_WhenCreationFails()
-		{
-			// Arrange
-			_mapperMock.Setup(m => m.Map<Assignment>(It.IsAny<RequestAssignmentDto>())).Returns(_assignmentMock.Object);
-			_assignmentRepositoryMock.Setup(ar => ar.AddAsync(It.IsAny<Assignment>())).ReturnsAsync(0);
 
-			// Act
-			var result = await _assignmentService.CreateAsync(_requestDtoMock.Object);
+        [Test]
+        public async Task CreateAsync_ShouldReturnStatus500InternalServerError_WhenCreationFails()
+        {
+            // Arrange
+            _mapperMock.Setup(m => m.Map<Assignment>(It.IsAny<RequestAssignmentDto>())).Returns(_assignmentMock.Object);
+            _assignmentRepositoryMock.Setup(ar => ar.AddAsync(It.IsAny<Assignment>())).ReturnsAsync(0);
+
+            // Act
+            var result = await _assignmentService.CreateAsync(_requestDtoMock.Object);
+
 
 			// Assert
 			result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
@@ -66,4 +71,5 @@ namespace AssetManagement.UnitTest.Services
 			result.Data.Should().Be(_assignmentMock.Object);
 		}
 	}
+
 }

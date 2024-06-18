@@ -1,6 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using AssetManagement.Api.Authorizations;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Models;
@@ -8,6 +5,7 @@ using AssetManagement.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Text;
 
 namespace AssetManagement.Api.Controllers;
 
@@ -15,13 +13,13 @@ namespace AssetManagement.Api.Controllers;
 [Route("users")]
 public class UsersController : ControllerBase
 {
-	private readonly IUserService _userService;
-	private readonly AppSetting _applicationSettings;
-	public UsersController(IUserService userService, IOptions<AppSetting> applicationSettings)
-	{
-		_userService = userService;
-		_applicationSettings = applicationSettings.Value;
-	}
+    private readonly IUserService _userService;
+    private readonly AppSetting _applicationSettings;
+    public UsersController(IUserService userService, IOptions<AppSetting> applicationSettings)
+    {
+        _userService = userService;
+        _applicationSettings = applicationSettings.Value;
+    }
 
 	[HttpPost]
 	[Authorize(Roles = TypeNameContraint.TypeAdmin)]
@@ -35,31 +33,33 @@ public class UsersController : ControllerBase
 			return StatusCode(StatusCodes.Status500InternalServerError, result);
 		}
 
-		return Ok(result);
-	}
+        return Ok(result);
+    }
 
-	[HttpPut("{id:guid}")]
-	[Authorize(Roles = TypeNameContraint.TypeAdmin)]
-	public async Task<IActionResult> Put(Guid id, [FromBody] CreateUpdateUserForm updateUserForm)
-	{
-		var result = await _userService.UpdateAsync(id, updateUserForm);
-		if (result.StatusCode == StatusCodes.Status404NotFound)
-		{
-			return NotFound(result);
-		}
-		if (result.StatusCode == StatusCodes.Status500InternalServerError)
-		{
-			return StatusCode(StatusCodes.Status500InternalServerError, result);
-		}
+    [HttpPut("{id:guid}")]
+    [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+    public async Task<IActionResult> Put(Guid id, [FromBody] CreateUpdateUserForm updateUserForm)
+    {
+        var result = await _userService.UpdateAsync(id, updateUserForm);
+        if (result.StatusCode == StatusCodes.Status404NotFound)
+        {
+            return NotFound(result);
+        }
+        if (result.StatusCode == StatusCodes.Status500InternalServerError)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, result);
+        }
 
-		return Ok(result);
-	}
+        return Ok(result);
+    }
 
     [HttpGet]
     [Authorize(Roles = TypeNameContraint.TypeAdmin)]
     public async Task<IActionResult> Get([FromQuery] UserFilter filter, int index = 1, int size = 10)
     {
-        var result = await _userService.GetAllAsync(filter, index, size);
+        var locationIdClaim = HttpContext.GetClaim("locationId");
+        var locationId = new Guid(locationIdClaim);
+        var result = await _userService.GetAllAsync(locationId,filter, index, size);
         if (result.StatusCode == StatusCodes.Status500InternalServerError)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, result);
@@ -78,18 +78,18 @@ public class UsersController : ControllerBase
         return Ok(result);
     }
 
-	[HttpPost("Login")]
-	public async Task<IActionResult> Login([FromBody] LoginForm login)
-	{
-		var key = Encoding.ASCII.GetBytes(_applicationSettings.Secret);
-		var result = await _userService.LoginAsync(login, key);
-		if (result.StatusCode == StatusCodes.Status400BadRequest)
-		{
-			return BadRequest(result);
-		}
-		return Ok(result);
-	}
-	[HttpGet("{id}")]
+    [HttpPost("Login")]
+    public async Task<IActionResult> Login([FromBody] LoginForm login)
+    {
+        var key = Encoding.ASCII.GetBytes(_applicationSettings.Secret);
+        var result = await _userService.LoginAsync(login, key);
+        if (result.StatusCode == StatusCodes.Status400BadRequest)
+        {
+            return BadRequest(result);
+        }
+        return Ok(result);
+    }
+    [HttpGet("{id}")]
     [Authorize(Roles = TypeNameContraint.TypeAdmin)]
     public async Task<IActionResult> GetById(Guid id)
     {

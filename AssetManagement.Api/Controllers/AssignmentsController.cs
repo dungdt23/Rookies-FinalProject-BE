@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AssetManagement.Api.Controllers
 {
-	[Route("assignments")]
+    [Route("assignments")]
 	[ApiController]
 	public class AssignmentsController : ControllerBase
 	{

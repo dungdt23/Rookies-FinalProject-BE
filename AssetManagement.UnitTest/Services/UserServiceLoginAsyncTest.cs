@@ -16,58 +16,58 @@ namespace AssetManagement.UnitTest.Services;
 [TestFixture]
 public class UserServiceLoginAsyncTest
 {
-	private readonly string _secret = "This is secret of nashtech assetmanagement project to create jwt token";
-	private Mock<IUserRepository> _userRepositoryMock;
-	private Mock<IGenericRepository<Assignment>> _assignmentRepositoryMock;
-	private Mock<IGenericRepository<Domain.Entities.Type>> _typeRepositoryMock;
-	private Mock<IMapper> _mapperMock;
-	private UserService _userService;
-	private Mock<User> _userMock;
-	private Mock<LoginForm> _loginFormMock;
+    private readonly string _secret = "This is secret of nashtech assetmanagement project to create jwt token";
+    private Mock<IUserRepository> _userRepositoryMock;
+    private Mock<IGenericRepository<Assignment>> _assignmentRepositoryMock;
+    private Mock<IGenericRepository<Domain.Entities.Type>> _typeRepositoryMock;
+    private Mock<IMapper> _mapperMock;
+    private UserService _userService;
+    private Mock<User> _userMock;
+    private Mock<LoginForm> _loginFormMock;
 
-	[OneTimeSetUp]
-	public void OneTimeSetup()
-	{
-		_userRepositoryMock = new Mock<IUserRepository>();
-		_assignmentRepositoryMock = new Mock<IGenericRepository<Assignment>>();
-		_typeRepositoryMock = new Mock<IGenericRepository<Domain.Entities.Type>>();
-		_mapperMock = new Mock<IMapper>();
-		_userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object, _typeRepositoryMock.Object, _mapperMock.Object);
-	}
+    [OneTimeSetUp]
+    public void OneTimeSetup()
+    {
+        _userRepositoryMock = new Mock<IUserRepository>();
+        _assignmentRepositoryMock = new Mock<IGenericRepository<Assignment>>();
+        _typeRepositoryMock = new Mock<IGenericRepository<Domain.Entities.Type>>();
+        _mapperMock = new Mock<IMapper>();
+        _userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object, _typeRepositoryMock.Object, _mapperMock.Object);
+    }
 
-	[SetUp]
-	public void Setup()
-	{
-		_loginFormMock = new Mock<LoginForm>();
-		_userMock = new Mock<User>();
-	}
+    [SetUp]
+    public void Setup()
+    {
+        _loginFormMock = new Mock<LoginForm>();
+        _userMock = new Mock<User>();
+    }
 
-	[Test]
-	public async Task LoginAsync_ShouldReturnSuccessResponse_WhenCredentialsAreValid()
-	{
-		// Arrange
-		var username = "sonnvb";
-		var validPassword = "sonnvb@01012002";
-		var login = new LoginForm
-		{
-			UserName = username,
-			Password = validPassword
-		};
+    [Test]
+    public async Task LoginAsync_ShouldReturnSuccessResponse_WhenCredentialsAreValid()
+    {
+        // Arrange
+        var username = "sonnvb";
+        var validPassword = "sonnvb@01012002";
+        var login = new LoginForm
+        {
+            UserName = username,
+            Password = validPassword
+        };
 
-		var key = Encoding.UTF8.GetBytes(_secret);
-		_userMock.Object.UserName = username;
-		_userMock.Object.DateOfBirth = new DateTime(2002, 01, 01);
+        var key = Encoding.UTF8.GetBytes(_secret);
+        _userMock.Object.UserName = username;
+        _userMock.Object.DateOfBirth = new DateTime(2002, 01, 01);
 
-		var mockList = new List<User> { _userMock.Object };
-		var mockQueryable = mockList.AsQueryable().BuildMock();
+        var mockList = new List<User> { _userMock.Object };
+        var mockQueryable = mockList.AsQueryable().BuildMock();
 
-		_userService.EncryptPassword(_userMock.Object, validPassword);
+        _userService.EncryptPassword(_userMock.Object, validPassword);
 
 
-		_userRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
-						   .Returns(mockQueryable);
-		// Act
-		var result = await _userService.LoginAsync(login, key);
+        _userRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
+                           .Returns(mockQueryable);
+        // Act
+        var result = await _userService.LoginAsync(login, key);
 
 		// Assert
 		result.Should().NotBeNull();
@@ -151,4 +151,5 @@ public class UserServiceLoginAsyncTest
 		result.Message.Should().Be(UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername);
 		result.Data.Should().Be(UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername);
 	}
+
 }
