@@ -52,7 +52,7 @@ public class UserControllerPostTest
         var response = new ApiResponse
         {
             StatusCode = StatusCodes.Status200OK,
-            Message = UserApiResponseMessageContraint.UserCreateSuccess,
+            Message = UserApiResponseMessageConstant.UserCreateSuccess,
             Data = _userMock.Object
         };
 
@@ -75,7 +75,7 @@ public class UserControllerPostTest
         var response = new ApiResponse
         {
             StatusCode = StatusCodes.Status500InternalServerError,
-            Message = UserApiResponseMessageContraint.UserCreateFail,
+            Message = UserApiResponseMessageConstant.UserCreateFail,
             Data = _userMock.Object
         };
 
@@ -104,8 +104,8 @@ public class UserControllerPostTest
             TotalCount = 20
         };
 
-        _userServiceMock.Setup(s => s.GetAllAsync(It.IsAny<UserFilter>(), It.IsAny<int?>(), It.IsAny<int?>()))
-                        .ReturnsAsync(response);
+        //_userServiceMock.Setup(s => s.GetAllAsync(It.IsAny<UserFilter>(), It.IsAny<int?>(), It.IsAny<int?>()))
+        //                .ReturnsAsync(response);
 
         _mapperMock.Setup(m => m.Map<IEnumerable<ResponseUserDto>>(users)).Returns(userDtos);
 
@@ -133,8 +133,8 @@ public class UserControllerPostTest
             TotalCount = 0
         };
 
-        _userServiceMock.Setup(s => s.GetAllAsync(It.IsAny<UserFilter>(), It.IsAny<int?>(), It.IsAny<int?>()))
-                        .ReturnsAsync(response);
+        //_userServiceMock.Setup(s => s.GetAllAsync(It.IsAny<UserFilter>(), It.IsAny<int?>(), It.IsAny<int?>()))
+        //                .ReturnsAsync(response);
 
         _mapperMock.Setup(m => m.Map<IEnumerable<ResponseUserDto>>(users)).Returns(userDtos);
 

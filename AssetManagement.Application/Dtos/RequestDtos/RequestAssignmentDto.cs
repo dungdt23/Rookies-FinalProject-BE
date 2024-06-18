@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace AssetManagement.Application.Dtos.RequestDtos
@@ -12,7 +13,7 @@ namespace AssetManagement.Application.Dtos.RequestDtos
 	{
 		[Required]
 		public Guid AssetId { get; set; }
-		[Required]
+		[JsonIgnore]
 		public Guid AssignerId { get; set; }
 		[Required]
 		public Guid AssigneeId { get; set; }

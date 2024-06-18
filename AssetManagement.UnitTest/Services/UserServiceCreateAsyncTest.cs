@@ -4,7 +4,6 @@ using AssetManagement.Application.Models;
 using AssetManagement.Application.Services.UserServices;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
-using AssetManagement.Domain.Enums;
 using AutoMapper;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -21,8 +20,8 @@ public class UserServiceCreateAsyncTest
 {
     private Mock<IUserRepository> _userRepositoryMock;
     private Mock<IGenericRepository<Assignment>> _assignmentRepositoryMock;
-	private Mock<IGenericRepository<Domain.Entities.Type>> _typeRepositoryMock;
-	private Mock<IMapper> _mapperMock;
+    private Mock<IGenericRepository<Domain.Entities.Type>> _typeRepositoryMock;
+    private Mock<IMapper> _mapperMock;
     private UserService _userService;
     private Mock<User> _userMock;
     private Mock<CreateUpdateUserForm> _createFormMock;
@@ -32,19 +31,20 @@ public class UserServiceCreateAsyncTest
     {
         _userRepositoryMock = new Mock<IUserRepository>();
         _assignmentRepositoryMock = new Mock<IGenericRepository<Assignment>>();
-		_typeRepositoryMock = new Mock<IGenericRepository<Domain.Entities.Type>>();
-		_mapperMock = new Mock<IMapper>();
-        _userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object,_typeRepositoryMock.Object, _mapperMock.Object);
+        _typeRepositoryMock = new Mock<IGenericRepository<Domain.Entities.Type>>();
+        _mapperMock = new Mock<IMapper>();
+        _userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object, _typeRepositoryMock.Object, _mapperMock.Object);
     }
 
     [SetUp]
-    public void Setup(){
+    public void Setup()
+    {
         _createFormMock = new Mock<CreateUpdateUserForm>();
         _userMock = new Mock<User>();
     }
 
 
-	[Test]
+    [Test]
     public async Task CreateAsync_ShouldReturnSuccessResponse_WhenUserIsCreated()
     {
         // Arrange
@@ -70,12 +70,12 @@ public class UserServiceCreateAsyncTest
         result.Should().NotBeNull();
         result.Should().BeOfType<ApiResponse>();
         result.StatusCode.Should().Be(StatusCodes.Status200OK);
-        result.Message.Should().Be(UserApiResponseMessageContraint.UserCreateSuccess);
+        result.Message.Should().Be(UserApiResponseMessageConstant.UserCreateSuccess);
         result.Data.Should().BeEquivalentTo(_userMock.Object);
     }
 
     [Test]
-	public async Task CreateAsync_ShouldReturnErrorResponse_WhenTypeDoesNotExist()
+    public async Task CreateAsync_ShouldReturnErrorResponse_WhenTypeDoesNotExist()
     {
 		// Arrange
 		var invalidTypeName = "invalid";
@@ -93,7 +93,7 @@ public class UserServiceCreateAsyncTest
 		result.Should().NotBeNull();
 		result.Should().BeOfType<ApiResponse>();
 		result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserCreateFail);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserCreateFail);
 		result.Data.Should().BeEquivalentTo(_createFormMock.Object.Type);
 	}
 	[Test]
@@ -122,7 +122,8 @@ public class UserServiceCreateAsyncTest
 		result.Should().NotBeNull();
 		result.Should().BeOfType<ApiResponse>();
 		result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserCreateFail);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserCreateFail);
 		result.Data.Should().BeEquivalentTo(_userMock.Object);
 	}
+
 }

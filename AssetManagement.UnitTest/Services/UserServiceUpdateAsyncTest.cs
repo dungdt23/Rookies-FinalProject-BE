@@ -8,13 +8,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using MockQueryable.Moq;
 using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using Type = AssetManagement.Domain.Entities.Type;
 
 namespace AssetManagement.UnitTest.Services;
@@ -22,6 +16,7 @@ namespace AssetManagement.UnitTest.Services;
 [TestFixture]
 public class UserServiceUpdateAsyncTest
 {
+
 	private Mock<IUserRepository> _userRepositoryMock;
 	private Mock<IGenericRepository<Assignment>> _assignmentRepositoryMock;
 	private Mock<IGenericRepository<Domain.Entities.Type>> _typeRepositoryMock;
@@ -47,7 +42,7 @@ public class UserServiceUpdateAsyncTest
 	}
 
 	[Test]
-	public async Task UpdateAsync_ShouldReturnSuccessResponse_WhenUserIsUpdated()
+	public async Task UpdateAsync_ShouldReturnSuccessResponse_WhenUserIsUpdatedSuccessfully()
 	{
 		// Arrange
 		var id = Guid.NewGuid();
@@ -78,7 +73,7 @@ public class UserServiceUpdateAsyncTest
 		// Assert
 		result.Should().NotBeNull();
 		result.StatusCode.Should().Be(StatusCodes.Status200OK);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserUpdateSuccess);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserUpdateSuccess);
 		result.Data.Should().BeEquivalentTo(_userMock.Object, options => options.ExcludingMissingMembers());
 	}
 
@@ -98,7 +93,7 @@ public class UserServiceUpdateAsyncTest
 		// Assert
 		result.Should().NotBeNull();
 		result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserUpdateFail);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserUpdateFail);
 	}
 
 	[Test]
@@ -121,7 +116,7 @@ public class UserServiceUpdateAsyncTest
 		// Assert
 		result.Should().NotBeNull();
 		result.StatusCode.Should().Be(StatusCodes.Status404NotFound);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserNotFound);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserNotFound);
 	}
 
 	[Test]
@@ -156,8 +151,9 @@ public class UserServiceUpdateAsyncTest
 		// Assert
 		result.Should().NotBeNull();
 		result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserUpdateFail);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserUpdateFail);
 		result.Data.Should().BeEquivalentTo(_userMock.Object, options => options.ExcludingMissingMembers());
 	}
+
 }
 

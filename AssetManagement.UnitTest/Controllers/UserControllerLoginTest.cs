@@ -57,7 +57,7 @@ namespace AssetManagement.UnitTest.Controllers
 			var apiResponse = new ApiResponse
 			{
 				StatusCode = StatusCodes.Status200OK,
-				Message = UserApiResponseMessageContraint.UserLoginSuccess,
+				Message = UserApiResponseMessageConstant.UserLoginSuccess,
 				Data = new { tokenType = "Bearer", token = "mockToken", isFirstTimeLogin = false }
 			};
 
@@ -81,8 +81,8 @@ namespace AssetManagement.UnitTest.Controllers
 			var apiResponse = new ApiResponse
 			{
 				StatusCode = StatusCodes.Status400BadRequest,
-				Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
-				Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
+				Message = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername,
+				Data = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername
 			};
 
 			_userServiceMock.Setup(us => us.LoginAsync(It.IsAny<LoginForm>(), It.IsAny<byte[]>()))

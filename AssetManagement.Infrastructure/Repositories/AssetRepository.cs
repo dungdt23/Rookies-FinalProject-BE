@@ -4,7 +4,6 @@ using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Migrations;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 
 namespace AssetManagement.Infrastructure.Repositories
 {
@@ -15,22 +14,22 @@ namespace AssetManagement.Infrastructure.Repositories
         {
             _context = context;
         }
-        private IQueryable<Asset> ApplyFilter(AssetFilter filter)
+        private IQueryable<Asset> ApplyFilter(Guid locationId, AssetFilter filter)
         {
             IQueryable<Asset> query = _context.Assets
                 .Include(x => x.Location)
                 .Include(x => x.Category)
                 .Where(x =>
                 ((!filter.state.HasValue) || (filter.state.HasValue) && (x.State == filter.state.Value))
-             && ((string.IsNullOrEmpty(filter.category)) || (!string.IsNullOrEmpty(filter.category) && x.Category.CategoryName.Equals(filter.category)))
+             && ((!filter.category.HasValue) || (filter.category.HasValue && x.CategoryId == filter.category))
              && ((string.IsNullOrEmpty(filter.search)) || (!string.IsNullOrEmpty(filter.search) && (x.AssetCode.Contains(filter.search) || x.AssetName.Contains(filter.search))))
-             && x.LocationId == filter.locationId
+             && x.LocationId == locationId
              && !x.IsDeleted);
             return query;
         }
-        public async Task<IEnumerable<Asset>> GetAllAsync(Func<Asset, object> sortCondition, AssetFilter filter, int? index, int? size)
+        public async Task<IEnumerable<Asset>> GetAllAsync(Func<Asset, object> sortCondition, Guid locationId, AssetFilter filter, int? index, int? size)
         {
-            IQueryable<Asset> query = ApplyFilter(filter);
+            IQueryable<Asset> query = ApplyFilter(locationId, filter);
             IEnumerable<Asset> assets = await query.AsNoTracking().ToListAsync();
             if (filter.order == TypeOrder.Ascending)
             {
@@ -49,32 +48,18 @@ namespace AssetManagement.Infrastructure.Repositories
                 return assets;
             }
         }
-        public async Task<int> GetTotalCountAsync(AssetFilter filter)
+        public async Task<int> GetTotalCountAsync(Guid locationId, AssetFilter filter)
         {
-            return await ApplyFilter(filter).CountAsync();
+            return await ApplyFilter(locationId, filter).CountAsync();
         }
-        public string CreateAssetCode(string prefix,Guid categoryId)
+        public string CreateAssetCode(string prefix, Guid categoryId)
         {
             var prefixLength = prefix.Length;
-            //var lastestAssetCode = await _context.Assets
-            //    .Where(x => x.CategoryId == categoryId)
-            //    .OrderByDescending(x => int.Parse(x.AssetCode.Substring(prefixLength)))
-            //    .FirstOrDefaultAsync();
             var assetCodes = _context.Assets
                 .Where(x => x.CategoryId == categoryId)
                 .Select(x => int.Parse(x.AssetCode.Substring(prefixLength)))
                 .AsEnumerable();
             var maxAssetCode = _context.Assets.Where(x => x.CategoryId == categoryId).Any() ? assetCodes.Max() : 0;
-            //if (lastestAssetCode == null) 
-            //{
-            //    return prefix + "000001";
-            //}
-            //else
-            //{
-            //    int newNumericPart = int.Parse(lastestAssetCode.AssetCode.Substring(2)) + 1;
-            //    string newAssetCode = $"{prefix}{newNumericPart:D6}";
-            //    return newAssetCode;
-            //}
             int newNumericPart = maxAssetCode + 1;
             return $"{prefix}{newNumericPart:D6}";
         }

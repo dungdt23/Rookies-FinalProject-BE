@@ -2,12 +2,14 @@ using AssetManagement.Api.Extensions;
 using AssetManagement.Api.ValidateModel;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.IServices.IAssetServices;
+using AssetManagement.Application.IServices.IAssignmentServices;
 using AssetManagement.Application.IServices.ICategoryServices;
 using AssetManagement.Application.IServices.ILocationServices;
 using AssetManagement.Application.IServices.ITypeServices;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Mappings;
 using AssetManagement.Application.Services.AssetServices;
+using AssetManagement.Application.Services.AssignmentServices;
 using AssetManagement.Application.Services.CategoryServices;
 using AssetManagement.Application.Services.LocationServices;
 using AssetManagement.Application.Services.TypeServices;
@@ -22,6 +24,7 @@ using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 using AssetManagement.Application.IServices.IAssignmentServices;
 using AssetManagement.Application.Services.AssignmentServices;
+using AssetManagement.Api.Middlewares;
 
 
 namespace AssetManagement.Api
@@ -42,6 +45,7 @@ namespace AssetManagement.Api
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IAssetRepository, AssetRepository>();
+            builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
 
 
             builder.Services.AddScoped<IUserService, UserService>();
@@ -124,15 +128,17 @@ namespace AssetManagement.Api
             app.UseSwaggerUI();
             // }
 
+            //app.MigrationDatabase();
+
             app.UseHttpsRedirection();
             app.UseCors("AllowAllOrigins");
 
-            app.UseAuthorization();
-
+			app.UseAuthentication();
+			app.UseAuthorization();
 
             app.MapControllers();
 
-            await app.SeedData();
+            await app.SeedDataAsync();
 
             app.Run();
         }

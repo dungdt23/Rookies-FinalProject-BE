@@ -17,13 +17,13 @@ namespace AssetManagement.Application.Services.AssetServices
         private readonly IAssetRepository _assetRepository;
         private readonly IGenericRepository<Category> _categoryRepository;
         private readonly IMapper _mapper;
-        public AssetService(IAssetRepository assetRepository,IGenericRepository<Category> categoryRepository,IMapper mapper)
+        public AssetService(IAssetRepository assetRepository, IGenericRepository<Category> categoryRepository, IMapper mapper)
         {
             _assetRepository = assetRepository;
-            _categoryRepository = categoryRepository;   
+            _categoryRepository = categoryRepository;
             _mapper = mapper;
         }
-        public async Task<PagedResponse<ResponseAssetDto>> GetAllAsync(AssetFilter filter, int? index, int? size)
+        public async Task<PagedResponse<ResponseAssetDto>> GetAllAsync(Guid locationId, AssetFilter filter, int? index, int? size)
         {
             Func<Asset, object> sortConditon = x => x.AssetCode;
             switch (filter.sort)
@@ -38,9 +38,9 @@ namespace AssetManagement.Application.Services.AssetServices
                     sortConditon = x => nameof(x.State) == nameof(AssetSort.State);
                     break;
             }
-            var assets = await _assetRepository.GetAllAsync(sortConditon, filter, index, size);
+            var assets = await _assetRepository.GetAllAsync(sortConditon, locationId, filter, index, size);
             var assetDtos = _mapper.Map<IEnumerable<ResponseAssetDto>>(assets);
-            var totalCount = await _assetRepository.GetTotalCountAsync(filter);
+            var totalCount = await _assetRepository.GetTotalCountAsync(locationId, filter);
             return new PagedResponse<ResponseAssetDto>
             {
                 Data = assetDtos,
@@ -53,7 +53,7 @@ namespace AssetManagement.Application.Services.AssetServices
             var asset = _mapper.Map<Asset>(requestAssetDto);
             var category = await _categoryRepository.GetByCondition(x => x.Id == requestAssetDto.CategoryId)
                 .FirstOrDefaultAsync();
-            var assetCode =  _assetRepository.CreateAssetCode(category.Prefix,category.Id);
+            var assetCode = _assetRepository.CreateAssetCode(category.Prefix, category.Id);
             asset.AssetCode = assetCode;
             var status = await _assetRepository.AddAsync(asset);
             if (status == StatusConstant.Success)
@@ -82,7 +82,7 @@ namespace AssetManagement.Application.Services.AssetServices
                 return new ApiResponse
                 {
                     Message = "Asset doesn't exist",
-                    StatusCode = StatusCodes.Status500InternalServerError
+                    StatusCode = StatusCodes.Status404NotFound
                 };
             }
             if (asset.State == Domain.Enums.TypeAssetState.Assigned)
@@ -90,7 +90,7 @@ namespace AssetManagement.Application.Services.AssetServices
                 return new ApiResponse
                 {
                     Message = "Can't update asset because it is assigned",
-                    StatusCode = StatusCodes.Status500InternalServerError
+                    StatusCode = StatusCodes.Status409Conflict
                 };
             }
             var updateAsset = _mapper.Map<Asset>(requestAssetDto);
@@ -123,7 +123,7 @@ namespace AssetManagement.Application.Services.AssetServices
                 return new ApiResponse
                 {
                     Message = "Asset doesn't exist",
-                    StatusCode = StatusCodes.Status500InternalServerError
+                    StatusCode = StatusCodes.Status404NotFound
                 };
             }
             //check if asset belong to any historical assignment
@@ -131,36 +131,23 @@ namespace AssetManagement.Application.Services.AssetServices
             if (historicalAssignment != null) return new ApiResponse
             {
                 Message = "Can not be deleted! Asset belong to an historical assignment",
-                StatusCode = StatusCodes.Status500InternalServerError
+                StatusCode = StatusCodes.Status409Conflict
             };
-            //check if asset is available
-            if (asset.State != Domain.Enums.TypeAssetState.Available
-             || asset.State != Domain.Enums.TypeAssetState.Assigned)
+            var status = await _assetRepository.DeleteAsync(id);
+            if (status == StatusConstant.Success)
             {
                 return new ApiResponse
                 {
-                    Message = "Asset not available! Please update its state",
-                    StatusCode = StatusCodes.Status500InternalServerError
+                    Message = "Delete asset successfully"
                 };
             }
             else
             {
-                var status = await _assetRepository.DeleteAsync(id);
-                if (status == StatusConstant.Success)
+                return new ApiResponse
                 {
-                    return new ApiResponse
-                    {
-                        Message = "Delete asset successfully"
-                    };
-                }
-                else
-                {
-                    return new ApiResponse
-                    {
-                        Message = "Delete asset failed",
-                        StatusCode = StatusCodes.Status500InternalServerError
-                    };
-                }
+                    Message = "Delete asset failed",
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
             }
         }
     }
