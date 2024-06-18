@@ -41,7 +41,7 @@ public class UserServiceUpdateAsyncTest
 	}
 
 	[Test]
-	public async Task UpdateAsync_ShouldReturnSuccessResponse_WhenUserIsUpdated()
+	public async Task UpdateAsync_ShouldReturnSuccessResponse_WhenUserIsUpdatedSuccessfully()
 	{
 		// Arrange
 		var id = Guid.NewGuid();

@@ -95,6 +95,7 @@ public class UsersController : ControllerBase
 		return Ok(result);
 	}
 	[HttpGet("{id}")]
+    [Authorize(Roles = TypeNameContraint.TypeAdmin)]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _userService.GetById(id);
