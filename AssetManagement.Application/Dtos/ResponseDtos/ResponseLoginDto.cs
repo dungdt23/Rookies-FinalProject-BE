@@ -10,6 +10,6 @@ namespace AssetManagement.Application.Dtos.ResponseDtos
 	{
 		public string TokenType { get; set; } = "Bearer";
 		public string Token { get; set; }
-		public bool IsFirstTimeLogin {  get; set; }
+		public bool IsPasswordChanged {  get; set; }
 	}
 }
