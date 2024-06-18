@@ -4,7 +4,6 @@ using AssetManagement.Application.Models;
 using AssetManagement.Application.Services.UserServices;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
-using AssetManagement.Domain.Enums;
 using AutoMapper;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;

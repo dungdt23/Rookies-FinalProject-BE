@@ -56,25 +56,11 @@ namespace AssetManagement.Infrastructure.Repositories
         public string CreateAssetCode(string prefix,Guid categoryId)
         {
             var prefixLength = prefix.Length;
-            //var lastestAssetCode = await _context.Assets
-            //    .Where(x => x.CategoryId == categoryId)
-            //    .OrderByDescending(x => int.Parse(x.AssetCode.Substring(prefixLength)))
-            //    .FirstOrDefaultAsync();
             var assetCodes = _context.Assets
                 .Where(x => x.CategoryId == categoryId)
                 .Select(x => int.Parse(x.AssetCode.Substring(prefixLength)))
                 .AsEnumerable();
             var maxAssetCode = _context.Assets.Where(x => x.CategoryId == categoryId).Any() ? assetCodes.Max() : 0;
-            //if (lastestAssetCode == null) 
-            //{
-            //    return prefix + "000001";
-            //}
-            //else
-            //{
-            //    int newNumericPart = int.Parse(lastestAssetCode.AssetCode.Substring(2)) + 1;
-            //    string newAssetCode = $"{prefix}{newNumericPart:D6}";
-            //    return newAssetCode;
-            //}
             int newNumericPart = maxAssetCode + 1;
             return $"{prefix}{newNumericPart:D6}";
         }

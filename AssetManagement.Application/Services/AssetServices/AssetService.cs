@@ -17,10 +17,10 @@ namespace AssetManagement.Application.Services.AssetServices
         private readonly IAssetRepository _assetRepository;
         private readonly IGenericRepository<Category> _categoryRepository;
         private readonly IMapper _mapper;
-        public AssetService(IAssetRepository assetRepository,IGenericRepository<Category> categoryRepository,IMapper mapper)
+        public AssetService(IAssetRepository assetRepository, IGenericRepository<Category> categoryRepository, IMapper mapper)
         {
             _assetRepository = assetRepository;
-            _categoryRepository = categoryRepository;   
+            _categoryRepository = categoryRepository;
             _mapper = mapper;
         }
         public async Task<PagedResponse<ResponseAssetDto>> GetAllAsync(AssetFilter filter, int? index, int? size)
@@ -53,7 +53,7 @@ namespace AssetManagement.Application.Services.AssetServices
             var asset = _mapper.Map<Asset>(requestAssetDto);
             var category = await _categoryRepository.GetByCondition(x => x.Id == requestAssetDto.CategoryId)
                 .FirstOrDefaultAsync();
-            var assetCode =  _assetRepository.CreateAssetCode(category.Prefix,category.Id);
+            var assetCode = _assetRepository.CreateAssetCode(category.Prefix, category.Id);
             asset.AssetCode = assetCode;
             var status = await _assetRepository.AddAsync(asset);
             if (status == StatusConstant.Success)
@@ -134,8 +134,7 @@ namespace AssetManagement.Application.Services.AssetServices
                 StatusCode = StatusCodes.Status500InternalServerError
             };
             //check if asset is available
-            if (asset.State != Domain.Enums.TypeAssetState.Available
-             || asset.State != Domain.Enums.TypeAssetState.Assigned)
+            if (asset.State != Domain.Enums.TypeAssetState.Available)
             {
                 return new ApiResponse
                 {

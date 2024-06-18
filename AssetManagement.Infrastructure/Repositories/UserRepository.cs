@@ -41,28 +41,28 @@ public class UserRepository : GenericRepository<User>, IUserRepository
 
         return userName;
     }
-    public async Task<IEnumerable<User>> GetAllAsync(Func<User,object> condition, UserFilter filter, int? index, int? size)
+    private IQueryable<User> ApplyFilter(UserFilter filter)
     {
-        IQueryable<User> query = _context.Users
-            .Include(x => x.Type)
-            .Include(x => x.Location)
-            .Where(x => !x.IsDeleted);
-
-
+        IQueryable<User> query = _context.Users.Where(x => !x.IsDeleted);
         if (filter.UserType.HasValue)
         {
             var type = Enum.GetName(typeof(UserType), filter.UserType.Value);
             query = query.Where(x => x.Type.TypeName.Equals(type));
         }
-
-        //handle search 
         var searchString = filter.SearchString;
 
         query = query.Where(x =>
         (string.IsNullOrEmpty(searchString) || (!string.IsNullOrEmpty(searchString)
         && (x.UserName.Contains(searchString) || x.FirstName.Contains(searchString) || x.StaffCode.Contains(searchString)))));
-
-        IEnumerable<User> users = await query.ToListAsync();
+        return query;
+    }
+    public async Task<IEnumerable<User>> GetAllAsync(Func<User, object> condition, UserFilter filter, int? index, int? size)
+    {
+        IQueryable<User> query = ApplyFilter(filter);
+        IEnumerable<User> users = await query.Include(x => x.Location)
+                                            .Include(x => x.Type)
+                                            .AsNoTracking()
+                                            .ToListAsync();
         if (filter.IsAscending)
         {
             // Sort based on the condition and then by StaffCode in ascending order
@@ -84,17 +84,6 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     }
     public async Task<int> GetTotalCountAsync(UserFilter filter)
     {
-        IQueryable<User> query = _context.Users.Where(x => !x.IsDeleted);
-        if (filter.UserType.HasValue)
-        {
-            var type = Enum.GetName(typeof(UserType), filter.UserType.Value);
-            query = query.Where(x => x.Type.TypeName.Equals(type));
-        }
-        var searchString = filter.SearchString;
-
-        query = query.Where(x =>
-        (string.IsNullOrEmpty(searchString) || (!string.IsNullOrEmpty(searchString)
-        && (x.UserName.Contains(searchString) || x.FirstName.Contains(searchString) || x.StaffCode.Contains(searchString)))));
-        return await query.CountAsync();
+        return await ApplyFilter(filter).CountAsync();
     }
 }
