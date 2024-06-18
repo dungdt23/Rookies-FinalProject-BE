@@ -235,35 +235,35 @@ public class UserService : IUserService
 
         var IsPasswordChanged = string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim("id", user.Id.ToString()),
-                new Claim("username", user.UserName),
-                new Claim("typeId", user.TypeId.ToString()),
-                new Claim("type", user.Type.TypeName.ToUpper()),
-                new Claim("locationId", user.LocationId.ToString()),
-                new Claim("location", user.Location.LocationName)
-              }),
-            Expires = DateTime.UtcNow.AddDays(7),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
-        };
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        var encrypterToken = tokenHandler.WriteToken(token);
-        return new ApiResponse
-        {
-            StatusCode = StatusCodes.Status200OK,
-            Message = UserApiResponseMessageContraint.UserLoginSuccess,
-            Data = new ResponseLoginDto
-            {
-                TokenType = "Bearer",
-                Token = encrypterToken,
-                IsPasswordChanged = IsPasswordChanged
-            }
-        };
-    }
+		var tokenHandler = new JwtSecurityTokenHandler();
+		var tokenDescriptor = new SecurityTokenDescriptor
+		{
+			Subject = new ClaimsIdentity(new[]
+			{
+				new Claim("id", user.Id.ToString()),
+				new Claim("username", user.UserName),
+				new Claim("typeId", user.TypeId.ToString()),
+				new Claim(ClaimTypes.Role, user.Type.TypeName),
+				new Claim("locationId", user.LocationId.ToString()),
+				new Claim("location", user.Location.LocationName)
+			  }),
+			Expires = DateTime.UtcNow.AddDays(7),
+			SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+		};
+		var token = tokenHandler.CreateToken(tokenDescriptor);
+		var encrypterToken = tokenHandler.WriteToken(token);
+		return new ApiResponse
+		{
+			StatusCode = StatusCodes.Status200OK,
+			Message = UserApiResponseMessageContraint.UserLoginSuccess,
+			Data = new ResponseLoginDto
+			{
+				TokenType = "Bearer",
+				Token = encrypterToken,
+				IsPasswordChanged = IsPasswordChanged
+			}
+		};
+	}
 
 
     public async Task<ApiResponse> GetById(Guid id)
