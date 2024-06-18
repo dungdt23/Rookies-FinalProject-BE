@@ -72,7 +72,7 @@ public class UserServiceLoginAsyncTest
 		// Assert
 		result.Should().NotBeNull();
 		result.StatusCode.Should().Be(StatusCodes.Status200OK);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserLoginSuccess);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserLoginSuccess);
 		var data = result.Data as ResponseLoginDto;
 		data.TokenType.Should().Be("Bearer");
 		data.Token.Should().NotBeNullOrEmpty();
@@ -111,8 +111,8 @@ public class UserServiceLoginAsyncTest
 		// Assert
 		result.Should().NotBeNull();
 		result.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername);
-		result.Data.Should().Be(UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername);
+		result.Data.Should().Be(UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername);
 	}
 
 	[Test]
@@ -148,7 +148,7 @@ public class UserServiceLoginAsyncTest
 		// Assert
 		result.Should().NotBeNull();
 		result.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername);
-		result.Data.Should().Be(UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername);
+		result.Data.Should().Be(UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername);
 	}
 }

@@ -72,7 +72,7 @@ public class UserServiceUpdateAsyncTest
 		// Assert
 		result.Should().NotBeNull();
 		result.StatusCode.Should().Be(StatusCodes.Status200OK);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserUpdateSuccess);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserUpdateSuccess);
 		result.Data.Should().BeEquivalentTo(_userMock.Object, options => options.ExcludingMissingMembers());
 	}
 
@@ -92,7 +92,7 @@ public class UserServiceUpdateAsyncTest
 		// Assert
 		result.Should().NotBeNull();
 		result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserUpdateFail);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserUpdateFail);
 	}
 
 	[Test]
@@ -115,7 +115,7 @@ public class UserServiceUpdateAsyncTest
 		// Assert
 		result.Should().NotBeNull();
 		result.StatusCode.Should().Be(StatusCodes.Status404NotFound);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserNotFound);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserNotFound);
 	}
 
 	[Test]
@@ -150,7 +150,7 @@ public class UserServiceUpdateAsyncTest
 		// Assert
 		result.Should().NotBeNull();
 		result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserUpdateFail);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserUpdateFail);
 		result.Data.Should().BeEquivalentTo(_userMock.Object, options => options.ExcludingMissingMembers());
 	}
 }

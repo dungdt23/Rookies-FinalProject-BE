@@ -13,9 +13,9 @@ namespace AssetManagement.Application.Dtos.RequestDtos
 	{
 		[Required]
 		public Guid AssetId { get; set; }
-		[Required]
-		public Guid AssignerId { get; set; }
 		[JsonIgnore]
+		public Guid AssignerId { get; set; }
+		[Required]
 		public Guid AssigneeId { get; set; }
 		[Required]
 		[LaterThanCurrentTime]

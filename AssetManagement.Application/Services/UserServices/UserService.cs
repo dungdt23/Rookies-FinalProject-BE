@@ -57,7 +57,7 @@ public class UserService : IUserService
             return new ApiResponse
             {
                 StatusCode = StatusCodes.Status404NotFound,
-                Message = UserApiResponseMessageContraint.UserCreateFail,
+                Message = UserApiResponseMessageConstant.UserCreateFail,
                 Data = form.Type
             };
         }
@@ -77,7 +77,7 @@ public class UserService : IUserService
             return new ApiResponse
             {
                 StatusCode = StatusCodes.Status200OK,
-                Message = UserApiResponseMessageContraint.UserCreateSuccess,
+                Message = UserApiResponseMessageConstant.UserCreateSuccess,
                 Data = user
             };
         }
@@ -86,7 +86,7 @@ public class UserService : IUserService
             return new ApiResponse
             {
                 StatusCode = StatusCodes.Status500InternalServerError,
-                Message = UserApiResponseMessageContraint.UserCreateFail,
+                Message = UserApiResponseMessageConstant.UserCreateFail,
                 Data = user
             };
 
@@ -137,7 +137,7 @@ public class UserService : IUserService
             return new ApiResponse
             {
                 StatusCode = StatusCodes.Status404NotFound,
-                Message = UserApiResponseMessageContraint.UserUpdateFail,
+                Message = UserApiResponseMessageConstant.UserUpdateFail,
                 Data = form.Type
             };
         }
@@ -149,7 +149,7 @@ public class UserService : IUserService
             {
                 StatusCode = StatusCodes.Status404NotFound,
                 Data = id,
-                Message = UserApiResponseMessageContraint.UserNotFound
+                Message = UserApiResponseMessageConstant.UserNotFound
             };
         }
         form.LocationId = user.LocationId;
@@ -162,7 +162,7 @@ public class UserService : IUserService
             {
                 StatusCode = StatusCodes.Status200OK,
                 Data = user,
-                Message = UserApiResponseMessageContraint.UserUpdateSuccess
+                Message = UserApiResponseMessageConstant.UserUpdateSuccess
             };
 
         }
@@ -172,7 +172,7 @@ public class UserService : IUserService
             {
                 StatusCode = StatusCodes.Status500InternalServerError,
                 Data = user,
-                Message = UserApiResponseMessageContraint.UserUpdateFail,
+                Message = UserApiResponseMessageConstant.UserUpdateFail,
             };
         }
     }
@@ -217,8 +217,8 @@ public class UserService : IUserService
 			return new ApiResponse
 			{
 				StatusCode = StatusCodes.Status400BadRequest,
-				Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
-				Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
+				Message = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername,
+				Data = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername
 			};
 		}
 		var match = CheckPassword(user, login.Password);
@@ -227,13 +227,13 @@ public class UserService : IUserService
 			return new ApiResponse
 			{
 				StatusCode = StatusCodes.Status400BadRequest,
-				Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
-				Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
+				Message = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername,
+				Data = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername
 			};
 		}
 
 
-		var IsPasswordChanged = string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
+		var IsPasswordChanged = !string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
 
 		var tokenHandler = new JwtSecurityTokenHandler();
 		var tokenDescriptor = new SecurityTokenDescriptor
@@ -255,7 +255,7 @@ public class UserService : IUserService
 		return new ApiResponse
 		{
 			StatusCode = StatusCodes.Status200OK,
-			Message = UserApiResponseMessageContraint.UserLoginSuccess,
+			Message = UserApiResponseMessageConstant.UserLoginSuccess,
 			Data = new ResponseLoginDto
 			{
 				TokenType = "Bearer",

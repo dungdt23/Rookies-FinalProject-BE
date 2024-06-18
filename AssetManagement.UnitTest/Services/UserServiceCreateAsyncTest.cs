@@ -69,7 +69,7 @@ public class UserServiceCreateAsyncTest
         result.Should().NotBeNull();
         result.Should().BeOfType<ApiResponse>();
         result.StatusCode.Should().Be(StatusCodes.Status200OK);
-        result.Message.Should().Be(UserApiResponseMessageContraint.UserCreateSuccess);
+        result.Message.Should().Be(UserApiResponseMessageConstant.UserCreateSuccess);
         result.Data.Should().BeEquivalentTo(_userMock.Object);
     }
 
@@ -92,7 +92,7 @@ public class UserServiceCreateAsyncTest
 		result.Should().NotBeNull();
 		result.Should().BeOfType<ApiResponse>();
 		result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserCreateFail);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserCreateFail);
 		result.Data.Should().BeEquivalentTo(_createFormMock.Object.Type);
 	}
 	[Test]
@@ -121,7 +121,7 @@ public class UserServiceCreateAsyncTest
 		result.Should().NotBeNull();
 		result.Should().BeOfType<ApiResponse>();
 		result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-		result.Message.Should().Be(UserApiResponseMessageContraint.UserCreateFail);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserCreateFail);
 		result.Data.Should().BeEquivalentTo(_userMock.Object);
 	}
 }

@@ -45,6 +45,7 @@ namespace AssetManagement.Api
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IAssetRepository, AssetRepository>();
+            builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
 
 
             builder.Services.AddScoped<IUserService, UserService>();
@@ -137,7 +138,6 @@ namespace AssetManagement.Api
 
             app.MapControllers();
 
-            await app.DeleteAllDataAsync();
             await app.SeedDataAsync();
 
             app.Run();
