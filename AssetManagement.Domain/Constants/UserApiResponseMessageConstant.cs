@@ -1,6 +1,6 @@
 namespace AssetManagement.Domain.Constants;
 
-public static class UserApiResponseMessageContraint
+public static class UserApiResponseMessageConstant
 {
     public const string UserCreateSuccess = "User created successfully";
     public const string UserCreateFail = "There something went wrong while creating user, please try again later";

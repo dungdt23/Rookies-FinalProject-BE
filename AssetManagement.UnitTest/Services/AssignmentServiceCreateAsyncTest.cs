@@ -11,21 +11,23 @@ using Moq;
 namespace AssetManagement.UnitTest.Services
 {
     [TestFixture]
-    public class AssignmentServiceCreateAsyncTest
-    {
-        private Mock<IGenericRepository<Assignment>> _assignmentRepositoryMock;
-        private Mock<IMapper> _mapperMock;
-        private AssignmentService _assignmentService;
-        private Mock<RequestAssignmentDto> _requestDtoMock;
-        private Mock<Assignment> _assignmentMock;
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            _assignmentRepositoryMock = new Mock<IGenericRepository<Assignment>>();
-            _mapperMock = new Mock<IMapper>();
-            _assignmentService = new AssignmentService(_assignmentRepositoryMock.Object, _mapperMock.Object);
-        }
+	public class AssignmentServiceCreateAsyncTest
+	{
+		private  Mock<IAssignmentRepository> _assignmentRepositoryMock;
+		private  Mock<IMapper> _mapperMock;
+		private  AssignmentService _assignmentService;
+		private Mock<RequestAssignmentDto> _requestDtoMock;
+		private Mock<Assignment> _assignmentMock;
+
+		[OneTimeSetUp]
+		public void OneTimeSetUp()
+		{
+			_assignmentRepositoryMock = new Mock<IAssignmentRepository>();
+			_mapperMock = new Mock<IMapper>();
+			_assignmentService = new AssignmentService(_assignmentRepositoryMock.Object, _mapperMock.Object);
+		}
+
 
         [SetUp]
         public void SetUp()
@@ -44,11 +46,13 @@ namespace AssetManagement.UnitTest.Services
             // Act
             var result = await _assignmentService.CreateAsync(_requestDtoMock.Object);
 
-            // Assert
-            result.StatusCode.Should().Be(StatusCodes.Status200OK);
-            result.Message.Should().Be(AssignmentApiResponseMessageContraint.AssignmentCreateSuccess);
-            result.Data.Should().Be(_assignmentMock.Object);
-        }
+
+			// Assert
+			result.StatusCode.Should().Be(StatusCodes.Status200OK);
+			result.Message.Should().Be(AssignmentApiResponseMessageConstant.AssignmentCreateSuccess);
+			result.Data.Should().Be(_assignmentMock.Object);
+		}
+
 
         [Test]
         public async Task CreateAsync_ShouldReturnStatus500InternalServerError_WhenCreationFails()
@@ -60,10 +64,12 @@ namespace AssetManagement.UnitTest.Services
             // Act
             var result = await _assignmentService.CreateAsync(_requestDtoMock.Object);
 
-            // Assert
-            result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-            result.Message.Should().Be(AssignmentApiResponseMessageContraint.AssignmentCreateFail);
-            result.Data.Should().Be(_assignmentMock.Object);
-        }
-    }
+
+			// Assert
+			result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+			result.Message.Should().Be(AssignmentApiResponseMessageConstant.AssignmentCreateFail);
+			result.Data.Should().Be(_assignmentMock.Object);
+		}
+	}
+
 }

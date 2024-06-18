@@ -70,59 +70,60 @@ public class UserServiceCreateAsyncTest
         result.Should().NotBeNull();
         result.Should().BeOfType<ApiResponse>();
         result.StatusCode.Should().Be(StatusCodes.Status200OK);
-        result.Message.Should().Be(UserApiResponseMessageContraint.UserCreateSuccess);
+        result.Message.Should().Be(UserApiResponseMessageConstant.UserCreateSuccess);
         result.Data.Should().BeEquivalentTo(_userMock.Object);
     }
 
     [Test]
     public async Task CreateAsync_ShouldReturnErrorResponse_WhenTypeDoesNotExist()
     {
-        // Arrange
-        var invalidTypeName = "invalid";
-        _createFormMock.Object.Type = invalidTypeName;
-        //Create empty list to return type == null
-        var typeListMock = new List<Type>();
-        var mockQueryable = typeListMock.AsQueryable().AsNoTracking().BuildMock();
+		// Arrange
+		var invalidTypeName = "invalid";
+		_createFormMock.Object.Type = invalidTypeName;
+		//Create empty list to return type == null
+		var typeListMock = new List<Type>();
+		var mockQueryable = typeListMock.AsQueryable().AsNoTracking().BuildMock();
 
-        _typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
+		_typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
 
-        // Act
-        var result = await _userService.CreateAsync(_createFormMock.Object);
+		// Act
+		var result = await _userService.CreateAsync(_createFormMock.Object);
 
-        // Assert
-        result.Should().NotBeNull();
-        result.Should().BeOfType<ApiResponse>();
-        result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-        result.Message.Should().Be(UserApiResponseMessageContraint.UserCreateFail);
-        result.Data.Should().BeEquivalentTo(_createFormMock.Object.Type);
-    }
-    [Test]
-    public async Task CreateAsync_ShouldReturnErrorResponse_WhenUserCreationFails()
+		// Assert
+		result.Should().NotBeNull();
+		result.Should().BeOfType<ApiResponse>();
+		result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserCreateFail);
+		result.Data.Should().BeEquivalentTo(_createFormMock.Object.Type);
+	}
+	[Test]
+	public async Task CreateAsync_ShouldReturnErrorResponse_WhenUserCreationFails()
     {
-        // Arrange
-        var generatedUserName = "sonnvb";
-        var generatedStaffCode = "SD0001";
-        _userMock.Object.FirstName = "Nguyen Viet Bao";
-        _userMock.Object.LastName = "Son";
+		// Arrange
+		var generatedUserName = "sonnvb";
+		var generatedStaffCode = "SD0001";
+		_userMock.Object.FirstName = "Nguyen Viet Bao";
+		_userMock.Object.LastName = "Son";
 
-        var typeMock = new Mock<Type>();
-        var typeListMock = new List<Type> { typeMock.Object };
-        var mockQueryable = typeListMock.AsQueryable().BuildMock();
+		var typeMock = new Mock<Type>();
+		var typeListMock = new List<Type> { typeMock.Object };
+		var mockQueryable = typeListMock.AsQueryable().BuildMock();
 
-        _typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
-        _mapperMock.Setup(m => m.Map<User>(It.IsAny<CreateUpdateUserForm>())).Returns(_userMock.Object);
-        _userRepositoryMock.Setup(r => r.GenerateStaffCode()).Returns(generatedStaffCode);
-        _userRepositoryMock.Setup(r => r.GenerateUserName(It.IsAny<string>())).Returns(generatedUserName);
-        _userRepositoryMock.Setup(r => r.AddAsync(It.IsAny<User>())).ReturnsAsync(0);
+		_typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
+		_mapperMock.Setup(m => m.Map<User>(It.IsAny<CreateUpdateUserForm>())).Returns(_userMock.Object);
+		_userRepositoryMock.Setup(r => r.GenerateStaffCode()).Returns(generatedStaffCode);
+		_userRepositoryMock.Setup(r => r.GenerateUserName(It.IsAny<string>())).Returns(generatedUserName);
+		_userRepositoryMock.Setup(r => r.AddAsync(It.IsAny<User>())).ReturnsAsync(0);
 
-        // Act
-        var result = await _userService.CreateAsync(_createFormMock.Object);
+		// Act
+		var result = await _userService.CreateAsync(_createFormMock.Object);
 
-        // Assert
-        result.Should().NotBeNull();
-        result.Should().BeOfType<ApiResponse>();
-        result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
-        result.Message.Should().Be(UserApiResponseMessageContraint.UserCreateFail);
-        result.Data.Should().BeEquivalentTo(_userMock.Object);
-    }
+		// Assert
+		result.Should().NotBeNull();
+		result.Should().BeOfType<ApiResponse>();
+		result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+		result.Message.Should().Be(UserApiResponseMessageConstant.UserCreateFail);
+		result.Data.Should().BeEquivalentTo(_userMock.Object);
+	}
+
 }

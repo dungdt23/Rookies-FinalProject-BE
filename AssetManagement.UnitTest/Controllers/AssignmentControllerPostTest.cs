@@ -44,7 +44,7 @@ namespace AssetManagement.UnitTest.Controllers
 			var apiResponse = new ApiResponse
 			{
 				StatusCode = StatusCodes.Status200OK,
-				Message = AssignmentApiResponseMessageContraint.AssignmentCreateSuccess,
+				Message = AssignmentApiResponseMessageConstant.AssignmentCreateSuccess,
 				Data = _assignmentMock.Object
 			};
 			_assignmentServiceMock.Setup(s => s.CreateAsync(It.IsAny<RequestAssignmentDto>()))
@@ -67,7 +67,7 @@ namespace AssetManagement.UnitTest.Controllers
 			var apiResponse = new ApiResponse
 			{
 				StatusCode = StatusCodes.Status500InternalServerError,
-				Message = AssignmentApiResponseMessageContraint.AssignmentCreateFail,
+				Message = AssignmentApiResponseMessageConstant.AssignmentCreateFail,
 				Data = _assignmentMock.Object
 			};
 			_assignmentServiceMock.Setup(s => s.CreateAsync(It.IsAny<RequestAssignmentDto>()))

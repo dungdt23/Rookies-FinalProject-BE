@@ -45,6 +45,7 @@ namespace AssetManagement.Api
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IAssetRepository, AssetRepository>();
+            builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
 
 
             builder.Services.AddScoped<IUserService, UserService>();
