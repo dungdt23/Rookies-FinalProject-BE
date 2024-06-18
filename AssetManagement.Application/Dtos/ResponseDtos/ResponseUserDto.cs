@@ -10,7 +10,7 @@ namespace AssetManagement.Application.Dtos.ResponseDtos
         public string LastName { get; set; }
         public string UserName { get; set; }
         public DateTime JoinedDate { get; set; }
-        public TypeGender TypeGender { get; set; }
+        public TypeGender Gender { get; set; }
         public DateTime DateOfBirth { get; set; }
 
         public string Type { get; set; }
