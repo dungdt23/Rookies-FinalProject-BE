@@ -24,7 +24,7 @@ namespace AssetManagement.Api.Controllers
 		public async Task<IActionResult> Post([FromBody] RequestAssignmentDto request)
 		{
 			var userIdClaim = HttpContext.GetClaim("id");
-			request.AssigneeId = new Guid(userIdClaim);
+			request.AssignerId = new Guid(userIdClaim);
 			var result = await _assignmentService.CreateAsync(request);
 			if (result.StatusCode == StatusCodes.Status500InternalServerError)
 			{
