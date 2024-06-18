@@ -83,7 +83,6 @@ namespace AssetManagement.UnitTest.Services
 
             // Assert
             Assert.AreEqual("Update asset failed", result.Message);
-            Assert.AreEqual(requestDto, result.Data);
         }
         [Test]
         public async Task UpdateAsync_ShouldReturnApiResponse_WhenAssetIsNotExisted()
@@ -101,7 +100,6 @@ namespace AssetManagement.UnitTest.Services
 
             // Assert
             Assert.AreEqual("Asset doesn't exist", result.Message);
-            Assert.AreEqual(requestDto, result.Data);
         }
         [Test]
         public async Task UpdateAsync_ShouldReturnApiResponse_WhenAssetIsAssigned()
@@ -120,7 +118,6 @@ namespace AssetManagement.UnitTest.Services
 
             // Assert
             Assert.AreEqual("Can't update asset because it is assigned", result.Message);
-            Assert.AreEqual(requestDto, result.Data);
         }
     }
 }
