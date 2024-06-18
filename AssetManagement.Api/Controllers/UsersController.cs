@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using AssetManagement.Api.Authorizations;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Models;
@@ -22,23 +23,17 @@ public class UsersController : ControllerBase
         _applicationSettings = applicationSettings.Value;
     }
 
-    [HttpPost]
-    [Authorize(Roles = TypeNameContraint.TypeAdmin)]
-    public async Task<IActionResult> Post([FromBody] CreateUpdateUserForm createUserForm)
-    {
-        //Get claim locationId from bearer token
-        var authorizationHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-        var token = authorizationHeader.Substring("Bearer ".Length).Trim();
-        var handler = new JwtSecurityTokenHandler();
-        var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
-        var locationIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "locationId")?.Value;
-
-        createUserForm.LocationId = new Guid(locationIdClaim);
-        var result = await _userService.CreateAsync(createUserForm);
-        if (result.StatusCode == StatusCodes.Status500InternalServerError)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, result);
-        }
+	[HttpPost]
+	[Authorize(Roles = TypeNameContraint.TypeAdmin)]
+	public async Task<IActionResult> Post([FromBody] CreateUpdateUserForm createUserForm)
+	{
+		var locationIdClaim = HttpContext.GetClaim("locationId");
+		createUserForm.LocationId = new Guid(locationIdClaim);
+		var result = await _userService.CreateAsync(createUserForm);
+		if (result.StatusCode == StatusCodes.Status500InternalServerError)
+		{
+			return StatusCode(StatusCodes.Status500InternalServerError, result);
+		}
 
         return Ok(result);
     }

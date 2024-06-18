@@ -22,6 +22,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
+using AssetManagement.Application.IServices.IAssignmentServices;
+using AssetManagement.Application.Services.AssignmentServices;
+using AssetManagement.Api.Middlewares;
 
 
 namespace AssetManagement.Api
@@ -129,8 +132,8 @@ namespace AssetManagement.Api
             app.UseHttpsRedirection();
             app.UseCors("AllowAllOrigins");
 
-            app.UseAuthorization();
-
+			app.UseAuthentication();
+			app.UseAuthorization();
 
             app.MapControllers();
 

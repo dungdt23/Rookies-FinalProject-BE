@@ -69,15 +69,15 @@ public class UserServiceLoginAsyncTest
         // Act
         var result = await _userService.LoginAsync(login, key);
 
-        // Assert
-        result.Should().NotBeNull();
-        result.StatusCode.Should().Be(StatusCodes.Status200OK);
-        result.Message.Should().Be(UserApiResponseMessageContraint.UserLoginSuccess);
-        var data = result.Data as ResponseLoginDto;
-        data.TokenType.Should().Be("Bearer");
-        data.Token.Should().NotBeNullOrEmpty();
-        data.IsFirstTimeLogin.Should().Be(true);
-    }
+		// Assert
+		result.Should().NotBeNull();
+		result.StatusCode.Should().Be(StatusCodes.Status200OK);
+		result.Message.Should().Be(UserApiResponseMessageContraint.UserLoginSuccess);
+		var data = result.Data as ResponseLoginDto;
+		data.TokenType.Should().Be("Bearer");
+		data.Token.Should().NotBeNullOrEmpty();
+		data.IsPasswordChanged.Should().Be(true);
+	}
 
     [Test]
     public async Task LoginAsync_ShouldReturnBadRequest_WhenPasswordIsInvalid()
