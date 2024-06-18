@@ -56,6 +56,7 @@ public class UsersController : ControllerBase
 	}
 
     [HttpGet]
+    [Authorize(Roles = TypeNameContraint.TypeAdmin)]
     public async Task<IActionResult> Get([FromQuery] UserFilter filter, int index = 1, int size = 10)
     {
         var result = await _userService.GetAllAsync(filter, index, size);
@@ -66,6 +67,7 @@ public class UsersController : ControllerBase
         return Ok(result);
     }
     [HttpDelete("{id}")]
+    [Authorize(Roles = TypeNameContraint.TypeAdmin)]
     public async Task<IActionResult> Delete(Guid id)
     {
         var result = await _userService.DisableUser(id);
@@ -88,6 +90,7 @@ public class UsersController : ControllerBase
 		return Ok(result);
 	}
 	[HttpGet("{id}")]
+    [Authorize(Roles = TypeNameContraint.TypeAdmin)]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _userService.GetById(id);

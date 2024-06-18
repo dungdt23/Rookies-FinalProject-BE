@@ -1,6 +1,8 @@
 ﻿using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IAssetServices;
+using AssetManagement.Domain.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AssetManagement.Api.Controllers
@@ -16,6 +18,7 @@ namespace AssetManagement.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
         public async Task<IActionResult> Get([FromQuery]AssetFilter filter, int index = 1, int size = 10)
         {
             var result = await _assetService.GetAllAsync(filter, index,  size);
@@ -27,6 +30,7 @@ namespace AssetManagement.Api.Controllers
             return Ok(result);
         }
         [HttpPost]
+        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
         public async Task<IActionResult> Post([FromBody] RequestAssetDto requestAssetDto)
         {
             var result = await _assetService.AddAsync(requestAssetDto);
@@ -37,6 +41,7 @@ namespace AssetManagement.Api.Controllers
             return Ok(result);
         }
         [HttpDelete("{id}")]
+        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _assetService.DeleteAsync(id);
@@ -47,6 +52,7 @@ namespace AssetManagement.Api.Controllers
             return Ok(result);
         }
         [HttpPut("{id}")]
+        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
         public async Task<IActionResult> Put(Guid id, [FromBody] RequestAssetDto requestAssetDto)
         {
             var result = await _assetService.UpdateAsync(id,requestAssetDto);

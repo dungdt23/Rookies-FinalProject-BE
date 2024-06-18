@@ -45,7 +45,7 @@ public static class ApplicationExtension
                 //pre-user for easier login
                 var adminUser = new CreateUpdateUserForm
                 {
-                    FirstName = "Nguyẽn",
+                    FirstName = "Nguyễn",
                     LastName = "Minh Ánh",
                     Type = "Admin",
                     LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Hà Nội")).Id,
