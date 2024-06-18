@@ -82,7 +82,7 @@ namespace AssetManagement.Application.Services.AssetServices
                 return new ApiResponse
                 {
                     Message = "Asset doesn't exist",
-                    StatusCode = StatusCodes.Status500InternalServerError
+                    StatusCode = StatusCodes.Status404NotFound
                 };
             }
             if (asset.State == Domain.Enums.TypeAssetState.Assigned)
@@ -90,7 +90,7 @@ namespace AssetManagement.Application.Services.AssetServices
                 return new ApiResponse
                 {
                     Message = "Can't update asset because it is assigned",
-                    StatusCode = StatusCodes.Status500InternalServerError
+                    StatusCode = StatusCodes.Status409Conflict
                 };
             }
             var updateAsset = _mapper.Map<Asset>(requestAssetDto);
@@ -123,7 +123,7 @@ namespace AssetManagement.Application.Services.AssetServices
                 return new ApiResponse
                 {
                     Message = "Asset doesn't exist",
-                    StatusCode = StatusCodes.Status500InternalServerError
+                    StatusCode = StatusCodes.Status404NotFound
                 };
             }
             //check if asset belong to any historical assignment
@@ -131,19 +131,8 @@ namespace AssetManagement.Application.Services.AssetServices
             if (historicalAssignment != null) return new ApiResponse
             {
                 Message = "Can not be deleted! Asset belong to an historical assignment",
-                StatusCode = StatusCodes.Status500InternalServerError
+                StatusCode = StatusCodes.Status409Conflict
             };
-            //check if asset is available
-            //if (asset.State != Domain.Enums.TypeAssetState.Available)
-            //{
-            //    return new ApiResponse
-            //    {
-            //        Message = "Asset not available! Please update its state",
-            //        StatusCode = StatusCodes.Status500InternalServerError
-            //    };
-            //}
-            //else
-            //{
             var status = await _assetRepository.DeleteAsync(id);
             if (status == StatusConstant.Success)
             {
@@ -160,7 +149,6 @@ namespace AssetManagement.Application.Services.AssetServices
                     StatusCode = StatusCodes.Status500InternalServerError
                 };
             }
-            //}
         }
     }
 }

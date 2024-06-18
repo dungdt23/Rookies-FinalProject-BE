@@ -56,7 +56,7 @@ public class UserService : IUserService
         {
             return new ApiResponse
             {
-                StatusCode = StatusCodes.Status500InternalServerError,
+                StatusCode = StatusCodes.Status404NotFound,
                 Message = UserApiResponseMessageContraint.UserCreateFail,
                 Data = form.Type
             };
@@ -65,12 +65,12 @@ public class UserService : IUserService
         var user = _mapper.Map<User>(form);
 
 
-		user.StaffCode = _userRepository.GenerateStaffCode();
-		var usernameToGenerate = $"{user.FirstName.Trim()} {user.LastName.Trim()}";
-		var usernameRemovedSymbol = usernameToGenerate.RemoveDiacritics();
-		user.UserName = _userRepository.GenerateUserName(usernameRemovedSymbol);
-		user.TypeId = type.Id;
-		user = EncryptPassword(user, $"{user.UserName}@{user.DateOfBirth:ddMMyyyy}");
+        user.StaffCode = _userRepository.GenerateStaffCode();
+        var usernameToGenerate = $"{user.FirstName.Trim()} {user.LastName.Trim()}";
+        var usernameRemovedSymbol = usernameToGenerate.RemoveDiacritics();
+        user.UserName = _userRepository.GenerateUserName(usernameRemovedSymbol);
+        user.TypeId = type.Id;
+        user = EncryptPassword(user, $"{user.UserName}@{user.DateOfBirth:ddMMyyyy}");
 
         if (await _userRepository.AddAsync(user) > 0)
         {
@@ -128,33 +128,33 @@ public class UserService : IUserService
         return user;
     }
 
-	public async Task<ApiResponse> UpdateAsync(Guid id, CreateUpdateUserForm form)
-	{
-		var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
+    public async Task<ApiResponse> UpdateAsync(Guid id, CreateUpdateUserForm form)
+    {
+        var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
 
-		if (type == null)
-		{
-			return new ApiResponse
-			{
-				StatusCode = StatusCodes.Status500InternalServerError,
-				Message = UserApiResponseMessageContraint.UserUpdateFail,
-				Data = form.Type
-			};
-		}
+        if (type == null)
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status404NotFound,
+                Message = UserApiResponseMessageContraint.UserUpdateFail,
+                Data = form.Type
+            };
+        }
 
-		var user = _userRepository.GetByCondition(u => u.Id == id).FirstOrDefault();
-		if (user == null)
-		{
-			return new ApiResponse
-			{
-				StatusCode = StatusCodes.Status404NotFound,
-				Data = id,
-				Message = UserApiResponseMessageContraint.UserNotFound
-			};
-		}
-		form.LocationId = user.LocationId;
-		_mapper.Map(form, user);
-		user.TypeId = type.Id;
+        var user = _userRepository.GetByCondition(u => u.Id == id).FirstOrDefault();
+        if (user == null)
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status404NotFound,
+                Data = id,
+                Message = UserApiResponseMessageContraint.UserNotFound
+            };
+        }
+        form.LocationId = user.LocationId;
+        _mapper.Map(form, user);
+        user.TypeId = type.Id;
 
         if (await _userRepository.UpdateAsync(user) > 0)
         {
@@ -199,65 +199,66 @@ public class UserService : IUserService
         else
             return new ApiResponse
             {
-                Message = "Can't disable user because user still has valid assignments"
+                Message = "Can't disable user because user still has valid assignments",
+                StatusCode= StatusCodes.Status409Conflict
             };
     }
 
 
-	public async Task<ApiResponse> LoginAsync(LoginForm login, byte[] key)
-	{
-		var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName)
-										.Include(u => u.Type)
-										.FirstOrDefaultAsync();
-		if (user == null)
-		{
-			return new ApiResponse
-			{
-				StatusCode = StatusCodes.Status400BadRequest,
-				Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
-				Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
-			};
-		}
-		var match = CheckPassword(user, login.Password);
-		if (!match)
-		{
-			return new ApiResponse
-			{
-				StatusCode = StatusCodes.Status400BadRequest,
-				Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
-				Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
-			};
-		}
+    public async Task<ApiResponse> LoginAsync(LoginForm login, byte[] key)
+    {
+        var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName)
+                                        .Include(u => u.Type)
+                                        .FirstOrDefaultAsync();
+        if (user == null)
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
+                Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
+            };
+        }
+        var match = CheckPassword(user, login.Password);
+        if (!match)
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername,
+                Data = UserApiResponseMessageContraint.UserLoginWrongPasswordOrUsername
+            };
+        }
 
 
         var isFirstTimeLogin = string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
 
-		var tokenHandler = new JwtSecurityTokenHandler();
-		var tokenDescriptor = new SecurityTokenDescriptor
-		{
-			Subject = new ClaimsIdentity(new[]
-			{
-				new Claim("id", user.Id.ToString()),
-				new Claim(ClaimTypes.Role, user.Type.TypeName.ToUpper()),
-				new Claim("locationId", user.LocationId.ToString())
-			  }),
-			Expires = DateTime.UtcNow.AddDays(7),
-			SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
-		};
-		var token = tokenHandler.CreateToken(tokenDescriptor);
-		var encrypterToken = tokenHandler.WriteToken(token);
-		return new ApiResponse
-		{
-			StatusCode = StatusCodes.Status200OK,
-			Message = UserApiResponseMessageContraint.UserLoginSuccess,
-			Data = new ResponseLoginDto
-			{
-				TokenType = "Bearer",
-				Token = encrypterToken,
-				IsFirstTimeLogin = isFirstTimeLogin
-			}
-		};
-	}
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim("id", user.Id.ToString()),
+                new Claim(ClaimTypes.Role, user.Type.TypeName.ToUpper()),
+                new Claim("locationId", user.LocationId.ToString())
+              }),
+            Expires = DateTime.UtcNow.AddDays(7),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+        };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var encrypterToken = tokenHandler.WriteToken(token);
+        return new ApiResponse
+        {
+            StatusCode = StatusCodes.Status200OK,
+            Message = UserApiResponseMessageContraint.UserLoginSuccess,
+            Data = new ResponseLoginDto
+            {
+                TokenType = "Bearer",
+                Token = encrypterToken,
+                IsFirstTimeLogin = isFirstTimeLogin
+            }
+        };
+    }
 
 
     public async Task<ApiResponse> GetById(Guid id)
@@ -271,7 +272,7 @@ public class UserService : IUserService
             return new ApiResponse
             {
                 Message = "User doesn't exist",
-                StatusCode = StatusCodes.Status500InternalServerError
+                StatusCode = StatusCodes.Status404NotFound
             };
         }
         else
