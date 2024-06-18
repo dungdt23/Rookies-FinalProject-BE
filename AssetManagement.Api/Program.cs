@@ -22,6 +22,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using AssetManagement.Application.IServices.IAssignmentServices;
 using AssetManagement.Application.Services.AssignmentServices;
+using AssetManagement.Api.Middlewares;
 
 
 namespace AssetManagement.Api
@@ -120,8 +121,8 @@ namespace AssetManagement.Api
 			app.UseHttpsRedirection();
 			app.UseCors("AllowAllOrigins");
 
+			app.UseAuthentication();
 			app.UseAuthorization();
-
 
 			app.MapControllers();
 

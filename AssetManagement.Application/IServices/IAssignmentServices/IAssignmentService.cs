@@ -14,7 +14,9 @@ namespace AssetManagement.Application.IServices.IAssignmentServices
 	{
 		Task<ApiResponse> CreateAsync(RequestAssignmentDto request);
 		Task<PagedResponse<ResponseAssetDto>> GetAllAsync(AssetFilter filter, int? index, int? size);
-		Task<ApiResponse> UpdateAsync(RequestAssignmentDto request);
-		
+		Task<ApiResponse> UpdateAsync(Guid id,RequestAssignmentDto request);
+		Task<ApiResponse> DeleteAsync(Guid id);
+
+
 	}
 }

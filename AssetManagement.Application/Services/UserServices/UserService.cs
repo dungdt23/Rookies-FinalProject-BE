@@ -203,6 +203,7 @@ public class UserService : IUserService
 	{
 		var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName)
 										.Include(u => u.Type)
+										.Include(u => u.Location)
 										.FirstOrDefaultAsync();
 		if (user == null)
 		{
@@ -224,7 +225,7 @@ public class UserService : IUserService
 			};
 		}
 
-		var isFirstTimeLogin = string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
+		var IsPasswordChanged = string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
 
 		var tokenHandler = new JwtSecurityTokenHandler();
 		var tokenDescriptor = new SecurityTokenDescriptor
@@ -232,8 +233,11 @@ public class UserService : IUserService
 			Subject = new ClaimsIdentity(new[]
 			{
 				new Claim("id", user.Id.ToString()),
-				new Claim(ClaimTypes.Role, user.Type.TypeName.ToUpper()),
-				new Claim("locationId", user.LocationId.ToString())
+				new Claim("username", user.UserName),
+				new Claim("typeId", user.TypeId.ToString()),
+				new Claim("type", user.Type.TypeName.ToUpper()),
+				new Claim("locationId", user.LocationId.ToString()),
+				new Claim("location", user.Location.LocationName)
 			  }),
 			Expires = DateTime.UtcNow.AddDays(7),
 			SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
@@ -248,7 +252,7 @@ public class UserService : IUserService
 			{
 				TokenType = "Bearer",
 				Token = encrypterToken,
-				IsFirstTimeLogin = isFirstTimeLogin
+				IsPasswordChanged = IsPasswordChanged
 			}
 		};
 	}
