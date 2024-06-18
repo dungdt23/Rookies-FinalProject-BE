@@ -7,16 +7,10 @@ using AutoMapper;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AssetManagement.UnitTest.Services
 {
-	[TestFixture]
+    [TestFixture]
 	public class AssignmentServiceCreateAsyncTest
 	{
 		private  Mock<IGenericRepository<Assignment>> _assignmentRepositoryMock;

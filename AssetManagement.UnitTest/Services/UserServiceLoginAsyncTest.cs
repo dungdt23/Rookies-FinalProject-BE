@@ -1,5 +1,4 @@
 using AssetManagement.Application.Dtos.ResponseDtos;
-using AssetManagement.Application.Filters;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.Models;
 using AssetManagement.Application.Services.UserServices;
@@ -8,12 +7,10 @@ using AssetManagement.Domain.Entities;
 using AutoMapper;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
 using System.Linq.Expressions;
 using System.Text;
-using Type = AssetManagement.Domain.Entities.Type;
 
 namespace AssetManagement.UnitTest.Services;
 [TestFixture]
