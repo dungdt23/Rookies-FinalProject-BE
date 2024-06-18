@@ -134,33 +134,33 @@ namespace AssetManagement.Application.Services.AssetServices
                 StatusCode = StatusCodes.Status500InternalServerError
             };
             //check if asset is available
-            if (asset.State != Domain.Enums.TypeAssetState.Available)
+            //if (asset.State != Domain.Enums.TypeAssetState.Available)
+            //{
+            //    return new ApiResponse
+            //    {
+            //        Message = "Asset not available! Please update its state",
+            //        StatusCode = StatusCodes.Status500InternalServerError
+            //    };
+            //}
+            //else
+            //{
+            var status = await _assetRepository.DeleteAsync(id);
+            if (status == StatusConstant.Success)
             {
                 return new ApiResponse
                 {
-                    Message = "Asset not available! Please update its state",
-                    StatusCode = StatusCodes.Status500InternalServerError
+                    Message = "Delete asset successfully"
                 };
             }
             else
             {
-                var status = await _assetRepository.DeleteAsync(id);
-                if (status == StatusConstant.Success)
+                return new ApiResponse
                 {
-                    return new ApiResponse
-                    {
-                        Message = "Delete asset successfully"
-                    };
-                }
-                else
-                {
-                    return new ApiResponse
-                    {
-                        Message = "Delete asset failed",
-                        StatusCode = StatusCodes.Status500InternalServerError
-                    };
-                }
+                    Message = "Delete asset failed",
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
             }
+            //}
         }
     }
 }

@@ -4,7 +4,6 @@ using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Migrations;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 
 namespace AssetManagement.Infrastructure.Repositories
 {
@@ -53,7 +52,7 @@ namespace AssetManagement.Infrastructure.Repositories
         {
             return await ApplyFilter(filter).CountAsync();
         }
-        public string CreateAssetCode(string prefix,Guid categoryId)
+        public string CreateAssetCode(string prefix, Guid categoryId)
         {
             var prefixLength = prefix.Length;
             var assetCodes = _context.Assets
