@@ -20,6 +20,7 @@ namespace AssetManagement.Domain.Constants
 		public const string AssignmentDeleteFail = "There something went wrong while deleting assignment, please try again later";
 		public const string AssignmentRespondSuccess = "Assignment responded successfully";
 		public const string AssignmentRespondFail = "There something went wrong while responding to assignment, please try again later";
-
+		public const string AssignmentRespondNotWaitingForAcceptance = "Only assignment waiting for acceptance can be responded";
+		public const string AssignmentRespondNotAvailable = "Only asset assigned to assignment is available can be responded";
 	}
 }

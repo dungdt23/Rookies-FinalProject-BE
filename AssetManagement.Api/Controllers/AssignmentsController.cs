@@ -25,7 +25,12 @@ namespace AssetManagement.Api.Controllers
 		public async Task<IActionResult> Post([FromBody] RequestAssignmentDto request)
 		{
 			var userIdClaim = HttpContext.GetClaim("id");
-			request.AssignerId = new Guid(userIdClaim);
+			Guid userIdGuild;
+			if (!Guid.TryParse(userIdClaim, out userIdGuild))
+			{
+				return Unauthorized();
+			}
+			request.AssignerId = userIdGuild;
 			var result = await _assignmentService.CreateAsync(request);
 			if (result.StatusCode == StatusCodes.Status500InternalServerError)
 			{
@@ -52,11 +57,36 @@ namespace AssetManagement.Api.Controllers
 			return Ok(result);
 		}
 
+		[HttpPut("respond")]
+		[Authorize]
+		public async Task<IActionResult> Respond([FromBody] RequestAssignmentRespondDto request)
+		{
+			var result = await _assignmentService.RespondAsync(request);
+			if (result.StatusCode == StatusCodes.Status404NotFound)
+			{
+				return NotFound(result);
+			}
+			if(result.StatusCode == StatusCodes.Status400BadRequest)
+			{
+				return BadRequest(result);
+			}
+			if (result.StatusCode == StatusCodes.Status500InternalServerError)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, result);
+			}
+
+			return Ok(result);
+		}
+
 		[HttpDelete("{id:guid}")]
 		[Authorize(Roles = TypeNameContraint.TypeAdmin)]
 		public async Task<IActionResult> Delete(Guid id)
 		{
 			var result = await _assignmentService.DeleteAsync(id);
+			if (result.StatusCode == StatusCodes.Status400BadRequest)
+			{
+				return BadRequest(result);
+			}
 			if (result.StatusCode == StatusCodes.Status404NotFound)
 			{
 				return NotFound(result);
@@ -72,12 +102,32 @@ namespace AssetManagement.Api.Controllers
 		[Authorize]
 		public async Task<IActionResult> Get([FromQuery] AssignmentFilter filter, int index = 1, int size = 10)
 		{
+			var locationIdClaim = HttpContext.GetClaim("locationId");
+			Guid locationIdGuid;
+			if (!Guid.TryParse(locationIdClaim, out locationIdGuid))
+			{
+				return Unauthorized();
+			}
+			filter.LocationId = locationIdGuid;
 			var result = await _assignmentService.GetAllAsync(filter, index, size);
 			if (result.StatusCode == StatusCodes.Status404NotFound)
 			{
 				return NotFound(result);
 			}
 			return Ok(result);
+		}
+
+		[HttpGet("{id:guid}")]
+		[Authorize(Roles = TypeNameContraint.TypeAdmin)]
+		public async Task<IActionResult> Get(Guid id)
+		{
+			var result = await _assignmentService.GetByIdAsync(id);
+			if (result.StatusCode == StatusCodes.Status404NotFound)
+			{
+				return NotFound(result);
+			}
+			return Ok(result);
+
 		}
 	}
 }

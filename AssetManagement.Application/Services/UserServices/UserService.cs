@@ -57,7 +57,7 @@ public class UserService : IUserService
             return new ApiResponse
             {
                 StatusCode = StatusCodes.Status404NotFound,
-                Message = UserApiResponseMessageConstant.UserCreateFail,
+                Message = UserApiResponseMessageConstant.TypeNotFound,
                 Data = form.Type
             };
         }
@@ -145,7 +145,10 @@ public class UserService : IUserService
             };
         }
 
-        var user = _userRepository.GetByCondition(u => u.Id == id).FirstOrDefault();
+        var user = _userRepository.GetByCondition(u => u.Id == id)
+                                    .Include(u => u.Type)											
+                                    .Include(u => u.Location)
+                                    .FirstOrDefault();
         if (user == null)
         {
             return new ApiResponse
@@ -165,10 +168,7 @@ public class UserService : IUserService
             {
                 StatusCode = StatusCodes.Status200OK,
 				Message = UserApiResponseMessageConstant.UserUpdateSuccess,
-                Data = _mapper.Map<ResponseUserDto>(await _userRepository.GetByCondition(u => u.Id == user.Id)
-																		.Include(u => u.Type)
-																		.Include(u => u.Location)
-																		.FirstOrDefaultAsync())
+                Data = _mapper.Map<ResponseUserDto>(user)
             };
 
         }
