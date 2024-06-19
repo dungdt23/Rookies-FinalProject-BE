@@ -74,12 +74,15 @@ public class UserService : IUserService
 
         if (await _userRepository.AddAsync(user) > 0)
         {
-            return new ApiResponse
+			return new ApiResponse
             {
                 StatusCode = StatusCodes.Status200OK,
                 Message = UserApiResponseMessageConstant.UserCreateSuccess,
-                Data = user
-            };
+                Data = _mapper.Map<ResponseUserDto>(await _userRepository.GetByCondition(u => u.Id == user.Id)
+                                                                        .Include(u => u.Type)
+                                                                        .Include(u=> u.Location)
+                                                                        .FirstOrDefaultAsync())
+			};
         }
         else
         {
@@ -87,8 +90,8 @@ public class UserService : IUserService
             {
                 StatusCode = StatusCodes.Status500InternalServerError,
                 Message = UserApiResponseMessageConstant.UserCreateFail,
-                Data = user
-            };
+                Data = _mapper.Map<ResponseUserDto>(user)
+			};
 
         }
     }
@@ -161,8 +164,11 @@ public class UserService : IUserService
             return new ApiResponse
             {
                 StatusCode = StatusCodes.Status200OK,
-                Data = user,
-                Message = UserApiResponseMessageConstant.UserUpdateSuccess
+				Message = UserApiResponseMessageConstant.UserUpdateSuccess,
+                Data = _mapper.Map<ResponseUserDto>(await _userRepository.GetByCondition(u => u.Id == user.Id)
+																		.Include(u => u.Type)
+																		.Include(u => u.Location)
+																		.FirstOrDefaultAsync())
             };
 
         }
@@ -171,8 +177,8 @@ public class UserService : IUserService
             return new ApiResponse
             {
                 StatusCode = StatusCodes.Status500InternalServerError,
-                Data = user,
                 Message = UserApiResponseMessageConstant.UserUpdateFail,
+                Data = _mapper.Map<ResponseUserDto>(user)
             };
         }
     }
