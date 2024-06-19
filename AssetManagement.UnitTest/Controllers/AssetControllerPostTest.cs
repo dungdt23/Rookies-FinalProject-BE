@@ -4,6 +4,7 @@ using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.IServices.IAssetServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AssetManagement.UnitTest.Controllers
@@ -12,11 +13,13 @@ namespace AssetManagement.UnitTest.Controllers
     {
         private Mock<IAssetService> _mockAssetService;
         private AssetsController _assetsController;
+        private Mock<ILogger<AssetsController>> _mockLogger;
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             _mockAssetService = new Mock<IAssetService>();
-            _assetsController = new AssetsController(_mockAssetService.Object);
+            _mockLogger = new Mock<ILogger<AssetsController>>();
+            _assetsController = new AssetsController(_mockAssetService.Object, _mockLogger.Object);
         }
         [Test]
         public async Task Post_ShouldReturnOkResult_WhenAssetIsAddedSuccessfully()
