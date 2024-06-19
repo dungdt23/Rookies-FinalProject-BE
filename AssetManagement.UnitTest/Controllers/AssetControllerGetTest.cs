@@ -6,6 +6,7 @@ using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IAssetServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System.Security.Claims;
 
@@ -16,12 +17,13 @@ namespace AssetManagement.UnitTests.Controllers
     {
         private Mock<IAssetService> _mockAssetService;
         private AssetsController _controller;
-
-        [SetUp]
-        public void Setup()
+        private Mock<ILogger<AssetsController>> _mockLogger;
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             _mockAssetService = new Mock<IAssetService>();
-            _controller = new AssetsController(_mockAssetService.Object);
+            _mockLogger = new Mock<ILogger<AssetsController>>();
+            _controller = new AssetsController(_mockAssetService.Object, _mockLogger.Object);
         }
 
         private void SetUpHttpContextWithClaim(string claimType)
