@@ -25,6 +25,7 @@ using System.Text;
 using AssetManagement.Application.IServices.IAssignmentServices;
 using AssetManagement.Application.Services.AssignmentServices;
 using AssetManagement.Api.Middlewares;
+using Microsoft.Extensions.Options;
 
 
 namespace AssetManagement.Api
@@ -38,7 +39,12 @@ namespace AssetManagement.Api
             ConfigurationManager configuration = builder.Configuration;
             builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("ApplicationSettings"));
             builder.Services.AddDbContext<AssetManagementDBContext>(
-                options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+                options =>
+                {
+                    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                }
+
             );
 
             // Add services to the container.
@@ -133,8 +139,8 @@ namespace AssetManagement.Api
             app.UseHttpsRedirection();
             app.UseCors("AllowAllOrigins");
 
-			app.UseAuthentication();
-			app.UseAuthorization();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllers();
 

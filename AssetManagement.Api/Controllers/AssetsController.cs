@@ -60,7 +60,21 @@ namespace AssetManagement.Api.Controllers
         [Authorize(Roles = TypeNameContraint.TypeAdmin)]
         public async Task<IActionResult> Put(Guid id, [FromBody] RequestAssetDto requestAssetDto)
         {
+            var locationIdClaim = HttpContext.GetClaim("locationId");
+            var locationId = new Guid(locationIdClaim);
+            requestAssetDto.LocationId = locationId;
             var result = await _assetService.UpdateAsync(id, requestAssetDto);
+            if (result.StatusCode == StatusCodes.Status500InternalServerError)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
+            return Ok(result);
+        }
+        [HttpGet("{id}")]
+        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var result = await _assetService.GetByIdAysnc(id);
             if (result.StatusCode == StatusCodes.Status500InternalServerError)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, result);

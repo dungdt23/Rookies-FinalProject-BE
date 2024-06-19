@@ -11,8 +11,7 @@ namespace AssetManagement.Application.Dtos.RequestDtos
         public string AssetName { get; set; }
         [Required]
         public Guid CategoryId { get; set; }
-        [Required]
-        public Guid LocationId { get; set; }
+        public Guid? LocationId { get; set; }
         [Required]
         [Specification]
         public string Specification { get; set; }
