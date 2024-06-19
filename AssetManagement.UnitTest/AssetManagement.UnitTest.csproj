@@ -25,4 +25,7 @@
   <ItemGroup>
     <Using Include="NUnit.Framework" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controllers\Assets\" />
+  </ItemGroup>
 </Project>
