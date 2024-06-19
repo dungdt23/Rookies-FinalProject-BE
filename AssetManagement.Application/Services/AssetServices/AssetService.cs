@@ -29,9 +29,9 @@ namespace AssetManagement.Application.Services.AssetServices
             switch (filter.sort)
             {
                 case AssetSort.AssetName:
-                    sortConditon = x => x.AssetCode;
+                    sortConditon = x => x.AssetName;
                     break;
-                case AssetSort.Category:
+                case AssetSort.CategoryName:
                     sortConditon = x => x.Category.CategoryName;
                     break;
                 case AssetSort.State:
@@ -58,9 +58,10 @@ namespace AssetManagement.Application.Services.AssetServices
             var status = await _assetRepository.AddAsync(asset);
             if (status == StatusConstant.Success)
             {
+                var returnAsset = _mapper.Map<ResponseAssetDto>(asset);
                 return new ApiResponse
                 {
-                    Data = requestAssetDto,
+                    Data = returnAsset,
                     Message = "Add new asset successfully"
                 };
             }
