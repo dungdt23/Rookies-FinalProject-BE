@@ -47,6 +47,9 @@ namespace AssetManagement.Api
 
             );
 
+            // The following line enables Application Insights telemetry collection.
+            builder.Services.AddApplicationInsightsTelemetry();
+
             // Add services to the container.
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUserRepository, UserRepository>();

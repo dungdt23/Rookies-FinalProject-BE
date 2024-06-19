@@ -12,15 +12,19 @@ namespace AssetManagement.Api.Controllers
     public class AssetsController : ControllerBase
     {
         private readonly IAssetService _assetService;
-        public AssetsController(IAssetService assetService)
+        private readonly ILogger<AssetsController> _logger;
+        public AssetsController(IAssetService assetService, ILogger<AssetsController> logger)
         {
             _assetService = assetService;
+            _logger = logger;
         }
 
         [HttpGet]
         [Authorize(Roles = TypeNameContraint.TypeAdmin)]
         public async Task<IActionResult> Get([FromQuery] AssetFilter filter, int index = 1, int size = 10)
         {
+            _logger.LogInformation("Testing: Executing HTTP GET method in Asset Controller");
+
             var locationIdClaim = HttpContext.GetClaim("locationId");
             var locationId = new Guid(locationIdClaim);
             var result = await _assetService.GetAllAsync(locationId, filter, index, size);
