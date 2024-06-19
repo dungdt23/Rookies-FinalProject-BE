@@ -33,11 +33,11 @@ namespace AssetManagement.Infrastructure.Repositories
             IEnumerable<Asset> assets = await query.AsNoTracking().ToListAsync();
             if (filter.order == TypeOrder.Ascending)
             {
-                assets.OrderBy(sortCondition);
+                assets = assets.OrderBy(sortCondition);
             }
             else
             {
-                assets.OrderByDescending(sortCondition);
+                assets = assets.OrderByDescending(sortCondition);
             }
             if (index.HasValue && size.HasValue)
             {
