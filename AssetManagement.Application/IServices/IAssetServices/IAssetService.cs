@@ -11,6 +11,7 @@ namespace AssetManagement.Application.IServices.IAssetServices
         Task<ApiResponse> AddAsync(RequestAssetDto requestAssetDto);
         Task<ApiResponse> UpdateAsync(Guid id, RequestAssetDto requestAssetDto);
         Task<ApiResponse> DeleteAsync(Guid id);
+        Task<ApiResponse> GetByIdAysnc(Guid id);
 
     }
 }
