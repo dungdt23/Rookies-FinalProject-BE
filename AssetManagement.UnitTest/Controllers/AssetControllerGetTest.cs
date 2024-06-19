@@ -24,12 +24,13 @@ namespace AssetManagement.UnitTests.Controllers
             _controller = new AssetsController(_mockAssetService.Object);
         }
 
-        private void SetUpHttpContextWithClaim(string claimType, string claimValue)
+        private void SetUpHttpContextWithClaim(string claimType)
         {
+            var locationId = Guid.NewGuid();
             var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {
-                new Claim(claimType, claimValue)
-            }, "mock"));
+                new Claim(claimType, locationId.ToString())
+            }));
 
             var httpContext = new DefaultHttpContext { User = user };
             _controller.ControllerContext = new ControllerContext
@@ -54,7 +55,7 @@ namespace AssetManagement.UnitTests.Controllers
                 StatusCode = StatusCodes.Status200OK
             };
 
-            SetUpHttpContextWithClaim("locationId", locationId.ToString());
+            SetUpHttpContextWithClaim("locationId");
 
             _mockAssetService.Setup(svc => svc.GetAllAsync(locationId, filter, index, size))
                 .ReturnsAsync(pagedResponse);
@@ -81,7 +82,7 @@ namespace AssetManagement.UnitTests.Controllers
                 StatusCode = StatusCodes.Status200OK
             };
 
-            SetUpHttpContextWithClaim("locationId", locationId.ToString());
+            SetUpHttpContextWithClaim("locationId");
 
             _mockAssetService.Setup(svc => svc.AddAsync(It.Is<RequestAssetDto>(dto => dto.LocationId == locationId)))
                 .ReturnsAsync(apiResponse);

@@ -29,9 +29,9 @@ namespace AssetManagement.Application.Services.AssetServices
             switch (filter.sort)
             {
                 case AssetSort.AssetName:
-                    sortConditon = x => x.AssetCode;
+                    sortConditon = x => x.AssetName;
                     break;
-                case AssetSort.Category:
+                case AssetSort.CategoryName:
                     sortConditon = x => x.Category.CategoryName;
                     break;
                 case AssetSort.State:
@@ -58,9 +58,10 @@ namespace AssetManagement.Application.Services.AssetServices
             var status = await _assetRepository.AddAsync(asset);
             if (status == StatusConstant.Success)
             {
+                var returnAsset = _mapper.Map<ResponseAssetDto>(asset);
                 return new ApiResponse
                 {
-                    Data = requestAssetDto,
+                    Data = returnAsset,
                     Message = "Add new asset successfully"
                 };
             }
@@ -95,12 +96,14 @@ namespace AssetManagement.Application.Services.AssetServices
             }
             var updateAsset = _mapper.Map<Asset>(requestAssetDto);
             updateAsset.Id = asset.Id;
+            updateAsset.AssetCode = asset.AssetCode;
             var status = await _assetRepository.UpdateAsync(updateAsset);
             if (status == StatusConstant.Success)
             {
+                var responseAsset = _mapper.Map<ResponseAssetDto>(updateAsset);
                 return new ApiResponse
                 {
-                    Data = requestAssetDto,
+                    Data = responseAsset,
                     Message = "Update asset successfully"
                 };
             }
@@ -149,6 +152,20 @@ namespace AssetManagement.Application.Services.AssetServices
                     StatusCode = StatusCodes.Status500InternalServerError
                 };
             }
+        }
+        public async Task<ApiResponse> GetByIdAysnc(Guid id)
+        {
+            var asset = await _assetRepository
+                .GetByCondition(x => x.Id == id)
+                .AsNoTracking()
+                .Include(x => x.Category)
+                .Include(x => x.Location)
+                .FirstOrDefaultAsync();
+            var assetDto = _mapper.Map<ResponseAssetDto>(asset);
+            return new ApiResponse
+            {
+                Data = assetDto
+            };
         }
     }
 }

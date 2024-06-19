@@ -14,16 +14,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace AssetManagement.UnitTest.Controller;
+namespace AssetManagement.UnitTest.Controllers.Users;
 
 [TestFixture]
 public class UserControllerPostTest
 {
+    private readonly string _authorizeHeaderMock = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbklkIjoiOGIwYTY0MjMtNjkxMy00ZDQ5LWJhMmYtOTQ2ZjZkOTMwOWYxIiwic3ViIjoiMTIzNDU2Nzg5MCIsIm5hbWUiOiJKb2huIERvZSIsImlhdCI6MTUxNjIzOTAyMn0.fO7XginXh1Zbjl4D8AYXxMliC_VeozuKBsl3EjmAiPg";
     private Mock<IUserService> _userServiceMock;
     private Mock<IOptions<AppSetting>> _applicationSettingsMock;
     private UsersController _usersController;
     private Mock<CreateUpdateUserForm> _createUserFormMock;
-    private Mock<User> _userMock;
+    private Mock<ResponseUserDto> _userDtoMock;
     private Mock<UserFilter> _userFilterMock;
     private Mock<IMapper> _mapperMock;
 
@@ -40,7 +41,7 @@ public class UserControllerPostTest
     [SetUp]
     public void SetUp()
     {
-        _userMock = new Mock<User>();
+        _userDtoMock = new Mock<ResponseUserDto>();
         _createUserFormMock = new Mock<CreateUpdateUserForm>();
         _userFilterMock = new Mock<UserFilter>();
     }
@@ -53,9 +54,11 @@ public class UserControllerPostTest
         {
             StatusCode = StatusCodes.Status200OK,
             Message = UserApiResponseMessageConstant.UserCreateSuccess,
-            Data = _userMock.Object
+            Data = _userDtoMock.Object
         };
-
+        _usersController.ControllerContext = new ControllerContext();
+        _usersController.ControllerContext.HttpContext = new DefaultHttpContext();
+        _usersController.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
         _userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
 
         // Act
@@ -69,6 +72,21 @@ public class UserControllerPostTest
     }
 
     [Test]
+    public async Task Post_ShouldReturnUnAuthorized_WhenCantDecodeLocationIdFromToken()
+    {
+        // Arrange
+        _usersController.ControllerContext = new ControllerContext();
+        _usersController.ControllerContext.HttpContext = new DefaultHttpContext();
+
+        // Act
+        var result = await _usersController.Post(_createUserFormMock.Object);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(UnauthorizedResult));
+    }
+
+    [Test]
     public async Task Post_ShouldReturnInternalServerError_WhenUserCreationFails()
     {
         // Arrange
@@ -76,9 +94,12 @@ public class UserControllerPostTest
         {
             StatusCode = StatusCodes.Status500InternalServerError,
             Message = UserApiResponseMessageConstant.UserCreateFail,
-            Data = _userMock.Object
+            Data = _userDtoMock.Object
         };
 
+        _usersController.ControllerContext = new ControllerContext();
+        _usersController.ControllerContext.HttpContext = new DefaultHttpContext();
+        _usersController.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
         _userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
 
         // Act

@@ -8,7 +8,8 @@ public static class ControllerExtension
     public static string GetClaim(this HttpContext context, string claimType)
     {
         var authorizationHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-        if(authorizationHeader == null){
+        if (authorizationHeader == null)
+        {
             return string.Empty;
         }
         var token = authorizationHeader.Substring("Bearer ".Length).Trim();

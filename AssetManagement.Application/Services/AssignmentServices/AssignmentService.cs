@@ -30,6 +30,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 		}
 		public async Task<ApiResponse> CreateAsync(RequestAssignmentDto request)
 		{
+
 			var assignment = _mapper.Map<Assignment>(request);
 
 			assignment.State = TypeAssignmentState.WaitingForAcceptance;
@@ -40,7 +41,12 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				{
 					StatusCode = StatusCodes.Status200OK,
 					Message = AssignmentApiResponseMessageConstant.AssignmentCreateSuccess,
-					Data = assignment
+					Data = _mapper.Map<ResponseAssignmentDto>(await _assignmentRepository.GetByCondition(a => a.Id == assignment.Id)
+																						.Include(a => a.Assigner)
+																						.Include(a => a.Assignee)
+																						.Include(a => a.Asset)
+																						.AsNoTracking()
+																						.FirstOrDefaultAsync())
 				};
 			}
 			else
@@ -49,7 +55,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				{
 					StatusCode = StatusCodes.Status500InternalServerError,
 					Message = AssignmentApiResponseMessageConstant.AssignmentCreateFail,
-					Data = assignment
+					Data = _mapper.Map<ResponseAssignmentDto>(assignment)
 				};
 
 			}
@@ -85,7 +91,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				{
 					StatusCode = StatusCodes.Status200OK,
 					Message = AssignmentApiResponseMessageConstant.AssignmentDeleteSuccess,
-					Data = assignment
+					Data = _mapper.Map<ResponseAssignmentDto>(assignment)
 				};
 			}
 			else
@@ -94,7 +100,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				{
 					StatusCode = StatusCodes.Status500InternalServerError,
 					Message = AssignmentApiResponseMessageConstant.AssignmentDeleteFail,
-					Data = assignment
+					Data = _mapper.Map<ResponseAssignmentDto>(assignment)
 				};
 			}
 		}
@@ -141,15 +147,44 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			var assignmentDtos = _mapper.Map<List<ResponseAssignmentDto>>(assignments);
 			return new PagedResponse<ResponseAssignmentDto>
 			{
+				StatusCode = StatusCodes.Status200OK,
 				Data = assignmentDtos,
 				TotalCount = totalCount,
 				Message = AssignmentApiResponseMessageConstant.AssignmentGetSuccess
 			};
 		}
 
+		public async Task<ApiResponse> GetByIdAsync(Guid id)
+		{
+			var assignment = await _assignmentRepository.GetByCondition(a => a.Id == id)
+														.Include(a => a.Assigner)
+														.Include(a => a.Assignee)
+														.Include(a => a.Asset)
+														.FirstOrDefaultAsync();
+			if (assignment == null)
+			{
+				return new ApiResponse
+				{
+					StatusCode = StatusCodes.Status404NotFound,
+					Message = AssignmentApiResponseMessageConstant.AssignmentNotFound,
+					Data = id
+				};
+			}
+
+			var assignmentDto = _mapper.Map<ResponseAssignmentDto>(assignment);
+			return new ApiResponse
+			{
+				StatusCode = StatusCodes.Status200OK,
+				Message = AssignmentApiResponseMessageConstant.AssignmentGetSuccess,
+				Data = assignmentDto
+			};
+		}
+
 		public async Task<ApiResponse> RespondAsync(RequestAssignmentRespondDto request)
 		{
 			var assignment = await _assignmentRepository.GetByCondition(a => a.Id == request.AssignmentId)
+														.Include(a => a.Assigner)
+														.Include(a => a.Assignee)
 														.Include(a => a.Asset)
 														.FirstOrDefaultAsync();
 
@@ -159,7 +194,27 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				{
 					StatusCode = StatusCodes.Status404NotFound,
 					Message = AssignmentApiResponseMessageConstant.AssignmentNotFound,
-					Data = $"Request Id : {request.AssignmentId}"
+					Data = $"Assignment Id : {request.AssignmentId}"
+				};
+			}
+
+			if(assignment.Asset.State != TypeAssetState.Available)
+			{
+				return new ApiResponse
+				{
+					StatusCode = StatusCodes.Status400BadRequest,
+					Message = AssignmentApiResponseMessageConstant.AssignmentRespondNotAvailable,
+					Data = assignment.Asset.State.ToString()
+				};
+			}
+
+			if (assignment.State != TypeAssignmentState.WaitingForAcceptance)
+			{
+				return new ApiResponse
+				{
+					StatusCode = StatusCodes.Status400BadRequest,
+					Message = AssignmentApiResponseMessageConstant.AssignmentRespondNotWaitingForAcceptance,
+					Data = assignment.State.ToString()
 				};
 			}
 
@@ -172,7 +227,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				{
 					StatusCode = StatusCodes.Status200OK,
 					Message = AssignmentApiResponseMessageConstant.AssignmentRespondSuccess,
-					Data = assignment
+					Data = _mapper.Map<ResponseAssignmentDto>(assignment)
 				};
 			}
 			else
@@ -181,7 +236,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				{
 					StatusCode = StatusCodes.Status500InternalServerError,
 					Message = AssignmentApiResponseMessageConstant.AssignmentRespondFail,
-					Data = assignment
+					Data = _mapper.Map<ResponseAssignmentDto>(assignment)
 				};
 
 
@@ -190,7 +245,11 @@ namespace AssetManagement.Application.Services.AssignmentServices
 
 		public async Task<ApiResponse> UpdateAsync(Guid id, RequestAssignmentDto request)
 		{
-			var assignment = await _assignmentRepository.GetByCondition(a => a.Id == id).FirstOrDefaultAsync();
+			var assignment = await _assignmentRepository.GetByCondition(a => a.Id == id)
+														.Include(a => a.Assigner)
+														.Include(a => a.Assignee)
+														.Include(a => a.Asset)
+														.FirstOrDefaultAsync();
 			if (assignment == null)
 			{
 				return new ApiResponse
@@ -209,7 +268,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				{
 					StatusCode = StatusCodes.Status200OK,
 					Message = AssignmentApiResponseMessageConstant.AssignmentUpdateSuccess,
-					Data = assignment
+					Data = _mapper.Map<ResponseAssignmentDto>(assignment)
 				};
 			}
 			else
@@ -218,7 +277,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				{
 					StatusCode = StatusCodes.Status500InternalServerError,
 					Message = AssignmentApiResponseMessageConstant.AssignmentUpdateFail,
-					Data = assignment
+					Data = _mapper.Map<ResponseAssignmentDto>(assignment)
 				};
 
 			}

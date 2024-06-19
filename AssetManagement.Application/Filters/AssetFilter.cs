@@ -14,7 +14,7 @@ namespace AssetManagement.Application.Filters
     {
         AssetCode = 1,
         AssetName = 2,  
-        Category = 3,
+        CategoryName = 3,
         State = 4
     }
 

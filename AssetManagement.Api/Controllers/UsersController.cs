@@ -26,7 +26,12 @@ public class UsersController : ControllerBase
 	public async Task<IActionResult> Post([FromBody] CreateUpdateUserForm createUserForm)
 	{
 		var locationIdClaim = HttpContext.GetClaim("locationId");
-		createUserForm.LocationId = new Guid(locationIdClaim);
+        Guid locationIdGuid;
+		if(!Guid.TryParse(locationIdClaim, out locationIdGuid))
+        {
+            return Unauthorized();
+        }
+        createUserForm.LocationId = locationIdGuid;
 		var result = await _userService.CreateAsync(createUserForm);
 		if (result.StatusCode == StatusCodes.Status500InternalServerError)
 		{
