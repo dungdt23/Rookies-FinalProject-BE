@@ -73,7 +73,9 @@ namespace AssetManagement.Application.Services.CategoryServices
         }
         public async Task<ApiResponse> GetAllAsync(int? index, int? size)
         {
-            var categories = await _categoryRepository.GetAllAsync(index, size).ToListAsync();
+            var categories = await _categoryRepository.GetAllAsync(index, size)
+                .OrderBy(x => x.CategoryName)
+                .ToListAsync();
             var categoryDtos = _mapper.Map<IEnumerable<ResponseCategoryDto>>(categories);
             return new ApiResponse
             {
