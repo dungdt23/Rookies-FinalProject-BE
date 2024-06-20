@@ -9,7 +9,7 @@ using MockQueryable.Moq;
 using Moq;
 using System.Linq.Expressions;
 
-namespace AssetManagement.UnitTest.Services
+namespace AssetManagement.UnitTest.Services.Assets
 {
     [TestFixture]
 

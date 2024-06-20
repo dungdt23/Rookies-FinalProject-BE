@@ -97,6 +97,7 @@ public static class ApplicationExtension
 
             if (!dbContext.Assets.Any())
             {
+                Random random = new Random();
                 var categories = dbContext.Categories.ToList();
                 var locations = dbContext.Locations.ToList();
                 var assetCodes = new Dictionary<Guid, int>();
@@ -105,7 +106,7 @@ public static class ApplicationExtension
                     .RuleFor(a => a.LocationId, f => f.PickRandom(locations).Id)
                     .RuleFor(a => a.Specification, f => f.Commerce.ProductDescription())
                     .RuleFor(a => a.InstalledDate, f => f.Date.Past(2))
-                    .RuleFor(a => a.State, f => TypeAssetState.Available)
+                    .RuleFor(a => a.State, f => (TypeAssetState)random.Next(1,6))
                     .RuleFor(a => a.AssetName, f => f.Commerce.ProductName())
                     .RuleFor(a => a.AssetCode, (f, a) =>
                       {
@@ -118,7 +119,7 @@ public static class ApplicationExtension
                       })
                     .RuleFor(a => a.CreatedAt, f => DateTime.Now)
                     .RuleFor(a => a.IsDeleted, f => false)
-                    .Generate(300);
+                    .Generate(450);
 
                 dbContext.AddRange(assetFaker);
                 dbContext.SaveChanges();
