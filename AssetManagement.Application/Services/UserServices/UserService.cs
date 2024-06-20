@@ -101,7 +101,7 @@ public class UserService : IUserService
         switch (filter.FieldFilter)
         {
             case FieldType.FullName:
-                condition = x => (x.FirstName + " " + x.LastName);
+                condition = x => (x.LastName + " " + x.FirstName);
                 break;
             case FieldType.JoinedDate:
                 condition = x => x.JoinedDate;

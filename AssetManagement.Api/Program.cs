@@ -22,10 +22,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
-using AssetManagement.Application.IServices.IAssignmentServices;
-using AssetManagement.Application.Services.AssignmentServices;
-using AssetManagement.Api.Middlewares;
-using Microsoft.Extensions.Options;
 
 
 namespace AssetManagement.Api

@@ -53,15 +53,17 @@ public class UserRepository : GenericRepository<User>, IUserRepository
 
         query = query.Where(x =>
         (string.IsNullOrEmpty(searchString) || (!string.IsNullOrEmpty(searchString)
-        && (x.UserName.Contains(searchString) || x.FirstName.Contains(searchString) || x.StaffCode.Contains(searchString)))));
+        && (x.UserName.Contains(searchString) || x.FirstName.Contains(searchString)
+        || x.LastName.Contains(searchString) || x.StaffCode.Contains(searchString)
+        || ((x.LastName + x.FirstName).ToLower().Replace(" ", "").Trim()).Contains(searchString.ToLower().Replace(" ", "").Trim())))));
         return query;
     }
-    public async Task<IEnumerable<User>> GetAllAsync(Func<User, object> condition,Guid locationId,UserFilter filter, int? index, int? size)
+    public async Task<IEnumerable<User>> GetAllAsync(Func<User, object> condition, Guid locationId, UserFilter filter, int? index, int? size)
     {
         IQueryable<User> query = ApplyFilter(locationId, filter);
         IEnumerable<User> users = await query.Include(x => x.Location)
                                             .Include(x => x.Type)
-                                              .AsNoTracking()
+                                             .AsNoTracking()
                                             .ToListAsync();
         if (filter.IsAscending)
         {
