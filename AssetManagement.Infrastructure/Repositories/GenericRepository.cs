@@ -74,6 +74,7 @@ namespace AssetManagement.Infrastructure.Repositories
                 if (entity == null) return RecordStatus.Invalid;
                 entity.DeletedAt = DateTime.Now;
                 entity.IsDeleted = true;
+                _dbSet.Update(entity);
                 int status = await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return status;
