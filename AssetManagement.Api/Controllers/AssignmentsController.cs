@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AssetManagement.Api.Controllers
 {
-    [Route("assignments")]
+	[Route("assignments")]
 	[ApiController]
 	public class AssignmentsController : ControllerBase
 	{
@@ -66,7 +66,7 @@ namespace AssetManagement.Api.Controllers
 			{
 				return NotFound(result);
 			}
-			if(result.StatusCode == StatusCodes.Status400BadRequest)
+			if (result.StatusCode == StatusCodes.Status400BadRequest)
 			{
 				return BadRequest(result);
 			}
@@ -108,6 +108,20 @@ namespace AssetManagement.Api.Controllers
 			{
 				return Unauthorized();
 			}
+			var userIdClaim = HttpContext.GetClaim("id");
+			Guid userIdGuid;
+			if (!Guid.TryParse(userIdClaim, out userIdGuid))
+			{
+				return Unauthorized();
+			}
+			var role = HttpContext.GetClaim("role");
+			object? roleEnum;
+			if (!Enum.TryParse(typeof(UserType), role, out roleEnum))
+			{
+				return Unauthorized();
+			}
+			filter.UserId = userIdGuid;
+			filter.UserType = (UserType) roleEnum;
 			filter.LocationId = locationIdGuid;
 			var result = await _assignmentService.GetAllAsync(filter, index, size);
 			if (result.StatusCode == StatusCodes.Status404NotFound)
