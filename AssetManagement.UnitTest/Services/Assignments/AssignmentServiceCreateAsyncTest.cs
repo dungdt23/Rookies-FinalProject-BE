@@ -19,6 +19,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
     public class AssignmentServiceCreateAsyncTest
     {
         private Mock<IAssignmentRepository> _assignmentRepositoryMock;
+        private Mock<IAssetRepository> _assetRepositoryMock;
         private Mock<IMapper> _mapperMock;
         private AssignmentService _assignmentService;
         private Mock<RequestAssignmentDto> _requestDtoMock;
@@ -28,9 +29,10 @@ namespace AssetManagement.UnitTest.Services.Assignments
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+            _assetRepositoryMock = new Mock<IAssetRepository>();
             _assignmentRepositoryMock = new Mock<IAssignmentRepository>();
             _mapperMock = new Mock<IMapper>();
-            _assignmentService = new AssignmentService(_assignmentRepositoryMock.Object, _mapperMock.Object);
+            _assignmentService = new AssignmentService(_assignmentRepositoryMock.Object, _assetRepositoryMock.Object, _mapperMock.Object);
         }
 
 

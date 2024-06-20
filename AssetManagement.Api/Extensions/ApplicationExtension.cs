@@ -125,6 +125,40 @@ public static class ApplicationExtension
                 dbContext.SaveChanges();
             }
 
+            if (!dbContext.Assignments.Any())
+            {
+                using var transaction = dbContext.Database.BeginTransaction();
+                try
+                {
+                    var assigner = dbContext.Users.Where(a => a.FirstName == "Nguyễn" && a.LastName == "Minh Ánh").FirstOrDefault();
+                    var typeStaff = dbContext.Types.Where(a => a.TypeName == "Staff").FirstOrDefault();
+                    var assignee = dbContext.Users.Where(a => a.TypeId == typeStaff.Id).ToList();
+                    var assets = dbContext.Assets.Where(a => a.State == TypeAssetState.Available).ToList();
+
+                    for (int i = 0; i < assignee.Count; i++)
+                    {
+                        var assignmentFaker = new Faker<Assignment>()
+                                        .RuleFor(a => a.AssetId, f => assets[i].Id)
+                                        .RuleFor(a => a.AssignerId, f => assigner.Id)
+                                        .RuleFor(a => a.AssigneeId, f => assignee[i].Id)
+                                        .RuleFor(a => a.State, f => f.PickRandom<TypeAssignmentState>())
+                                        .RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
+                                        .RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
+                        var assignment = assignmentFaker.Generate(1).FirstOrDefault();
+                        dbContext.Assignments.Add(assignment);
+                        assets[i].State = TypeAssetState.NotAvailable;
+                        dbContext.Assets.Update(assets[i]);
+                        Console.WriteLine(assignment);
+                    }
+                    dbContext.SaveChanges();
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    System.Console.WriteLine("Create assignment failed");
+                }
+            }
+
             return app;
         }
     }
