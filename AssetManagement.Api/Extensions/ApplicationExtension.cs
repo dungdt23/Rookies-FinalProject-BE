@@ -55,6 +55,31 @@ public static class ApplicationExtension
                 };
                 await userService.CreateAsync(adminUser);
 
+                adminUser = new CreateUpdateUserForm
+                {
+                    FirstName = "Đào",
+                    LastName = "Tiến Dũng",
+                    Type = "Admin",
+                    LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Đằ Nẵng")).Id,
+                    DateOfBirth = new DateTime(2002, 7, 20),
+                    JoinedDate = new DateTime(2024, 4, 22),
+                    Gender = TypeGender.Male
+                };
+
+                await userService.CreateAsync(adminUser);
+
+                adminUser = new CreateUpdateUserForm
+                {
+                    FirstName = "Nguyễn",
+                    LastName = "Viết Bảo Sơn",
+                    Type = "Admin",
+                    LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Hồ Chí Minh")).Id,
+                    DateOfBirth = new DateTime(2002, 4, 9),
+                    JoinedDate = new DateTime(2024, 4, 22),
+                    Gender = TypeGender.Male
+                };
+
+                await userService.CreateAsync(adminUser);
 
                 for (int i = 0; i < 300; i++)
                 {
