@@ -16,9 +16,19 @@ public class AssignmentRepository : GenericRepository<Assignment>, IAssignmentRe
     private IQueryable<Assignment> ApplyFilter(AssignmentFilter filter)
     {
         IQueryable<Assignment> query = _dbContext.Assignments.Where(x => !x.IsDeleted && x.Assigner.LocationId == filter.LocationId);
-        if (filter.UserType.HasValue && filter.UserType.Value == UserType.Staff && filter.UserId.HasValue)
+        if (filter.UserType == UserType.Staff && filter.UserId.HasValue)
         {
             query = query.Where(x => x.AssigneeId == filter.UserId.Value);
+        }
+
+        if (filter.StateFilter.HasValue)
+        {
+            query = query.Where(x => x.State == filter.StateFilter.Value);
+        }
+
+        if (filter.AssignedDateFilter.HasValue)
+        {
+            query = query.Where(x => x.AssignedDate.Date == filter.AssignedDateFilter.Value);
         }
         var searchString = filter.SearchString;
 
