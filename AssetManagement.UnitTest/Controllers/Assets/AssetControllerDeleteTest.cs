@@ -1,15 +1,15 @@
 ﻿using AssetManagement.Api.Controllers;
 using AssetManagement.Application.ApiResponses;
-using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.IServices.IAssetServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace AssetManagement.UnitTest.Controllers
+namespace AssetManagement.UnitTest.Controllers.Assets
 {
-    public class AssetControllerPostTest
+    [TestFixture]
+    public class AssetControllerDeleteTest
     {
         private Mock<IAssetService> _mockAssetService;
         private AssetsController _assetsController;
@@ -22,21 +22,20 @@ namespace AssetManagement.UnitTest.Controllers
             _assetsController = new AssetsController(_mockAssetService.Object, _mockLogger.Object);
         }
         [Test]
-        public async Task Post_ShouldReturnOkResult_WhenAssetIsAddedSuccessfully()
+        public async Task Delete_ShouldReturnOkResult_WhenAssetIsDeletedSuccessfully()
         {
             // Arrange
-            var requestDto = new RequestAssetDto();
+            var id = Guid.NewGuid();
             var response = new ApiResponse
             {
-                Data = requestDto,
-                Message = "Add new asset successfully"
+                Message = "Delete asset successfully"
             };
 
-            _mockAssetService.Setup(service => service.AddAsync(requestDto))
+            _mockAssetService.Setup(service => service.DeleteAsync(id))
                 .ReturnsAsync(response);
 
             // Act
-            var result = await _assetsController.Post(requestDto);
+            var result = await _assetsController.Delete(id);
 
             // Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
@@ -44,21 +43,21 @@ namespace AssetManagement.UnitTest.Controllers
             Assert.AreEqual(response, okResult.Value);
         }
         [Test]
-        public async Task Post_ShouldReturnInternalServerError_WhenServiceReturnsError()
+        public async Task Delete_ShouldReturnInternalServerError_WhenServiceReturnsError()
         {
             // Arrange
-            var requestDto = new RequestAssetDto();
+            var id = Guid.NewGuid();
             var response = new ApiResponse
             {
                 StatusCode = StatusCodes.Status500InternalServerError,
-                Message = "Add new asset failed"
+                Message = "Delete asset failed"
             };
 
-            _mockAssetService.Setup(service => service.AddAsync(requestDto))
+            _mockAssetService.Setup(service => service.DeleteAsync(id))
                 .ReturnsAsync(response);
 
             // Act
-            var result = await _assetsController.Post(requestDto);
+            var result = await _assetsController.Delete(id);
 
             // Assert
             Assert.IsInstanceOf<ObjectResult>(result);

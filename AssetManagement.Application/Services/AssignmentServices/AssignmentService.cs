@@ -22,20 +22,44 @@ namespace AssetManagement.Application.Services.AssignmentServices
 	public class AssignmentService : IAssignmentService
 	{
 		private readonly IAssignmentRepository _assignmentRepository;
+		private readonly IAssetRepository _assetRepository;
 		private readonly IMapper _mapper;
-		public AssignmentService(IAssignmentRepository assignmentRepository, IMapper mapper)
+		public AssignmentService(IAssignmentRepository assignmentRepository, IAssetRepository assetRepository, IMapper mapper)
 		{
 			_assignmentRepository = assignmentRepository;
+			_assetRepository = assetRepository;
 			_mapper = mapper;
 		}
 		public async Task<ApiResponse> CreateAsync(RequestAssignmentDto request)
 		{
+			var asset = await _assetRepository.GetByCondition(a => a.Id == request.AssetId && a.IsDeleted == false).FirstOrDefaultAsync();
+			if (asset == null)
+			{
+				return new ApiResponse
+				{
+					StatusCode = StatusCodes.Status404NotFound,
+					Message = AssignmentApiResponseMessageConstant.AssetNotFound,
+					Data = $"Asset Id: {request.AssetId}"
+				};
+			}
+
+			if (asset.State != TypeAssetState.Available)
+			{
+				return new ApiResponse
+				{
+					StatusCode = StatusCodes.Status409Conflict,
+					Message = AssignmentApiResponseMessageConstant.AssetNotAvailable,
+					Data = $"Asset Id: {request.AssetId}"
+				};
+			}
+
+			asset.State = TypeAssetState.NotAvailable;
 
 			var assignment = _mapper.Map<Assignment>(request);
 
 			assignment.State = TypeAssignmentState.WaitingForAcceptance;
 
-			if (await _assignmentRepository.AddAsync(assignment) > 0)
+			if (await _assignmentRepository.AddAsync(assignment) > 0 && await _assetRepository.UpdateAsync(asset) > 0)
 			{
 				return new ApiResponse
 				{
@@ -79,7 +103,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status400BadRequest,
+					StatusCode = StatusCodes.Status409Conflict,
 					Message = AssignmentApiResponseMessageConstant.AssignmentDeleteNotWaitingForAcceptance,
 					Data = assignment.State.ToString()
 				};
@@ -139,11 +163,10 @@ namespace AssetManagement.Application.Services.AssignmentServices
 
 			}
 
-			if (index.HasValue && size.HasValue)
-			{
-				assignmentsQuery.Skip((index.Value - 1) * size.Value).Take(size.Value);
-			}
-			var assignments = assignmentsQuery.ToList();
+
+
+			var assignments = assignmentsQuery.Skip((index.Value - 1) * size.Value).Take(size.Value).ToList();
+
 			var assignmentDtos = _mapper.Map<List<ResponseAssignmentDto>>(assignments);
 			return new PagedResponse<ResponseAssignmentDto>
 			{
@@ -198,7 +221,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				};
 			}
 
-			if(assignment.Asset.State != TypeAssetState.Available)
+			if (assignment.Asset.State != TypeAssetState.Available)
 			{
 				return new ApiResponse
 				{

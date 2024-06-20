@@ -6,7 +6,7 @@ using AssetManagement.Domain.Entities;
 using AutoMapper;
 using Moq;
 
-namespace AssetManagement.UnitTest.Services
+namespace AssetManagement.UnitTest.Services.Assets
 {
     [TestFixture]
     public class AssetServiceGetAllAsyncTest
