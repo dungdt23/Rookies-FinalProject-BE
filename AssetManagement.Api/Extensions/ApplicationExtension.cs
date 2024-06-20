@@ -86,7 +86,6 @@ public static class ApplicationExtension
                 }
 
             }
-
             if (!dbContext.Categories.Any())
             {
                 dbContext.Add(new Category { CategoryName = "Laptop", Prefix = "LA", CreatedAt = DateTime.Now, IsDeleted = false });
@@ -119,7 +118,7 @@ public static class ApplicationExtension
                       })
                     .RuleFor(a => a.CreatedAt, f => DateTime.Now)
                     .RuleFor(a => a.IsDeleted, f => false)
-                    .Generate(20);
+                    .Generate(300);
 
                 dbContext.AddRange(assetFaker);
                 dbContext.SaveChanges();
