@@ -1,4 +1,6 @@
-﻿namespace AssetManagement.Application.Dtos.ResponseDtos
+﻿using AssetManagement.Domain.Enums;
+
+namespace AssetManagement.Application.Dtos.ResponseDtos
 {
     public class ResponseAssetDto
     {
@@ -9,6 +11,6 @@
         public string Location { get; set; }
         public string Specification { get; set; }
         public DateTime InstalledDate { get; set; }
-        public string State { get; set; }
+        public TypeAssetState State { get; set; }
     }
 }

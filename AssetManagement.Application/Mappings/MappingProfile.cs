@@ -28,8 +28,7 @@ namespace AssetManagement.Application.Mappings
             //Mapping Asset
             CreateMap<Asset, ResponseAssetDto>()
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location.LocationName))
-                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.CategoryName))
-                .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.State.ToString()));
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.CategoryName));
             CreateMap<RequestAssetDto, Asset>();
 
             //Mapping Assignment

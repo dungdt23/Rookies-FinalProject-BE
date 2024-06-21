@@ -35,7 +35,7 @@ namespace AssetManagement.Application.Services.AssetServices
                     sortConditon = x => x.Category.CategoryName;
                     break;
                 case AssetSort.State:
-                    sortConditon = x => nameof(x.State) == nameof(AssetSort.State);
+                    sortConditon = x => x.State;
                     break;
             }
             var assets = await _assetRepository.GetAllAsync(sortConditon, locationId, filter, index, size);

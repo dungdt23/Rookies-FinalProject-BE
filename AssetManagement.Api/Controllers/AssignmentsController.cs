@@ -1,16 +1,13 @@
-﻿using AssetManagement.Api.Authorizations;
-using AssetManagement.Application.Dtos.RequestDtos;
+﻿using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IAssignmentServices;
-using AssetManagement.Application.Services.AssignmentServices;
 using AssetManagement.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AssetManagement.Api.Controllers
 {
-	[Route("assignments")]
+    [Route("assignments")]
 	[ApiController]
 	public class AssignmentsController : ControllerBase
 	{
