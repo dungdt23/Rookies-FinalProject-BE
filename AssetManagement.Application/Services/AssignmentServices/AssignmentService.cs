@@ -157,7 +157,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			{
 				return new PagedResponse<ResponseAssignmentDto>
 				{
-					StatusCode = StatusCodes.Status404NotFound,
+					StatusCode = StatusCodes.Status200OK,
 					Message = AssignmentApiResponseMessageConstant.AssignmentGetNotFound
 				};
 
