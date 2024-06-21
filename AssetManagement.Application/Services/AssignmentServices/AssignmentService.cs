@@ -221,16 +221,6 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				};
 			}
 
-			if (assignment.Asset.State != TypeAssetState.Available)
-			{
-				return new ApiResponse
-				{
-					StatusCode = StatusCodes.Status400BadRequest,
-					Message = AssignmentApiResponseMessageConstant.AssignmentRespondNotAvailable,
-					Data = assignment.Asset.State.ToString()
-				};
-			}
-
 			if (assignment.State != TypeAssignmentState.WaitingForAcceptance)
 			{
 				return new ApiResponse
