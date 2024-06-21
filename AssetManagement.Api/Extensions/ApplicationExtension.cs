@@ -167,17 +167,6 @@ public static class ApplicationExtension
 			{
 				dbContext.Users.RemoveRange(dbContext.Users);
 			}
-
-			if (dbContext.Types.Any())
-			{
-				dbContext.Types.RemoveRange(dbContext.Types);
-			}
-
-			if (dbContext.Locations.Any())
-			{
-				dbContext.Locations.RemoveRange(dbContext.Locations);
-			}
-
 			if (dbContext.Assets.Any())
 			{
 				dbContext.Assets.RemoveRange(dbContext.Assets);
