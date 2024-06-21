@@ -3,6 +3,7 @@ using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.Models;
 using AssetManagement.Domain.Entities;
 using AutoMapper;
+using System.Text.RegularExpressions;
 
 namespace AssetManagement.Application.Mappings
 {
@@ -33,13 +34,12 @@ namespace AssetManagement.Application.Mappings
 
             //Mapping Assignment
             CreateMap<RequestAssignmentDto, Assignment>();
-            CreateMap<Assignment,ResponseAssignmentDto>()
+            CreateMap<Assignment, ResponseAssignmentDto>()
                 .ForMember(dest => dest.AssignedBy, opt => opt.MapFrom(src => src.Assigner.UserName))
                 .ForMember(dest => dest.AssignedTo, opt => opt.MapFrom(src => src.Assignee.UserName))
                 .ForMember(dest => dest.AssetCode, opt => opt.MapFrom(src => src.Asset.AssetCode))
                 .ForMember(dest => dest.AssetName, opt => opt.MapFrom(src => src.Asset.AssetName))
-                .ForMember(dest => dest.Specification, opt => opt.MapFrom(src => src.Asset.Specification))
-                .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.State.ToString()));
+                .ForMember(dest => dest.Specification, opt => opt.MapFrom(src => src.Asset.Specification));
 
 
         }
