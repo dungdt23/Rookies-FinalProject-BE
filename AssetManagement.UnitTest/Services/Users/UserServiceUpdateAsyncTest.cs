@@ -1,6 +1,6 @@
-﻿using AssetManagement.Application.Dtos.RequestDtos;
-using AssetManagement.Application.Dtos.ResponseDtos;
+﻿using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.IRepositories;
+using AssetManagement.Application.Models;
 using AssetManagement.Application.Services.UserServices;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
@@ -25,7 +25,7 @@ public class UserServiceUpdateAsyncTest
     private UserService _userService;
     private Mock<User> _userMock;
     private Mock<ResponseUserDto> _userDtoMock;
-    private Mock<RequestUserEditDto> _updateFormMock;
+    private Mock<CreateUpdateUserForm> _updateFormMock;
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
@@ -39,7 +39,7 @@ public class UserServiceUpdateAsyncTest
     [SetUp]
     public void Setup()
     {
-        _updateFormMock = new Mock<RequestUserEditDto>();
+        _updateFormMock = new Mock<CreateUpdateUserForm>();
         _userMock = new Mock<User>();
         _userDtoMock = new Mock<ResponseUserDto>();
     }
@@ -57,13 +57,16 @@ public class UserServiceUpdateAsyncTest
 
         _userRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
                            .Returns(new List<User> { _userMock.Object }.AsQueryable());
-        _mapperMock.Setup(m => m.Map(It.IsAny<RequestUserEditDto>(), It.IsAny<User>()))
-                                .Callback<RequestUserEditDto, User>((src, dest) =>
+        _mapperMock.Setup(m => m.Map(It.IsAny<CreateUpdateUserForm>(), It.IsAny<User>()))
+                                .Callback<CreateUpdateUserForm, User>((src, dest) =>
                                 {
+                                    dest.FirstName = src.FirstName;
+                                    dest.LastName = src.LastName;
                                     dest.DateOfBirth = src.DateOfBirth;
                                     dest.Gender = src.Gender;
                                     dest.TypeId = typeMock.Object.Id;
                                     dest.JoinedDate = src.JoinedDate;
+                                    dest.LocationId = src.LocationId;
                                 });
         _userRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<User>())).ReturnsAsync(1);
         _mapperMock.Setup(r => r.Map<ResponseUserDto>(It.IsAny<User>())).Returns(_userDtoMock.Object);
@@ -78,7 +81,7 @@ public class UserServiceUpdateAsyncTest
     }
 
     [Test]
-    public async Task UpdateAsync_ShouldReturnBadRequestResponse_WhenTypeIsNotFound()
+    public async Task UpdateAsync_ShouldReturnNotFoundResponse_WhenTypeIsNotFound()
     {
         // Arrange
         var id = Guid.NewGuid();
@@ -92,12 +95,12 @@ public class UserServiceUpdateAsyncTest
 
         // Assert
         result.Should().NotBeNull();
-        result.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+        result.StatusCode.Should().Be(StatusCodes.Status404NotFound);
         result.Message.Should().Be(UserApiResponseMessageConstant.UserUpdateFail);
     }
 
     [Test]
-    public async Task UpdateAsync_ShouldReturnBadRequestResponse_WhenUserIsNotFound()
+    public async Task UpdateAsync_ShouldReturnNotFoundResponse_WhenUserIsNotFound()
     {
         // Arrange
         var id = Guid.NewGuid();
@@ -115,7 +118,7 @@ public class UserServiceUpdateAsyncTest
 
         // Assert
         result.Should().NotBeNull();
-        result.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+        result.StatusCode.Should().Be(StatusCodes.Status404NotFound);
         result.Message.Should().Be(UserApiResponseMessageConstant.UserNotFound);
     }
 
@@ -132,13 +135,16 @@ public class UserServiceUpdateAsyncTest
 
         _userRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
                            .Returns(new List<User> { _userMock.Object }.AsQueryable());
-        _mapperMock.Setup(m => m.Map(It.IsAny<RequestUserEditDto>(), It.IsAny<User>()))
-                                .Callback<RequestUserEditDto, User>((src, dest) =>
+        _mapperMock.Setup(m => m.Map(It.IsAny<CreateUpdateUserForm>(), It.IsAny<User>()))
+                                .Callback<CreateUpdateUserForm, User>((src, dest) =>
                                 {
+                                    dest.FirstName = src.FirstName;
+                                    dest.LastName = src.LastName;
                                     dest.DateOfBirth = src.DateOfBirth;
                                     dest.Gender = src.Gender;
                                     dest.TypeId = typeMock.Object.Id;
                                     dest.JoinedDate = src.JoinedDate;
+                                    dest.LocationId = src.LocationId;
                                 });
         _userRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<User>())).ReturnsAsync(0);
         _mapperMock.Setup(r => r.Map<ResponseUserDto>(It.IsAny<User>())).Returns(_userDtoMock.Object);

@@ -1,9 +1,9 @@
 using AssetManagement.Application.ApiResponses;
-using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.IServices.IUserServices;
+using AssetManagement.Application.Models;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AutoMapper;
@@ -48,7 +48,7 @@ public class UserService : IUserService
     }
 
 
-    public async Task<ApiResponse> CreateAsync(RequestUserCreateDto form)
+    public async Task<ApiResponse> CreateAsync(CreateUpdateUserForm form)
     {
         var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
 
@@ -131,7 +131,7 @@ public class UserService : IUserService
         return user;
     }
 
-    public async Task<ApiResponse> UpdateAsync(Guid id, RequestUserEditDto form)
+    public async Task<ApiResponse> UpdateAsync(Guid id, CreateUpdateUserForm form)
     {
         var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
 
@@ -139,7 +139,7 @@ public class UserService : IUserService
         {
             return new ApiResponse
             {
-                StatusCode = StatusCodes.Status400BadRequest,
+                StatusCode = StatusCodes.Status404NotFound,
                 Message = UserApiResponseMessageConstant.UserUpdateFail,
                 Data = form.Type
             };
@@ -153,14 +153,13 @@ public class UserService : IUserService
         {
             return new ApiResponse
             {
-                StatusCode = StatusCodes.Status400BadRequest,
+                StatusCode = StatusCodes.Status404NotFound,
                 Data = id,
                 Message = UserApiResponseMessageConstant.UserNotFound
             };
         }
-
+        form.LocationId = user.LocationId;
         _mapper.Map(form, user);
-        user.Type = type;
         user.TypeId = type.Id;
 
         if (await _userRepository.UpdateAsync(user) > 0)
@@ -214,7 +213,7 @@ public class UserService : IUserService
 
 
 
-	public async Task<ApiResponse> LoginAsync(RequestLoginDto login, byte[] key)
+	public async Task<ApiResponse> LoginAsync(LoginForm login, byte[] key)
 	{
 		var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName)
 										.Include(u => u.Type)
