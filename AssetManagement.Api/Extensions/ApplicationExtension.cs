@@ -1,11 +1,9 @@
-﻿using AssetManagement.Application.Dtos.RequestDtos;
-using AssetManagement.Application.IServices.IUserServices;
+﻿using AssetManagement.Application.IServices.IUserServices;
+using AssetManagement.Application.Models;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Migrations;
 using Bogus;
-using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace AssetManagement.Api.Extensions;
 

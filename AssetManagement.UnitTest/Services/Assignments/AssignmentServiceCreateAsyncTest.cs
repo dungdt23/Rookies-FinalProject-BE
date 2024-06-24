@@ -56,7 +56,6 @@ namespace AssetManagement.UnitTest.Services.Assignments
 
 			_mapperMock.Setup(m => m.Map<Assignment>(It.IsAny<RequestAssignmentDto>())).Returns(_assignmentMock.Object);
             _assignmentRepositoryMock.Setup(ar => ar.AddAsync(It.IsAny<Assignment>())).ReturnsAsync(1);
-            _assetRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<Asset>())).ReturnsAsync(1);
 
             var assignmentListMock = new List<Assignment> { _assignmentMock.Object };
             var assignmentQueryMock = assignmentListMock.AsQueryable().BuildMock();

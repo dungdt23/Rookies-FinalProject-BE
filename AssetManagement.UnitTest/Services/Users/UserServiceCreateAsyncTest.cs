@@ -1,7 +1,7 @@
 using AssetManagement.Application.ApiResponses;
-using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.IRepositories;
+using AssetManagement.Application.Models;
 using AssetManagement.Application.Services.UserServices;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
@@ -26,7 +26,7 @@ public class UserServiceCreateAsyncTest
     private UserService _userService;
     private Mock<User> _userMock;
     private Mock<ResponseUserDto> _userDtoMock;
-    private Mock<RequestUserCreateDto> _createFormMock;
+    private Mock<CreateUpdateUserForm> _createFormMock;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
@@ -41,7 +41,7 @@ public class UserServiceCreateAsyncTest
     [SetUp]
     public void Setup()
     {
-        _createFormMock = new Mock<RequestUserCreateDto>();
+        _createFormMock = new Mock<CreateUpdateUserForm>();
         _userMock = new Mock<User>();
         _userDtoMock = new Mock<ResponseUserDto>();
 
@@ -62,7 +62,7 @@ public class UserServiceCreateAsyncTest
         var mockTypeQueryable = typeListMock.AsQueryable().BuildMock();
 
         _typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockTypeQueryable);
-        _mapperMock.Setup(m => m.Map<User>(It.IsAny<RequestUserCreateDto>())).Returns(_userMock.Object);
+        _mapperMock.Setup(m => m.Map<User>(It.IsAny<CreateUpdateUserForm>())).Returns(_userMock.Object);
         _userRepositoryMock.Setup(r => r.GenerateStaffCode()).Returns(generatedStaffCode);
         _userRepositoryMock.Setup(r => r.GenerateUserName(It.IsAny<string>())).Returns(generatedUserName);
         _userRepositoryMock.Setup(r => r.AddAsync(It.IsAny<User>())).ReturnsAsync(1);
@@ -120,7 +120,7 @@ public class UserServiceCreateAsyncTest
         var mockQueryable = typeListMock.AsQueryable().BuildMock();
 
         _typeRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Type, bool>>>())).Returns(mockQueryable);
-        _mapperMock.Setup(m => m.Map<User>(It.IsAny<RequestUserCreateDto>())).Returns(_userMock.Object);
+        _mapperMock.Setup(m => m.Map<User>(It.IsAny<CreateUpdateUserForm>())).Returns(_userMock.Object);
         _userRepositoryMock.Setup(r => r.GenerateStaffCode()).Returns(generatedStaffCode);
         _userRepositoryMock.Setup(r => r.GenerateUserName(It.IsAny<string>())).Returns(generatedUserName);
         _userRepositoryMock.Setup(r => r.AddAsync(It.IsAny<User>())).ReturnsAsync(0);

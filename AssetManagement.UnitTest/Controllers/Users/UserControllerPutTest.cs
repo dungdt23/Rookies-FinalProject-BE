@@ -1,8 +1,8 @@
 using AssetManagement.Api;
 using AssetManagement.Api.Controllers;
 using AssetManagement.Application.ApiResponses;
-using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.IServices.IUserServices;
+using AssetManagement.Application.Models;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using FluentAssertions;
@@ -18,7 +18,7 @@ public class UserControllerPutTest
     private Mock<IUserService> _userServiceMock;
     private Mock<IOptions<AppSetting>> _applicationSettingsMock;
     private UsersController _usersController;
-    private Mock<RequestUserEditDto> _updateUserFormMock;
+    private Mock<CreateUpdateUserForm> _updateUserFormMock;
     private Mock<User> _userMock;
 
     [OneTimeSetUp]
@@ -33,7 +33,7 @@ public class UserControllerPutTest
     public void SetUp()
     {
         _userMock = new Mock<User>();
-        _updateUserFormMock = new Mock<RequestUserEditDto>();
+        _updateUserFormMock = new Mock<CreateUpdateUserForm>();
     }
 
     [Test]
@@ -48,7 +48,7 @@ public class UserControllerPutTest
             Data = _userMock.Object
         };
 
-        _userServiceMock.Setup(s => s.UpdateAsync(It.IsAny<Guid>(), It.IsAny<RequestUserEditDto>())).ReturnsAsync(response);
+        _userServiceMock.Setup(s => s.UpdateAsync(It.IsAny<Guid>(), It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
 
         // Act
         var result = await _usersController.Put(id, _updateUserFormMock.Object);
@@ -72,7 +72,7 @@ public class UserControllerPutTest
             Data = id
         };
 
-        _userServiceMock.Setup(s => s.UpdateAsync(It.IsAny<Guid>(), It.IsAny<RequestUserEditDto>())).ReturnsAsync(response);
+        _userServiceMock.Setup(s => s.UpdateAsync(It.IsAny<Guid>(), It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
 
         // Act
         var result = await _usersController.Put(id, _updateUserFormMock.Object);
@@ -97,7 +97,7 @@ public class UserControllerPutTest
             Data = _userMock.Object
         };
 
-        _userServiceMock.Setup(s => s.UpdateAsync(It.IsAny<Guid>(), It.IsAny<RequestUserEditDto>())).ReturnsAsync(response);
+        _userServiceMock.Setup(s => s.UpdateAsync(It.IsAny<Guid>(), It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
 
         // Act
         var result = await _usersController.Put(id, _updateUserFormMock.Object);
