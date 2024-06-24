@@ -58,8 +58,6 @@ namespace AssetManagement.UnitTest.Services.Assignments
             _assignmentRepositoryMock.Setup(ar => ar.AddAsync(It.IsAny<Assignment>())).ReturnsAsync(1);
             _assetRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<Asset>())).ReturnsAsync(1);
 
-            var assignmentListMock = new List<Assignment> { _assignmentMock.Object };
-            var assignmentQueryMock = assignmentListMock.AsQueryable().BuildMock();
 
             _assignmentRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Assignment, bool>>>())).Returns(assignmentQueryMock);
             _mapperMock.Setup(m => m.Map<ResponseAssignmentDto>(It.IsAny<Assignment>())).Returns(_assignmentDtoMock.Object);
@@ -80,6 +78,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
         {
 			// Arrange
 			var assetMock = new Mock<Asset>();
+
 			var assetListMock = new List<Asset> { assetMock.Object };
 			var assetQueryMock = assetListMock.AsQueryable().BuildMock();
 

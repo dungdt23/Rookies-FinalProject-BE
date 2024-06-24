@@ -2,7 +2,6 @@
 using AssetManagement.Api;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IUserServices;
-using AssetManagement.Application.Models;
 using AssetManagement.Domain.Entities;
 using AutoMapper;
 using Microsoft.Extensions.Options;
@@ -17,6 +16,7 @@ using AssetManagement.Domain.Constants;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using FluentAssertions;
+using AssetManagement.Application.Dtos.RequestDtos;
 
 namespace AssetManagement.UnitTest.Controllers.Users
 {
@@ -26,7 +26,7 @@ namespace AssetManagement.UnitTest.Controllers.Users
         private Mock<IUserService> _userServiceMock;
         private Mock<IOptions<AppSetting>> _applicationSettingsMock;
         private UsersController _usersController;
-        private Mock<LoginForm> _loginFormMock;
+        private Mock<RequestLoginDto> _loginFormMock;
         private Mock<User> _userMock;
         private Mock<UserFilter> _userFilterMock;
         private Mock<IMapper> _mapperMock;
@@ -46,7 +46,7 @@ namespace AssetManagement.UnitTest.Controllers.Users
         public void SetUp()
         {
             _userMock = new Mock<User>();
-            _loginFormMock = new Mock<LoginForm>();
+            _loginFormMock = new Mock<RequestLoginDto>();
             _userFilterMock = new Mock<UserFilter>();
         }
 
@@ -61,7 +61,7 @@ namespace AssetManagement.UnitTest.Controllers.Users
                 Data = new { tokenType = "Bearer", token = "mockToken", isFirstTimeLogin = false }
             };
 
-            _userServiceMock.Setup(us => us.LoginAsync(It.IsAny<LoginForm>(), It.IsAny<byte[]>()))
+            _userServiceMock.Setup(us => us.LoginAsync(It.IsAny<RequestLoginDto>(), It.IsAny<byte[]>()))
                             .ReturnsAsync(apiResponse);
 
             // Act
@@ -85,7 +85,7 @@ namespace AssetManagement.UnitTest.Controllers.Users
                 Data = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername
             };
 
-            _userServiceMock.Setup(us => us.LoginAsync(It.IsAny<LoginForm>(), It.IsAny<byte[]>()))
+            _userServiceMock.Setup(us => us.LoginAsync(It.IsAny<RequestLoginDto>(), It.IsAny<byte[]>()))
                             .ReturnsAsync(apiResponse);
 
             // Act

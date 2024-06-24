@@ -1,5 +1,5 @@
-﻿using AssetManagement.Application.IServices.IUserServices;
-using AssetManagement.Application.Models;
+﻿using AssetManagement.Application.Dtos.RequestDtos;
+using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Migrations;
@@ -45,7 +45,7 @@ public static class ApplicationExtension
                 int dateOfBirthRange = (DateTime.Today.AddYears(-18) - startDate).Days;
 
                 //pre-user admin for easier login
-                var adminUser = new CreateUpdateUserForm
+                var adminUser = new RequestUserCreateDto
                 {
                     FirstName = "Nguyễn",
                     LastName = "Minh Ánh",
@@ -56,7 +56,7 @@ public static class ApplicationExtension
                     Gender = TypeGender.Male
                 };
                 await userService.CreateAsync(adminUser);
-                var adminUser1 = new CreateUpdateUserForm
+                var adminUser1 = new RequestUserCreateDto
                 {
                     FirstName = "Dao",
                     LastName = "Tien Dung",
@@ -67,7 +67,7 @@ public static class ApplicationExtension
                     Gender = TypeGender.Male
                 };
                 await userService.CreateAsync(adminUser1);
-                var adminUser2 = new CreateUpdateUserForm
+                var adminUser2 = new RequestUserCreateDto
                 {
                     FirstName = "Nguyen",
                     LastName = "Viet Bao Son",
@@ -83,7 +83,7 @@ public static class ApplicationExtension
 
 
                 //pre-user sstaff
-                var staffUser = new CreateUpdateUserForm
+                var staffUser = new RequestUserCreateDto
                 {
                     FirstName = "Mac",
                     LastName = "Trang",
@@ -95,7 +95,7 @@ public static class ApplicationExtension
                 };
                 await userService.CreateAsync(staffUser);
 
-                var staffUser2 = new CreateUpdateUserForm
+                var staffUser2 = new RequestUserCreateDto
                 {
                     FirstName = "Ho",
                     LastName = "Huong",
@@ -108,7 +108,7 @@ public static class ApplicationExtension
                 await userService.CreateAsync(staffUser2);
 
 
-                var staffUser3 = new CreateUpdateUserForm
+                var staffUser3 = new RequestUserCreateDto
                 {
                     FirstName = "Pham",
                     LastName = "Quynh",
@@ -120,7 +120,7 @@ public static class ApplicationExtension
                 };
                 await userService.CreateAsync(staffUser3);
 
-                var staffUser4 = new CreateUpdateUserForm
+                var staffUser4 = new RequestUserCreateDto
                 {
                     FirstName = "Phung",
                     LastName = "Linh",
@@ -146,7 +146,7 @@ public static class ApplicationExtension
                     }
 
 
-                    CreateUpdateUserForm form = new CreateUpdateUserForm
+                    RequestUserCreateDto form = new RequestUserCreateDto
                     {
                         FirstName = firstName,
                         LastName = lastName,

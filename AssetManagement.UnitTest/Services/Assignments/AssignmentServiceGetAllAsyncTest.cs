@@ -49,7 +49,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 		}
 
 		[Test]
-		public async Task GetAllAsync_ReturnNotFound_WhenFoundNoAssignmentRecord()
+		public async Task GetAllAsync_ReturnOk_WhenFoundNoAssignmentRecord()
 		{
 			//Arrange
 			var index = 1;
