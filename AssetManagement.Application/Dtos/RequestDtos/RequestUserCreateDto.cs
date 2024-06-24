@@ -20,7 +20,8 @@ public class RequestUserCreateDto
     public DateTime DateOfBirth { get; set; }
 
     [Required]
-    public TypeGender Gender { get; set; } = TypeGender.Female;
+	[JsonConverter(typeof(JsonStringEnumConverter))]
+	public TypeGender Gender { get; set; } = TypeGender.Female;
 
     [Required]
     [WorkingDay]

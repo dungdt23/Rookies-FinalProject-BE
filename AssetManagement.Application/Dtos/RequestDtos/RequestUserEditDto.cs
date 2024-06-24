@@ -1,5 +1,6 @@
 ﻿using AssetManagement.Application.Validation;
 using AssetManagement.Domain.Enums;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -17,6 +18,7 @@ namespace AssetManagement.Application.Dtos.RequestDtos
 		public DateTime DateOfBirth { get; set; }
 
 		[Required]
+		[JsonConverter(typeof(JsonStringEnumConverter))]
 		public TypeGender Gender { get; set; } = TypeGender.Female;
 
 		[Required]
