@@ -48,12 +48,17 @@ namespace AssetManagement.UnitTest.Services.Assignments
         public async Task CreateAsync_ShouldReturnOk_WhenAssignmentIsCreatedSuccessfully()
         {
             // Arrange
-            _mapperMock.Setup(m => m.Map<Assignment>(It.IsAny<RequestAssignmentDto>())).Returns(_assignmentMock.Object);
+            var assetMock = new Mock<Asset>();
+			var assetListMock = new List<Asset> { assetMock.Object };
+			var assetQueryMock = assetListMock.AsQueryable().BuildMock();
+
+            _assetRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Asset, bool>>>())).Returns(assetQueryMock);
+
+			_mapperMock.Setup(m => m.Map<Assignment>(It.IsAny<RequestAssignmentDto>())).Returns(_assignmentMock.Object);
             _assignmentRepositoryMock.Setup(ar => ar.AddAsync(It.IsAny<Assignment>())).ReturnsAsync(1);
 
             var assignmentListMock = new List<Assignment> { _assignmentMock.Object };
             var assignmentQueryMock = assignmentListMock.AsQueryable().BuildMock();
-
             _assignmentRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Assignment, bool>>>())).Returns(assignmentQueryMock);
             _mapperMock.Setup(m => m.Map<ResponseAssignmentDto>(It.IsAny<Assignment>())).Returns(_assignmentDtoMock.Object);
 
@@ -71,9 +76,18 @@ namespace AssetManagement.UnitTest.Services.Assignments
         [Test]
         public async Task CreateAsync_ShouldReturnStatus500InternalServerError_WhenCreationFails()
         {
-            // Arrange
-            _mapperMock.Setup(m => m.Map<Assignment>(It.IsAny<RequestAssignmentDto>())).Returns(_assignmentMock.Object);
+			// Arrange
+			var assetMock = new Mock<Asset>();
+
+			var assetListMock = new List<Asset> { assetMock.Object };
+			var assetQueryMock = assetListMock.AsQueryable().BuildMock();
+
+			_assetRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Asset, bool>>>())).Returns(assetQueryMock);
+
+			_mapperMock.Setup(m => m.Map<Assignment>(It.IsAny<RequestAssignmentDto>())).Returns(_assignmentMock.Object);
             _assignmentRepositoryMock.Setup(ar => ar.AddAsync(It.IsAny<Assignment>())).ReturnsAsync(0);
+			_assetRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<Asset>())).ReturnsAsync(0);
+
 			_mapperMock.Setup(m => m.Map<ResponseAssignmentDto>(It.IsAny<Assignment>())).Returns(_assignmentDtoMock.Object);
 
 			// Act
