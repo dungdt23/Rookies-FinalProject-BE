@@ -93,7 +93,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status404NotFound,
+					StatusCode = StatusCodes.Status400BadRequest,
 					Message = AssignmentApiResponseMessageConstant.AssignmentNotFound,
 					Data = id
 				};
@@ -129,7 +129,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			}
 		}
 
-		public async Task<PagedResponse<ResponseAssignmentDto>> GetAllAsync(AssignmentFilter filter, int? index, int? size)
+		public async Task<PagedResponse<ResponseAssignmentDto>> GetAllAsync(AssignmentFilter filter, Guid userId, UserType userType, Guid locationId, int? index, int? size)
 		{
 			Func<Assignment, object> sortCondition = x => x.Asset.AssetCode;
 			switch (filter.FieldFilter)
@@ -150,7 +150,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 					sortCondition = x => x.State;
 					break;
 			}
-			var assignmentsQuery = _assignmentRepository.GetAll(sortCondition, filter);
+			var assignmentsQuery = _assignmentRepository.GetAll(sortCondition, filter, userId,userType,locationId);
 			var totalCount = assignmentsQuery.Count();
 
 			if (totalCount == 0)
