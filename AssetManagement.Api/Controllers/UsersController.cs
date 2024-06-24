@@ -1,6 +1,6 @@
+using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IUserServices;
-using AssetManagement.Application.Models;
 using AssetManagement.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,34 +21,34 @@ public class UsersController : ControllerBase
         _applicationSettings = applicationSettings.Value;
     }
 
-	[HttpPost]
-	[Authorize(Roles = TypeNameContraint.TypeAdmin)]
-	public async Task<IActionResult> Post([FromBody] CreateUpdateUserForm createUserForm)
-	{
-		var locationIdClaim = HttpContext.GetClaim("locationId");
+    [HttpPost]
+    [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+    public async Task<IActionResult> Post([FromBody] RequestUserCreateDto createUserForm)
+    {
+        var locationIdClaim = HttpContext.GetClaim("locationId");
         Guid locationIdGuid;
-		if(!Guid.TryParse(locationIdClaim, out locationIdGuid))
+        if (!Guid.TryParse(locationIdClaim, out locationIdGuid))
         {
             return Unauthorized();
         }
         createUserForm.LocationId = locationIdGuid;
-		var result = await _userService.CreateAsync(createUserForm);
-		if (result.StatusCode == StatusCodes.Status500InternalServerError)
-		{
-			return StatusCode(StatusCodes.Status500InternalServerError, result);
-		}
+        var result = await _userService.CreateAsync(createUserForm);
+        if (result.StatusCode == StatusCodes.Status500InternalServerError)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, result);
+        }
 
         return Ok(result);
     }
 
     [HttpPut("{id:guid}")]
     [Authorize(Roles = TypeNameContraint.TypeAdmin)]
-    public async Task<IActionResult> Put(Guid id, [FromBody] CreateUpdateUserForm updateUserForm)
+    public async Task<IActionResult> Put(Guid id, [FromBody] RequestUserEditDto updateUserForm)
     {
         var result = await _userService.UpdateAsync(id, updateUserForm);
-        if (result.StatusCode == StatusCodes.Status404NotFound)
+        if (result.StatusCode == StatusCodes.Status400BadRequest)
         {
-            return NotFound(result);
+            return BadRequest(result);
         }
         if (result.StatusCode == StatusCodes.Status500InternalServerError)
         {
@@ -64,7 +64,7 @@ public class UsersController : ControllerBase
     {
         var locationIdClaim = HttpContext.GetClaim("locationId");
         var locationId = new Guid(locationIdClaim);
-        var result = await _userService.GetAllAsync(locationId,filter, index, size);
+        var result = await _userService.GetAllAsync(locationId, filter, index, size);
         if (result.StatusCode == StatusCodes.Status500InternalServerError)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, result);
@@ -88,7 +88,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost("Login")]
-    public async Task<IActionResult> Login([FromBody] LoginForm login)
+    public async Task<IActionResult> Login([FromBody] RequestLoginDto login)
     {
         var key = Encoding.ASCII.GetBytes(_applicationSettings.Secret);
         var result = await _userService.LoginAsync(login, key);
