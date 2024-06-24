@@ -58,7 +58,10 @@ namespace AssetManagement.Application.Services.AssetServices
             var status = await _assetRepository.AddAsync(asset);
             if (status == StatusConstant.Success)
             {
-                var returnAsset = _mapper.Map<ResponseAssetDto>(asset);
+                var returnAsset = _mapper.Map<ResponseAssetDto>(await _assetRepository.GetByCondition(a => a.Id == asset.Id)
+                                                                                    .Include(a => a.Location)
+                                                                                    .Include(a => a.Category)
+                                                                                    .FirstOrDefaultAsync());
                 return new ApiResponse
                 {
                     Data = returnAsset,
@@ -100,7 +103,10 @@ namespace AssetManagement.Application.Services.AssetServices
             var status = await _assetRepository.UpdateAsync(updateAsset);
             if (status == StatusConstant.Success)
             {
-                var responseAsset = _mapper.Map<ResponseAssetDto>(updateAsset);
+                var responseAsset = _mapper.Map<ResponseAssetDto>(await _assetRepository.GetByCondition(a => a.Id == asset.Id)
+                                                                                    .Include(a => a.Location)
+                                                                                    .Include(a => a.Category)
+                                                                                    .FirstOrDefaultAsync());
                 return new ApiResponse
                 {
                     Data = responseAsset,
