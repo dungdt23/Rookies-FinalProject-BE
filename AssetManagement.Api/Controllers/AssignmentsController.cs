@@ -84,10 +84,6 @@ namespace AssetManagement.Api.Controllers
 			{
 				return BadRequest(result);
 			}
-			if (result.StatusCode == StatusCodes.Status404NotFound)
-			{
-				return NotFound(result);
-			}
 			if (result.StatusCode == StatusCodes.Status500InternalServerError)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, result);
@@ -117,10 +113,7 @@ namespace AssetManagement.Api.Controllers
 			{
 				return Unauthorized();
 			}
-			filter.UserId = userIdGuid;
-			filter.UserType = (UserType) roleEnum;
-			filter.LocationId = locationIdGuid;
-			var result = await _assignmentService.GetAllAsync(filter, index, size);
+			var result = await _assignmentService.GetAllAsync(filter,userIdGuid, (UserType) roleEnum, locationIdGuid, index, size);
 			if (result.StatusCode == StatusCodes.Status404NotFound)
 			{
 				return NotFound(result);

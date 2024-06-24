@@ -20,7 +20,7 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
 	[TestFixture]
 	public class AssignmentControllerGetTest
 	{
-		private readonly string _authorizeHeaderMock = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbklkIjoiOGIwYTY0MjMtNjkxMy00ZDQ5LWJhMmYtOTQ2ZjZkOTMwOWYxIiwic3ViIjoiMTIzNDU2Nzg5MCIsIm5hbWUiOiJKb2huIERvZSIsImlhdCI6MTUxNjIzOTAyMn0.fO7XginXh1Zbjl4D8AYXxMliC_VeozuKBsl3EjmAiPg";
+		private readonly string _authorizeHeaderMock = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbklkIjoiOGIwYTY0MjMtNjkxMy00ZDQ5LWJhMmYtOTQ2ZjZkOTMwOWYxIiwiaWQiOiI4YjBhNjQyMy02OTEzLTRkNDktYmEyZi05NDZmNmQ5MzA5ZjEiLCJyb2xlIjoiQWRtaW4iLCJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.z-W0nZeRlzWxzXa8XjXNNsr1h1jOI9jZsWN-q_5NrLU";
 		private AssignmentsController _controller;
 		private Mock<IAssignmentService> _assignmentServiceMock;
 		private Mock<ResponseAssignmentDto> _assignmentDtoMock;
@@ -56,7 +56,12 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
 			_controller.ControllerContext = new ControllerContext();
 			_controller.ControllerContext.HttpContext = new DefaultHttpContext();
 			_controller.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
-			_assignmentServiceMock.Setup(a => a.GetAllAsync(It.IsAny<AssignmentFilter>(), It.IsAny<int?>(), It.IsAny<int?>())).ReturnsAsync(response);
+			_assignmentServiceMock.Setup(a => a.GetAllAsync(It.IsAny<AssignmentFilter>(), 
+															It.IsAny<Guid>(),
+															It.IsAny<UserType>(),
+															It.IsAny<Guid>(),
+															It.IsAny<int?>(), 
+															It.IsAny<int?>())).ReturnsAsync(response);
 
 			//Act
 			var result = await _controller.Get(_filterMock.Object, index, size);
@@ -102,7 +107,12 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
 			_controller.ControllerContext = new ControllerContext();
 			_controller.ControllerContext.HttpContext = new DefaultHttpContext();
 			_controller.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
-			_assignmentServiceMock.Setup(a => a.GetAllAsync(It.IsAny<AssignmentFilter>(), It.IsAny<int?>(), It.IsAny<int?>())).ReturnsAsync(response);
+			_assignmentServiceMock.Setup(a => a.GetAllAsync(It.IsAny<AssignmentFilter>(),
+															It.IsAny<Guid>(),
+															It.IsAny<UserType>(),
+															It.IsAny<Guid>(),
+															It.IsAny<int?>(),
+															It.IsAny<int?>())).ReturnsAsync(response);
 
 			//Act
 			var result = await _controller.Get(_filterMock.Object, index, size);
