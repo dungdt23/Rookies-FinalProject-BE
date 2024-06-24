@@ -1,10 +1,10 @@
 using AssetManagement.Api;
 using AssetManagement.Api.Controllers;
 using AssetManagement.Application.ApiResponses;
-using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IUserServices;
+using AssetManagement.Application.Models;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AutoMapper;
@@ -23,7 +23,7 @@ public class UserControllerPostTest
     private Mock<IUserService> _userServiceMock;
     private Mock<IOptions<AppSetting>> _applicationSettingsMock;
     private UsersController _usersController;
-    private Mock<RequestUserCreateDto> _createUserFormMock;
+    private Mock<CreateUpdateUserForm> _createUserFormMock;
     private Mock<ResponseUserDto> _userDtoMock;
     private Mock<UserFilter> _userFilterMock;
     private Mock<IMapper> _mapperMock;
@@ -42,7 +42,7 @@ public class UserControllerPostTest
     public void SetUp()
     {
         _userDtoMock = new Mock<ResponseUserDto>();
-        _createUserFormMock = new Mock<RequestUserCreateDto>();
+        _createUserFormMock = new Mock<CreateUpdateUserForm>();
         _userFilterMock = new Mock<UserFilter>();
     }
 
@@ -59,7 +59,7 @@ public class UserControllerPostTest
         _usersController.ControllerContext = new ControllerContext();
         _usersController.ControllerContext.HttpContext = new DefaultHttpContext();
         _usersController.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
-        _userServiceMock.Setup(s => s.CreateAsync(It.IsAny<RequestUserCreateDto>())).ReturnsAsync(response);
+        _userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
 
         // Act
         var result = await _usersController.Post(_createUserFormMock.Object);
@@ -100,7 +100,7 @@ public class UserControllerPostTest
         _usersController.ControllerContext = new ControllerContext();
         _usersController.ControllerContext.HttpContext = new DefaultHttpContext();
         _usersController.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
-        _userServiceMock.Setup(s => s.CreateAsync(It.IsAny<RequestUserCreateDto>())).ReturnsAsync(response);
+        _userServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateUpdateUserForm>())).ReturnsAsync(response);
 
         // Act
         var result = await _usersController.Post(_createUserFormMock.Object);
