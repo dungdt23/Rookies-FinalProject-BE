@@ -15,7 +15,7 @@ public class AssignmentRepository : GenericRepository<Assignment>, IAssignmentRe
     }
     private IQueryable<Assignment> ApplyFilter(AssignmentFilter filter)
     {
-        IQueryable<Assignment> query = _dbContext.Assignments.Where(x => !x.IsDeleted);
+        IQueryable<Assignment> query = _dbContext.Assignments.Where(x => !x.IsDeleted && x.Assigner.LocationId == filter.LocationId);
         if (filter.UserType == UserType.Staff && filter.UserId.HasValue)
         {
             query = query.Where(x => x.AssigneeId == filter.UserId.Value);

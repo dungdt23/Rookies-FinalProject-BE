@@ -164,8 +164,6 @@ namespace AssetManagement.Application.Services.AssignmentServices
 
 			}
 
-
-
 			var assignments = assignmentsQuery.Skip((index.Value - 1) * size.Value).Take(size.Value).ToList();
 
 			var assignmentDtos = _mapper.Map<List<ResponseAssignmentDto>>(assignments);
