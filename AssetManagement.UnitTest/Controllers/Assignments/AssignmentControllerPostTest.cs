@@ -14,7 +14,7 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
     [TestFixture]
     public class AssignmentControllerPostTest
     {
-        private readonly string _authorizeHeaderMock = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbklkIjoiZGRhZDhjNjgtYTI1YS00MTZhLTk4MDgtYzIyYWIyYWJkZTBmIiwic3ViIjoiMTIzNDU2Nzg5MCIsIm5hbWUiOiJKb2huIERvZSIsImlhdCI6MTUxNjIzOTAyMn0.zGkUGTif6i3P1iTc-rQ2hxuzyNELXN-9OGlXEcOj04c";
+        private readonly string _authorizeHeaderMock = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRkYWQ4YzY4LWEyNWEtNDE2YS05ODA4LWMyMmFiMmFiZGUwZiIsInN1YiI6IjEyMzQ1Njc4OTAiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.Kk3jkNhHJfWg4RkOlMia_t92AQn3oOVsmnyL3Dc8zEA";
         private AssignmentsController _controller;
         private Mock<IAssignmentService> _assignmentServiceMock;
         private Mock<RequestAssignmentDto> _requestDtoMock;

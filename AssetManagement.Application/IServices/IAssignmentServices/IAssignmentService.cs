@@ -13,7 +13,7 @@ namespace AssetManagement.Application.IServices.IAssignmentServices
 	public interface IAssignmentService
 	{
 		Task<ApiResponse> CreateAsync(RequestAssignmentDto request);
-		Task<PagedResponse<ResponseAssignmentDto>> GetAllAsync(AssignmentFilter filter, int? index, int? size);
+		Task<PagedResponse<ResponseAssignmentDto>> GetAllAsync(AssignmentFilter filter, Guid userId, UserType userType, Guid locationId, int? index, int? size);
 		Task<ApiResponse> GetByIdAsync(Guid id);
 		Task<ApiResponse> UpdateAsync(Guid id,RequestAssignmentDto request);
 		Task<ApiResponse> DeleteAsync(Guid id);

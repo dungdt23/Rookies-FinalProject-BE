@@ -49,7 +49,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 		}
 
 		[Test]
-		public async Task DeleteAsync_ShouldReturnNotFound_WhenAssignmentNotFoundWithId()
+		public async Task DeleteAsync_ShouldReturnBadRequest_WhenAssignmentNotFoundWithId()
 		{
 			//Arrange
 			var id = Guid.NewGuid();
@@ -64,7 +64,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 			//Assert
 			result.Should().NotBeNull();
 			result.Should().BeOfType(typeof(ApiResponse));
-			result.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+			result.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
 			result.Message.Should().Be(AssignmentApiResponseMessageConstant.AssignmentNotFound);
 			result.Data.Should().Be(id);
 		}
