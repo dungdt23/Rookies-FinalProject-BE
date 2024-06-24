@@ -1,6 +1,6 @@
+using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IUserServices;
-using AssetManagement.Application.Models;
 using AssetManagement.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +23,7 @@ public class UsersController : ControllerBase
 
 	[HttpPost]
 	[Authorize(Roles = TypeNameContraint.TypeAdmin)]
-	public async Task<IActionResult> Post([FromBody] CreateUpdateUserForm createUserForm)
+	public async Task<IActionResult> Post([FromBody] RequestUserCreateDto createUserForm)
 	{
 		var locationIdClaim = HttpContext.GetClaim("locationId");
         Guid locationIdGuid;
@@ -43,12 +43,12 @@ public class UsersController : ControllerBase
 
     [HttpPut("{id:guid}")]
     [Authorize(Roles = TypeNameContraint.TypeAdmin)]
-    public async Task<IActionResult> Put(Guid id, [FromBody] CreateUpdateUserForm updateUserForm)
+    public async Task<IActionResult> Put(Guid id, [FromBody] RequestUserEditDto updateUserForm)
     {
         var result = await _userService.UpdateAsync(id, updateUserForm);
-        if (result.StatusCode == StatusCodes.Status404NotFound)
+        if (result.StatusCode == StatusCodes.Status400BadRequest)
         {
-            return NotFound(result);
+            return BadRequest(result);
         }
         if (result.StatusCode == StatusCodes.Status500InternalServerError)
         {
@@ -84,7 +84,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost("Login")]
-    public async Task<IActionResult> Login([FromBody] LoginForm login)
+    public async Task<IActionResult> Login([FromBody] RequestLoginDto login)
     {
         var key = Encoding.ASCII.GetBytes(_applicationSettings.Secret);
         var result = await _userService.LoginAsync(login, key);

@@ -1,6 +1,5 @@
 ﻿using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
-using AssetManagement.Application.Models;
 using AssetManagement.Domain.Entities;
 using AutoMapper;
 using System.Text.RegularExpressions;
@@ -13,9 +12,12 @@ namespace AssetManagement.Application.Mappings
         public MappingProfile()
         {
             // Mapping User
-            CreateMap<CreateUpdateUserForm, User>()
+            CreateMap<RequestUserCreateDto, User>()
                 .ForMember(dest => dest.Type, opt => opt.Ignore());
-            CreateMap<User, ResponseUserDto>()
+            CreateMap<RequestUserEditDto, User>()
+                .ForMember(dest => dest.Type, opt => opt.Ignore());
+         
+			CreateMap<User, ResponseUserDto>()
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location.LocationName))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.TypeName));
             //Mapping Category

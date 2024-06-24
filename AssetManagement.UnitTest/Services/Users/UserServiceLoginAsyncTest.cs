@@ -1,6 +1,6 @@
+using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.IRepositories;
-using AssetManagement.Application.Models;
 using AssetManagement.Application.Services.UserServices;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
@@ -23,7 +23,7 @@ public class UserServiceLoginAsyncTest
     private Mock<IMapper> _mapperMock;
     private UserService _userService;
     private Mock<User> _userMock;
-    private Mock<LoginForm> _loginFormMock;
+    private Mock<RequestLoginDto> _loginFormMock;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
@@ -38,7 +38,7 @@ public class UserServiceLoginAsyncTest
     [SetUp]
     public void Setup()
     {
-        _loginFormMock = new Mock<LoginForm>();
+        _loginFormMock = new Mock<RequestLoginDto>();
         _userMock = new Mock<User>();
     }
 
@@ -48,7 +48,7 @@ public class UserServiceLoginAsyncTest
         // Arrange
         var username = "sonnvb";
         var validPassword = "sonnvb@01012002";
-        var login = new LoginForm
+        var login = new RequestLoginDto
         {
             UserName = username,
             Password = validPassword
@@ -88,7 +88,7 @@ public class UserServiceLoginAsyncTest
         var username = "sonnvb";
         var validPassword = "sonnvb@01012002";
         var invalidPassword = "invalid";
-        var login = new LoginForm
+        var login = new RequestLoginDto
         {
             UserName = username,
             Password = invalidPassword
@@ -124,7 +124,7 @@ public class UserServiceLoginAsyncTest
         var username = "sonnvb";
         var validPassword = "sonnvb@01012002";
         var invalidPassword = "invalid";
-        var login = new LoginForm
+        var login = new RequestLoginDto
         {
             UserName = username,
             Password = invalidPassword

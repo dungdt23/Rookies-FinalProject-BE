@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace AssetManagement.Application.Models;
+namespace AssetManagement.Application.Dtos.RequestDtos;
 
-public class LoginForm
+public class RequestLoginDto
 {
     [Required]
     [MaxLength(200)]
