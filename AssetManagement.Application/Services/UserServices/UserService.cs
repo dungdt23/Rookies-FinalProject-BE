@@ -1,9 +1,9 @@
 using AssetManagement.Application.ApiResponses;
+using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.IServices.IUserServices;
-using AssetManagement.Application.Models;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AutoMapper;
@@ -48,7 +48,7 @@ public class UserService : IUserService
     }
 
 
-    public async Task<ApiResponse> CreateAsync(CreateUpdateUserForm form)
+    public async Task<ApiResponse> CreateAsync(RequestUserCreateDto form)
     {
         var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
 
@@ -74,15 +74,15 @@ public class UserService : IUserService
 
         if (await _userRepository.AddAsync(user) > 0)
         {
-			return new ApiResponse
+            return new ApiResponse
             {
                 StatusCode = StatusCodes.Status200OK,
                 Message = UserApiResponseMessageConstant.UserCreateSuccess,
                 Data = _mapper.Map<ResponseUserDto>(await _userRepository.GetByCondition(u => u.Id == user.Id)
                                                                         .Include(u => u.Type)
-                                                                        .Include(u=> u.Location)
+                                                                        .Include(u => u.Location)
                                                                         .FirstOrDefaultAsync())
-			};
+            };
         }
         else
         {
@@ -91,7 +91,7 @@ public class UserService : IUserService
                 StatusCode = StatusCodes.Status500InternalServerError,
                 Message = UserApiResponseMessageConstant.UserCreateFail,
                 Data = _mapper.Map<ResponseUserDto>(user)
-			};
+            };
 
         }
     }
@@ -131,7 +131,7 @@ public class UserService : IUserService
         return user;
     }
 
-    public async Task<ApiResponse> UpdateAsync(Guid id, CreateUpdateUserForm form)
+    public async Task<ApiResponse> UpdateAsync(Guid id, RequestUserEditDto form)
     {
         var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
 
@@ -139,27 +139,28 @@ public class UserService : IUserService
         {
             return new ApiResponse
             {
-                StatusCode = StatusCodes.Status404NotFound,
+                StatusCode = StatusCodes.Status400BadRequest,
                 Message = UserApiResponseMessageConstant.UserUpdateFail,
                 Data = form.Type
             };
         }
 
         var user = _userRepository.GetByCondition(u => u.Id == id)
-                                    .Include(u => u.Type)											
+                                    .Include(u => u.Type)
                                     .Include(u => u.Location)
                                     .FirstOrDefault();
         if (user == null)
         {
             return new ApiResponse
             {
-                StatusCode = StatusCodes.Status404NotFound,
+                StatusCode = StatusCodes.Status400BadRequest,
                 Data = id,
                 Message = UserApiResponseMessageConstant.UserNotFound
             };
         }
-        form.LocationId = user.LocationId;
+
         _mapper.Map(form, user);
+        user.Type = type;
         user.TypeId = type.Id;
 
         if (await _userRepository.UpdateAsync(user) > 0)
@@ -167,7 +168,7 @@ public class UserService : IUserService
             return new ApiResponse
             {
                 StatusCode = StatusCodes.Status200OK,
-				Message = UserApiResponseMessageConstant.UserUpdateSuccess,
+                Message = UserApiResponseMessageConstant.UserUpdateSuccess,
                 Data = _mapper.Map<ResponseUserDto>(user)
             };
 
@@ -213,65 +214,65 @@ public class UserService : IUserService
 
 
 
-	public async Task<ApiResponse> LoginAsync(LoginForm login, byte[] key)
-	{
-		var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName)
-										.Include(u => u.Type)
-										.Include(u => u.Location)
-										.FirstOrDefaultAsync();
-		if (user == null)
-		{
-			return new ApiResponse
-			{
-				StatusCode = StatusCodes.Status400BadRequest,
-				Message = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername,
-				Data = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername
-			};
-		}
-		var match = CheckPassword(user, login.Password);
-		if (!match)
-		{
-			return new ApiResponse
-			{
-				StatusCode = StatusCodes.Status400BadRequest,
-				Message = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername,
-				Data = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername
-			};
-		}
+    public async Task<ApiResponse> LoginAsync(RequestLoginDto login, byte[] key)
+    {
+        var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName)
+                                        .Include(u => u.Type)
+                                        .Include(u => u.Location)
+                                        .FirstOrDefaultAsync();
+        if (user == null)
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername,
+                Data = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername
+            };
+        }
+        var match = CheckPassword(user, login.Password);
+        if (!match)
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername,
+                Data = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername
+            };
+        }
 
 
-		var IsPasswordChanged = !string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
+        var IsPasswordChanged = !string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
 
 
-		var tokenHandler = new JwtSecurityTokenHandler();
-		var tokenDescriptor = new SecurityTokenDescriptor
-		{
-			Subject = new ClaimsIdentity(new[]
-			{
-				new Claim("id", user.Id.ToString()),
-				new Claim("username", user.UserName),
-				new Claim("typeId", user.TypeId.ToString()),
-				new Claim(ClaimTypes.Role, user.Type.TypeName),
-				new Claim("locationId", user.LocationId.ToString()),
-				new Claim("location", user.Location.LocationName)
-			  }),
-			Expires = DateTime.UtcNow.AddDays(7),
-			SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
-		};
-		var token = tokenHandler.CreateToken(tokenDescriptor);
-		var encrypterToken = tokenHandler.WriteToken(token);
-		return new ApiResponse
-		{
-			StatusCode = StatusCodes.Status200OK,
-			Message = UserApiResponseMessageConstant.UserLoginSuccess,
-			Data = new ResponseLoginDto
-			{
-				TokenType = "Bearer",
-				Token = encrypterToken,
-				IsPasswordChanged = IsPasswordChanged
-			}
-		};
-	}
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim("id", user.Id.ToString()),
+                new Claim("username", user.UserName),
+                new Claim("typeId", user.TypeId.ToString()),
+                new Claim(ClaimTypes.Role, user.Type.TypeName),
+                new Claim("locationId", user.LocationId.ToString()),
+                new Claim("location", user.Location.LocationName)
+              }),
+            Expires = DateTime.UtcNow.AddDays(7),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+        };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var encrypterToken = tokenHandler.WriteToken(token);
+        return new ApiResponse
+        {
+            StatusCode = StatusCodes.Status200OK,
+            Message = UserApiResponseMessageConstant.UserLoginSuccess,
+            Data = new ResponseLoginDto
+            {
+                TokenType = "Bearer",
+                Token = encrypterToken,
+                IsPasswordChanged = IsPasswordChanged
+            }
+        };
+    }
 
 
     public async Task<ApiResponse> GetById(Guid id)
