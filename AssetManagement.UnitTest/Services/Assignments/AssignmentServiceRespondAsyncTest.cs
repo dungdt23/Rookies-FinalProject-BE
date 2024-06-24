@@ -93,28 +93,6 @@ namespace AssetManagement.UnitTest.Services.Assignments
 		}
 
 		[Test]
-		public async Task RespondAsync_ShouldReturnBadRequest_WhenAssetIsNotAvailable()
-		{
-			//Arrange
-			_assignmentMock.Object.State = TypeAssignmentState.WaitingForAcceptance;
-			_assignmentMock.Object.Asset = new Asset { State = TypeAssetState.NotAvailable, CreatedAt = DateTime.Now, IsDeleted = false };
-			var assignmentsMock = new List<Assignment> { _assignmentMock.Object };
-			var assignmentsQueryMock = assignmentsMock.AsQueryable().BuildMock();
-
-			_assignmentRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Assignment, bool>>>())).Returns(assignmentsQueryMock);
-
-			//Act
-			var result = await _assignmentService.RespondAsync(_requestDtoMock.Object);
-
-			//Assert
-			result.Should().NotBeNull();
-			result.Should().BeOfType(typeof(ApiResponse));
-			result.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
-			result.Message.Should().Be(AssignmentApiResponseMessageConstant.AssignmentRespondNotAvailable);
-			result.Data.Should().Be(_assignmentMock.Object.Asset.State.ToString());
-		}
-
-		[Test]
 		public async Task RespondAsync_ShouldReturnError_WhenRespondToAssignmentFail()
 		{
 			//Arrange

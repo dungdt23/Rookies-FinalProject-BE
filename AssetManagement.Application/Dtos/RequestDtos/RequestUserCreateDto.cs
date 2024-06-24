@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 using AssetManagement.Application.Validation;
 using AssetManagement.Domain.Enums;
 
-namespace AssetManagement.Application.Models;
+namespace AssetManagement.Application.Dtos.RequestDtos;
 
-public class CreateUpdateUserForm
+public class RequestUserCreateDto
 {
     [Required]
     [Naming]
@@ -29,7 +29,7 @@ public class CreateUpdateUserForm
 
     [Required]
     public string Type { get; set; }
-    
+
     [JsonIgnore]
 
     public Guid LocationId { get; set; }

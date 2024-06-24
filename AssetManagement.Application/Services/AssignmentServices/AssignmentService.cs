@@ -103,7 +103,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status409Conflict,
+					StatusCode = StatusCodes.Status400BadRequest,
 					Message = AssignmentApiResponseMessageConstant.AssignmentDeleteNotWaitingForAcceptance,
 					Data = assignment.State.ToString()
 				};
