@@ -20,7 +20,7 @@ namespace AssetManagement.Infrastructure.Repositories
                 .Include(x => x.Location)
                 .Include(x => x.Category)
                 .Where(x =>
-                ((!filter.state.HasValue) || (filter.state.HasValue) && (x.State == filter.state.Value))
+                ((!filter.state.HasValue) && (x.State == TypeAssetState.Available || x.State == TypeAssetState.NotAvailable || x.State == TypeAssetState.Assigned) || (filter.state.HasValue) && (x.State == filter.state.Value))
              && ((!filter.category.HasValue) || (filter.category.HasValue && x.CategoryId == filter.category))
              && ((string.IsNullOrEmpty(filter.search)) || (!string.IsNullOrEmpty(filter.search) && (x.AssetCode.Contains(filter.search) || x.AssetName.Contains(filter.search))))
              && x.LocationId == locationId
