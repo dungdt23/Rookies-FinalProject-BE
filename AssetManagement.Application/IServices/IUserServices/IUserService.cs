@@ -2,7 +2,6 @@ using AssetManagement.Application.ApiResponses;
 using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.Filters;
-using AssetManagement.Application.Models;
 using AssetManagement.Domain.Entities;
 
 namespace AssetManagement.Application.IServices.IUserServices;

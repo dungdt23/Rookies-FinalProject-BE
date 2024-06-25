@@ -54,7 +54,6 @@ namespace AssetManagement.Infrastructure.Repositories
             }
             catch (Exception)
             {
-
                 return RecordStatus.Invalid;
             }
         }

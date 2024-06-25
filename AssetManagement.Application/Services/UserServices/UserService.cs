@@ -66,7 +66,7 @@ public class UserService : IUserService
 
 
         user.StaffCode = _userRepository.GenerateStaffCode();
-        var usernameToGenerate = $"{user.FirstName.Trim()} {user.LastName.Trim()}";
+        var usernameToGenerate = $"{user.LastName.Trim()} {user.FirstName.Trim()}";
         var usernameRemovedSymbol = usernameToGenerate.RemoveDiacritics();
         user.UserName = _userRepository.GenerateUserName(usernameRemovedSymbol);
         user.TypeId = type.Id;
