@@ -60,7 +60,6 @@ namespace AssetManagement.Infrastructure.Repositories
 
         public async Task<int> DeleteAsync(Guid id)
         {
-           
             try
             {
                 var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
@@ -69,7 +68,6 @@ namespace AssetManagement.Infrastructure.Repositories
                 entity.IsDeleted = true;
                 _dbSet.Update(entity);
                 int status = await _context.SaveChangesAsync();
-
                 return status;
             }
             catch (Exception)
