@@ -58,7 +58,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         && (x.UserName.ToLower().Contains(searchString.ToLower()) || x.FirstName.ToLower().Contains(searchString.ToLower())
         || x.LastName.ToLower().Contains(searchString.ToLower()) || x.StaffCode.Contains(searchString)
         || ((x.LastName + x.FirstName).ToLower().Replace(" ", "").Trim()).Contains(searchString.ToLower().Replace(" ", "").Trim())
-        || ((x.FirstName + x.LastName).ToLower().Replace(" ", "").Trim()).Contains(searchString.ToLower().Replace(" ", "").Trim()) ))));
+        || ((x.FirstName + x.LastName).ToLower().Replace(" ", "").Trim()).Contains(searchString.ToLower().Replace(" ", "").Trim())))));
         return query;
     }
     public async Task<IEnumerable<User>> GetAllAsync(Func<User, object> condition, Guid locationId, UserFilter filter, int? index, int? size)
