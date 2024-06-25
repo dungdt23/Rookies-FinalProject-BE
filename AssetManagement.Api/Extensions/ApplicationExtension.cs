@@ -19,169 +19,170 @@ public static class ApplicationExtension
 			var userService = scope.ServiceProvider.GetService<IUserService>();
 			dbContext.Database.EnsureCreated();
 
-
-
-			if (!dbContext.Types.Any())
-			{
-				dbContext.Add(new Domain.Entities.Type { TypeName = "Staff", Description = "Staff of system", CreatedAt = DateTime.Now, IsDeleted = false });
-				dbContext.Add(new Domain.Entities.Type { TypeName = "Admin", Description = "Administration of system", CreatedAt = DateTime.Now, IsDeleted = false });
-				dbContext.SaveChanges();
-			}
-
-			if (!dbContext.Locations.Any())
-			{
-				dbContext.Add(new Location { LocationName = "Hà Nội", CreatedAt = DateTime.Now, IsDeleted = false });
-				dbContext.Add(new Location { LocationName = "Đà Nẵng", CreatedAt = DateTime.Now, IsDeleted = false });
-				dbContext.Add(new Location { LocationName = "Hồ Chí Minh", CreatedAt = DateTime.Now, IsDeleted = false });
-				dbContext.SaveChanges();
-			}
-
-			if (!dbContext.Users.Any())
-			{
-				List<string> firstNames = new List<string> { "Nguyễn", "Trần", "Lê", "Phan", "Hoàng", "Huỳnh", "Phan", "Vũ" };
-				List<string> lastNames = new List<string> { "An", "Bảo", "Cường", "Minh Duy", "Minh Ánh", "Lan", "Mai", "Ngọc" };
-				List<Domain.Entities.Type> types = dbContext.Types.ToList();
-				List<Guid> locationIds = dbContext.Locations.Select(t => t.Id).ToList();
-				Random random = new Random();
-
-				DateTime startDate = new DateTime(1990, 1, 1);
-				int dateOfBirthRange = (DateTime.Today.AddYears(-18) - startDate).Days;
-
-				//pre-user admin for easier login
-				var adminUser = new RequestUserCreateDto
-				{
-					FirstName = "Nguyễn",
-					LastName = "Minh Ánh",
-					Type = "Admin",
-					LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Hà Nội")).Id,
-					DateOfBirth = new DateTime(2003, 9, 19),
-					JoinedDate = new DateTime(2024, 4, 22),
-					Gender = TypeGender.Male
-				};
-				await userService.CreateAsync(adminUser);
-				var adminUser1 = new RequestUserCreateDto
-				{
-					FirstName = "Dao",
-					LastName = "Tien Dung",
-					Type = "Admin",
-					LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Đà Nẵng")).Id,
-					DateOfBirth = new DateTime(2002, 7, 20),
-					JoinedDate = new DateTime(2024, 4, 22),
-					Gender = TypeGender.Male
-				};
-				await userService.CreateAsync(adminUser1);
-				var adminUser2 = new RequestUserCreateDto
-				{
-					FirstName = "Nguyen",
-					LastName = "Viet Bao Son",
-					Type = "Admin",
-					LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Hồ Chí Minh")).Id,
-					DateOfBirth = new DateTime(2002, 4, 9),
-					JoinedDate = new DateTime(2024, 4, 22),
-					Gender = TypeGender.Male
-				};
-				await userService.CreateAsync(adminUser2);
-
-
-
-
-				//pre-user sstaff
-				var staffUser = new RequestUserCreateDto
-				{
-					FirstName = "Mac",
-					LastName = "Trang",
-					Type = "Staff",
-					LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Hà Nội")).Id,
-					DateOfBirth = new DateTime(1999, 01, 01),
-					JoinedDate = new DateTime(2024, 4, 22),
-					Gender = TypeGender.Female
-				};
-				await userService.CreateAsync(staffUser);
-
-				var staffUser2 = new RequestUserCreateDto
-				{
-					FirstName = "Ho",
-					LastName = "Huong",
-					Type = "Staff",
-					LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Đà Nẵng")).Id,
-					DateOfBirth = new DateTime(2003, 01, 01),
-					JoinedDate = new DateTime(2024, 4, 22),
-					Gender = TypeGender.Female
-				};
-				await userService.CreateAsync(staffUser2);
-
-
-				var staffUser3 = new RequestUserCreateDto
-				{
-					FirstName = "Pham",
-					LastName = "Quynh",
-					Type = "Staff",
-					LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Hồ Chí Minh")).Id,
-					DateOfBirth = new DateTime(2003, 01, 01),
-					JoinedDate = new DateTime(2024, 4, 22),
-					Gender = TypeGender.Female
-				};
-				await userService.CreateAsync(staffUser3);
-
-				var staffUser4 = new RequestUserCreateDto
-				{
-					FirstName = "Phung",
-					LastName = "Linh",
-					Type = "Staff",
-					LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Hà Nội")).Id,
-					DateOfBirth = new DateTime(2003, 01, 01),
-					JoinedDate = new DateTime(2024, 4, 22),
-					Gender = TypeGender.Female
-				};
-				await userService.CreateAsync(staffUser4);
-
-				for (int i = 0; i < 300; i++)
-				{
-					string firstName = firstNames[random.Next(firstNames.Count)];
-					string lastName = lastNames[random.Next(lastNames.Count)];
-					Domain.Entities.Type type = types[random.Next(types.Count)];
-					Guid locationId = locationIds[random.Next(locationIds.Count)];
-					DateTime dateOfBirth = startDate.AddDays(random.Next(dateOfBirthRange));
-					DateTime joinedDate = dateOfBirth.AddYears(18).AddDays(random.Next(1, 60));
-					if (joinedDate.DayOfWeek == DayOfWeek.Saturday || joinedDate.DayOfWeek == DayOfWeek.Sunday)
-					{
-						joinedDate.AddDays(2);
-					}
-
-
-					RequestUserCreateDto form = new RequestUserCreateDto
-					{
-						FirstName = firstName,
-						LastName = lastName,
-						Type = type.TypeName,
-						LocationId = locationId,
-						DateOfBirth = dateOfBirth,
-						JoinedDate = joinedDate,
-						Gender = (TypeGender)random.Next(0, 2)
-					};
-
-					await userService.CreateAsync(form);
-
-				}
-
-			}
-
-
-
-			if (!dbContext.Categories.Any())
-			{
-				dbContext.Add(new Category { CategoryName = "Laptop", Prefix = "LA", CreatedAt = DateTime.Now, IsDeleted = false });
-				dbContext.Add(new Category { CategoryName = "Monitor", Prefix = "MO", CreatedAt = DateTime.Now, IsDeleted = false });
-				dbContext.Add(new Category { CategoryName = "PC", Prefix = "PC", CreatedAt = DateTime.Now, IsDeleted = false });
-				dbContext.Add(new Category { CategoryName = "Keyboard", Prefix = "KE", CreatedAt = DateTime.Now, IsDeleted = false });
-				dbContext.SaveChanges();
-			}
 			using var transaction = dbContext.Database.BeginTransaction();
 			try
 			{
+
+
+				if (!dbContext.Types.Any())
+				{
+					dbContext.Add(new Domain.Entities.Type { TypeName = "Staff", Description = "Staff of system", CreatedAt = DateTime.Now, IsDeleted = false });
+					dbContext.Add(new Domain.Entities.Type { TypeName = "Admin", Description = "Administration of system", CreatedAt = DateTime.Now, IsDeleted = false });
+					dbContext.SaveChanges();
+				}
+
+				if (!dbContext.Locations.Any())
+				{
+					dbContext.Add(new Location { LocationName = "Hà Nội", CreatedAt = DateTime.Now, IsDeleted = false });
+					dbContext.Add(new Location { LocationName = "Đà Nẵng", CreatedAt = DateTime.Now, IsDeleted = false });
+					dbContext.Add(new Location { LocationName = "Hồ Chí Minh", CreatedAt = DateTime.Now, IsDeleted = false });
+					dbContext.SaveChanges();
+				}
+
+				if (!dbContext.Users.Any())
+				{
+					List<string> firstNames = new List<string> { "An", "Bảo", "Cường", "Minh Duy", "Minh Ánh", "Lan", "Mai", "Ngọc" };
+					List<string> lastNames = new List<string> { "Nguyễn", "Trần", "Lê", "Phan", "Hoàng", "Huỳnh", "Phan", "Vũ" };
+					List<Domain.Entities.Type> types = dbContext.Types.ToList();
+					List<Guid> locationIds = dbContext.Locations.Select(t => t.Id).ToList();
+					Random random = new Random();
+
+					DateTime startDate = new DateTime(1990, 1, 1);
+					int dateOfBirthRange = (DateTime.Today.AddYears(-18) - startDate).Days;
+
+					//pre-user admin for easier login
+					var adminUser = new RequestUserCreateDto
+					{
+						FirstName = "Minh Ánh",
+						LastName = "Nguyễn",
+						Type = "Admin",
+						LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Hà Nội")).Id,
+						DateOfBirth = new DateTime(2003, 9, 19),
+						JoinedDate = new DateTime(2024, 4, 22),
+						Gender = TypeGender.Male
+					};
+					await userService.CreateAsync(adminUser);
+					var adminUser1 = new RequestUserCreateDto
+					{
+						FirstName = "Tien Dung",
+						LastName = "Dao",
+						Type = "Admin",
+						LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Đà Nẵng")).Id,
+						DateOfBirth = new DateTime(2002, 7, 20),
+						JoinedDate = new DateTime(2024, 4, 22),
+						Gender = TypeGender.Male
+					};
+					await userService.CreateAsync(adminUser1);
+					var adminUser2 = new RequestUserCreateDto
+					{
+						FirstName = "Son",
+						LastName = "Nguyen Viet Bao",
+						Type = "Admin",
+						LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Hồ Chí Minh")).Id,
+						DateOfBirth = new DateTime(2002, 4, 9),
+						JoinedDate = new DateTime(2024, 4, 22),
+						Gender = TypeGender.Male
+					};
+					await userService.CreateAsync(adminUser2);
+
+
+
+
+					//pre-user sstaff
+					var staffUser = new RequestUserCreateDto
+					{
+						FirstName = "Trang",
+						LastName = "Mac",
+						Type = "Staff",
+						LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Hà Nội")).Id,
+						DateOfBirth = new DateTime(1999, 01, 01),
+						JoinedDate = new DateTime(2024, 4, 22),
+						Gender = TypeGender.Female
+					};
+					await userService.CreateAsync(staffUser);
+
+					var staffUser2 = new RequestUserCreateDto
+					{
+						FirstName = "Huong",
+						LastName = "Ho",
+						Type = "Staff",
+						LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Đà Nẵng")).Id,
+						DateOfBirth = new DateTime(2003, 01, 01),
+						JoinedDate = new DateTime(2024, 4, 22),
+						Gender = TypeGender.Female
+					};
+					await userService.CreateAsync(staffUser2);
+
+
+					var staffUser3 = new RequestUserCreateDto
+					{
+						FirstName = "Quynh",
+						LastName = "Pham",
+						Type = "Staff",
+						LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Hồ Chí Minh")).Id,
+						DateOfBirth = new DateTime(2003, 01, 01),
+						JoinedDate = new DateTime(2024, 4, 22),
+						Gender = TypeGender.Female
+					};
+					await userService.CreateAsync(staffUser3);
+
+					var staffUser4 = new RequestUserCreateDto
+					{
+						FirstName = "Phung",
+						LastName = "Linh",
+						Type = "Staff",
+						LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Hà Nội")).Id,
+						DateOfBirth = new DateTime(2003, 01, 01),
+						JoinedDate = new DateTime(2024, 4, 22),
+						Gender = TypeGender.Female
+					};
+					await userService.CreateAsync(staffUser4);
+
+					for (int i = 0; i < 50; i++)
+					{
+						string firstName = firstNames[random.Next(firstNames.Count)];
+						string lastName = lastNames[random.Next(lastNames.Count)];
+						Domain.Entities.Type type = types[random.Next(types.Count)];
+						Guid locationId = locationIds[random.Next(locationIds.Count)];
+						DateTime dateOfBirth = startDate.AddDays(random.Next(dateOfBirthRange));
+						DateTime joinedDate = dateOfBirth.AddYears(18).AddDays(random.Next(1, 60));
+						if (joinedDate.DayOfWeek == DayOfWeek.Saturday || joinedDate.DayOfWeek == DayOfWeek.Sunday)
+						{
+							joinedDate.AddDays(2);
+						}
+
+
+						RequestUserCreateDto form = new RequestUserCreateDto
+						{
+							FirstName = firstName,
+							LastName = lastName,
+							Type = type.TypeName,
+							LocationId = locationId,
+							DateOfBirth = dateOfBirth,
+							JoinedDate = joinedDate,
+							Gender = (TypeGender)random.Next(0, 2)
+						};
+
+						await userService.CreateAsync(form);
+
+					}
+
+				}
+
+
+
+				if (!dbContext.Categories.Any())
+				{
+					dbContext.Add(new Category { CategoryName = "Laptop", Prefix = "LA", CreatedAt = DateTime.Now, IsDeleted = false });
+					dbContext.Add(new Category { CategoryName = "Monitor", Prefix = "MO", CreatedAt = DateTime.Now, IsDeleted = false });
+					dbContext.Add(new Category { CategoryName = "PC", Prefix = "PC", CreatedAt = DateTime.Now, IsDeleted = false });
+					dbContext.Add(new Category { CategoryName = "Keyboard", Prefix = "KE", CreatedAt = DateTime.Now, IsDeleted = false });
+					dbContext.SaveChanges();
+				}
+				var assetCodes = new Dictionary<Guid, int>();
 				if (!dbContext.Assets.Any())
 				{
-					var assets = GenerateAsset(350, dbContext);
+					var assets = GenerateAsset(assetCodes, 350, dbContext);
 				}
 
 				if (!dbContext.Assignments.Any())
@@ -190,7 +191,7 @@ public static class ApplicationExtension
 					var assigner = dbContext.Users.Where(a => a.StaffCode.Equals("SD0001")).AsNoTracking().FirstOrDefault();
 					var typeStaff = dbContext.Types.Where(a => a.TypeName == "Staff").AsNoTracking().FirstOrDefault();
 					var assignee = dbContext.Users.Where(a => a.TypeId == typeStaff.Id).AsNoTracking().ToList();
-					var assets = GenerateAsset(50, dbContext);
+					var assets = GenerateAsset(assetCodes, 50, dbContext);
 					dbContext.ChangeTracker.Clear();
 
 					for (int i = 0; i < assets.Count; i++)
@@ -198,7 +199,7 @@ public static class ApplicationExtension
 						var assignmentFaker = new Faker<Assignment>()
 										.RuleFor(a => a.AssetId, f => assets[i].Id)
 										.RuleFor(a => a.AssignerId, f => assigner.Id)
-										.RuleFor(a => a.AssigneeId, f => assignee[i].Id)
+										.RuleFor(a => a.AssigneeId, f => f.PickRandom(assignee).Id)
 										.RuleFor(a => a.State, f => f.PickRandom<TypeAssignmentState>())
 										.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
 										.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
@@ -212,14 +213,14 @@ public static class ApplicationExtension
 						.Include(a => a.Location)
 						.Where(a => a.StaffCode.Equals("SD0001")).AsNoTracking().FirstOrDefault();
 					var assigneesHN = dbContext.Users.Where(a => a.UserName.Equals("trangm") || a.UserName.Equals("linhp")).AsNoTracking().ToList();
-					var assetsHN = GenerateAsset(5, dbContext, "Hà Nội");
+					var assetsHN = GenerateAsset(assetCodes, 5, dbContext, "Hà Nội");
 					dbContext.ChangeTracker.Clear();
 					for (int i = 0; i < assetsHN.Count; i++)
 					{
 						var assignmentFaker = new Faker<Assignment>()
 										.RuleFor(a => a.AssetId, f => assetsHN[i].Id)
 										.RuleFor(a => a.AssignerId, f => assignerHN.Id)
-										.RuleFor(a => a.AssigneeId, f => assigneesHN[random.Next(0, 2)].Id)
+										.RuleFor(a => a.AssigneeId, f => f.PickRandom(assigneesHN).Id)
 										.RuleFor(a => a.State, f => f.PickRandom<TypeAssignmentState>())
 										.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
 										.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
@@ -232,7 +233,7 @@ public static class ApplicationExtension
 						.Include(a => a.Location)
 						.Where(a => a.UserName.Equals("dungdt")).AsNoTracking().FirstOrDefault();
 					var assigneeDN = dbContext.Users.Where(a => a.UserName.Equals("huongh")).AsNoTracking().FirstOrDefault();
-					var assetsDN = GenerateAsset(5, dbContext, "Đà Nẵng");
+					var assetsDN = GenerateAsset(assetCodes, 5, dbContext, "Đà Nẵng");
 					dbContext.ChangeTracker.Clear();
 					for (int i = 0; i < assetsDN.Count; i++)
 					{
@@ -252,7 +253,7 @@ public static class ApplicationExtension
 						.Include(a => a.Location)
 						.Where(a => a.UserName.Equals("sonnvb")).AsNoTracking().FirstOrDefault();
 					var assigneeHCM = dbContext.Users.Where(a => a.UserName.Equals("quynhp")).AsNoTracking().FirstOrDefault();
-					var assetsHCM = GenerateAsset(5, dbContext, "Hồ Chí Minh");
+					var assetsHCM = GenerateAsset(assetCodes, 5, dbContext, "Hồ Chí Minh");
 					dbContext.ChangeTracker.Clear();
 					for (int i = 0; i < assetsHCM.Count; i++)
 					{
@@ -293,7 +294,7 @@ public static class ApplicationExtension
 		}
 	}
 
-	public static List<Asset> GenerateAsset(int amount, AssetManagementDBContext dbContext, string? locationName = null)
+	public static List<Asset> GenerateAsset(Dictionary<Guid, int> assetCodes, int amount, AssetManagementDBContext dbContext, string? locationName = null)
 	{
 		Random random = new Random();
 		var categories = dbContext.Categories.ToList();
@@ -307,7 +308,7 @@ public static class ApplicationExtension
 		{
 			locations = dbContext.Locations.Where(x => x.LocationName == locationName).ToList();
 		}
-		var assetCodes = new Dictionary<Guid, int>();
+
 		var assetFaker = new Faker<Asset>()
 			.RuleFor(a => a.CategoryId, f => f.PickRandom(categories).Id)
 			.RuleFor(a => a.LocationId, f => f.PickRandom(locations).Id)
@@ -343,6 +344,11 @@ public static class ApplicationExtension
 			await dbContext.Database.EnsureCreatedAsync();
 
 			// Delete seed data as needed
+			if (dbContext.Users.Any())
+			{
+				dbContext.Users.RemoveRange(dbContext.Users);
+			}
+
 			if (dbContext.Assets.Any())
 			{
 				dbContext.Assets.RemoveRange(dbContext.Assets);
