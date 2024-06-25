@@ -7,9 +7,6 @@ namespace AssetManagement.Application.Filters;
 
 public class AssignmentFilter
 {
-    public Guid LocationId { get; set; }
-    public Guid? UserId { get; set; }
-    public UserType UserType { get; set; }
     public string? SearchString { get; set; }
     public bool IsAscending { get; set; } = true;
     public TypeAssignmentState? StateFilter { get; set; }

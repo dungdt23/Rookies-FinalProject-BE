@@ -13,12 +13,12 @@ public class AssignmentRepository : GenericRepository<Assignment>, IAssignmentRe
     {
         _dbContext = dBContext;
     }
-    private IQueryable<Assignment> ApplyFilter(AssignmentFilter filter)
+    private IQueryable<Assignment> ApplyFilter(AssignmentFilter filter, Guid userId, UserType userType, Guid locationId)
     {
-        IQueryable<Assignment> query = _dbContext.Assignments.Where(x => !x.IsDeleted);
-        if (filter.UserType == UserType.Staff && filter.UserId.HasValue)
+        IQueryable<Assignment> query = _dbContext.Assignments.Where(x => !x.IsDeleted && x.Assigner.LocationId == locationId);
+        if (userType == UserType.Staff)
         {
-            query = query.Where(x => x.AssigneeId == filter.UserId.Value);
+            query = query.Where(x => x.AssigneeId == userId);
         }
 
         if (filter.StateFilter.HasValue)
@@ -37,9 +37,9 @@ public class AssignmentRepository : GenericRepository<Assignment>, IAssignmentRe
         && (x.Asset.AssetCode.Contains(searchString) || x.Asset.AssetName.Contains(searchString) || x.Assignee.UserName.Contains(searchString))));
         return query;
     }
-    public IQueryable<Assignment> GetAll(Func<Assignment, object> sortCondition, AssignmentFilter filter)
+    public IQueryable<Assignment> GetAll(Func<Assignment, object> sortCondition, AssignmentFilter filter, Guid userId, UserType userType, Guid locationId)
     {
-        var query = ApplyFilter(filter);
+        var query = ApplyFilter(filter, userId, userType, locationId);
         var assignments = query.Include(a => a.Assigner)
                                 .Include(a => a.Assignee)
                                 .Include(a => a.Asset)
