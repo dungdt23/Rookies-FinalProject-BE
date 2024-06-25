@@ -141,7 +141,7 @@ namespace AssetManagement.Api
 
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseMiddleware<ValidateUserMiddleware>();
+            //app.UseMiddleware<ValidateUserMiddleware>();
 
             app.MapControllers();
 
