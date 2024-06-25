@@ -1,6 +1,5 @@
 ﻿using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.IServices.IUserServices;
-using AssetManagement.Application.Models;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Migrations;
@@ -344,10 +343,6 @@ public static class ApplicationExtension
 			await dbContext.Database.EnsureCreatedAsync();
 
 			// Delete seed data as needed
-			if (dbContext.Users.Any())
-			{
-				dbContext.Users.RemoveRange(dbContext.Users);
-			}
 			if (dbContext.Assets.Any())
 			{
 				dbContext.Assets.RemoveRange(dbContext.Assets);

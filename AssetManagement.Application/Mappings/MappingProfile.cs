@@ -1,6 +1,5 @@
 ﻿using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
-using AssetManagement.Application.Models;
 using AssetManagement.Domain.Entities;
 using AutoMapper;
 using System.Text.RegularExpressions;
