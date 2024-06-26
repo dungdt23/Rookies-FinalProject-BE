@@ -193,7 +193,7 @@ public class UserService : IUserService
             StatusCode = StatusCodes.Status500InternalServerError
         };
         var userValidAssignment = user.ReceivedAssignments
-            .Where(x => x.State != Domain.Enums.TypeAssignmentState.Rejected && !x.IsDeleted);
+            .Where(x => x.State != Domain.Enums.TypeAssignmentState.Declined && !x.IsDeleted);
         //check if user have any valid asignment
         if (userValidAssignment.Count() == 0)
         {
