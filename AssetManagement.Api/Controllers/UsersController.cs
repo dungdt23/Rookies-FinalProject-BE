@@ -102,6 +102,10 @@ public class UsersController : ControllerBase
         {
             return BadRequest(result);
         }
+        if (result.StatusCode == StatusCodes.Status403Forbidden)
+        {
+            return Forbid();
+        }
         return Ok(result);
     }
     [HttpGet("{id}")]

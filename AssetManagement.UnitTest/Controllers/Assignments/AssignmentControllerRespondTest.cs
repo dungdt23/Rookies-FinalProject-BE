@@ -94,7 +94,7 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
 			{
 				StatusCode = StatusCodes.Status400BadRequest,
 				Message = AssignmentApiResponseMessageConstant.AssignmentRespondNotWaitingForAcceptance,
-				Data = TypeAssignmentState.Rejected
+				Data = TypeAssignmentState.Declined
 			};
 
 			_assignmentServiceMock.Setup(s => s.RespondAsync(_requestDtoMock.Object)).ReturnsAsync(response);

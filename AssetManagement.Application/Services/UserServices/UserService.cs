@@ -199,7 +199,7 @@ public class UserService : IUserService
             StatusCode = StatusCodes.Status500InternalServerError
         };
         var userValidAssignment = user.ReceivedAssignments
-            .Where(x => x.State != Domain.Enums.TypeAssignmentState.Rejected && !x.IsDeleted);
+            .Where(x => x.State != Domain.Enums.TypeAssignmentState.Declined && !x.IsDeleted);
 
         //check if user have any valid asignment
         if (userValidAssignment.Count() == 0)
@@ -219,7 +219,7 @@ public class UserService : IUserService
     }
     public async Task<ApiResponse> LoginAsync(RequestLoginDto login, byte[] key)
     {
-        var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName && u.IsDeleted == false)
+        var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName)
                                         .Include(u => u.Type)
                                         .Include(u => u.Location)
                                         .FirstOrDefaultAsync();
@@ -230,6 +230,15 @@ public class UserService : IUserService
                 StatusCode = StatusCodes.Status400BadRequest,
                 Message = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername,
                 Data = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername
+            };
+        }
+        else if (user.IsDeleted)
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status403Forbidden,
+                Message = UserApiResponseMessageConstant.DisabledUser,
+                Data = UserApiResponseMessageConstant.DisabledUser
             };
         }
         var match = CheckPassword(user, login.Password);

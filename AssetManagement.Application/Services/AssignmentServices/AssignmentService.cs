@@ -232,7 +232,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				};
 			}
 
-			assignment.State = request.IsAccept ? TypeAssignmentState.Accepted : TypeAssignmentState.Rejected;
+			assignment.State = request.IsAccept ? TypeAssignmentState.Accepted : TypeAssignmentState.Declined;
 			assignment.Asset.State = request.IsAccept ? TypeAssetState.Assigned : TypeAssetState.Available;
 
 			if (await _assignmentRepository.UpdateAsync(assignment) > 0)
