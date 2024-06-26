@@ -1,4 +1,5 @@
 using AssetManagement.Api.Extensions;
+using AssetManagement.Api.Middlewares;
 using AssetManagement.Api.ValidateModel;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.IServices.IAssetServices;
@@ -143,11 +144,15 @@ namespace AssetManagement.Api
 
             app.UseAuthentication();
             app.UseAuthorization();
+            //app.UseMiddleware<ValidateUserMiddleware>();
 
             app.MapControllers();
 
-            //await app.DeleteAllDataAsync();
-            await app.SeedDataAsync();
+            if (app.Environment.IsDevelopment())
+            {
+                //await app.DeleteAllDataAsync();
+                await app.SeedDataAsync();
+            }
 
             app.Run();
         }
