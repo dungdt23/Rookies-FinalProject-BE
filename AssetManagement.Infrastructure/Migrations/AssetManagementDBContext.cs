@@ -1,6 +1,5 @@
 ﻿using AssetManagement.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace AssetManagement.Infrastructure.Migrations
 {
@@ -78,6 +77,10 @@ namespace AssetManagement.Infrastructure.Migrations
                 .HasForeignKey(x => x.AssetId);
 
             });
+
+            modelBuilder.Entity<GlobalSetting>().HasData(
+                new GlobalSetting { Id = 1, GlobalInvalidationTimestamp = DateTime.MinValue }
+            );
         }
         public DbSet<Asset> Assets { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
@@ -86,6 +89,7 @@ namespace AssetManagement.Infrastructure.Migrations
         public DbSet<ReturnRequest> ReturnRequests { get; set; }
         public DbSet<Domain.Entities.Type> Types { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<GlobalSetting> GlobalSettings { get; set; }
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{

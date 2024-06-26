@@ -3,6 +3,7 @@ using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IRepositories;
+using AssetManagement.Application.IServices;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
@@ -24,18 +25,21 @@ public class UserService : IUserService
     private readonly IGenericRepository<Assignment> _assignmentRepository;
     private readonly IGenericRepository<Domain.Entities.Type> _typeRepository;
     private readonly IMapper _mapper;
+    private readonly IJwtInvalidationService _jwtInvalidationService;
+
     public UserService(IUserRepository userRepository,
         IGenericRepository<Assignment> assignmentRepository,
         IGenericRepository<Domain.Entities.Type> typeRepository,
-        IMapper mapper)
+        IMapper mapper,
+        IJwtInvalidationService jwtInvalidationService)
     {
         _userRepository = userRepository;
         _mapper = mapper;
         _assignmentRepository = assignmentRepository;
         _typeRepository = typeRepository;
         _mapper = mapper;
+        _jwtInvalidationService = jwtInvalidationService;
     }
-
     public bool CheckPassword(User user, string password)
     {
         bool result;
@@ -46,8 +50,6 @@ public class UserService : IUserService
         }
         return result;
     }
-
-
     public async Task<ApiResponse> CreateAsync(RequestUserCreateDto form)
     {
         var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
@@ -120,7 +122,6 @@ public class UserService : IUserService
             TotalCount = totalCount
         };
     }
-
     public User EncryptPassword(User user, string password)
     {
         using (HMACSHA512? hmac = new HMACSHA512())
@@ -130,7 +131,6 @@ public class UserService : IUserService
         }
         return user;
     }
-
     public async Task<ApiResponse> UpdateAsync(Guid id, RequestUserEditDto form)
     {
         var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
@@ -159,9 +159,15 @@ public class UserService : IUserService
             };
         }
 
+        if (type.Id != user.TypeId)
+        {
+            user.TokenInvalidationTimestamp = DateTime.Now;
+        }
+
         _mapper.Map(form, user);
         user.Type = type;
         user.TypeId = type.Id;
+
 
         if (await _userRepository.UpdateAsync(user) > 0)
         {
@@ -194,6 +200,7 @@ public class UserService : IUserService
         };
         var userValidAssignment = user.ReceivedAssignments
             .Where(x => x.State != Domain.Enums.TypeAssignmentState.Declined && !x.IsDeleted);
+
         //check if user have any valid asignment
         if (userValidAssignment.Count() == 0)
         {
@@ -210,13 +217,9 @@ public class UserService : IUserService
                 StatusCode = StatusCodes.Status409Conflict
             };
     }
-
-
-
-
     public async Task<ApiResponse> LoginAsync(RequestLoginDto login, byte[] key)
     {
-        var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName && u.IsDeleted == false)
+        var user = await _userRepository.GetByCondition(u => u.UserName == login.UserName)
                                         .Include(u => u.Type)
                                         .Include(u => u.Location)
                                         .FirstOrDefaultAsync();
@@ -227,6 +230,15 @@ public class UserService : IUserService
                 StatusCode = StatusCodes.Status400BadRequest,
                 Message = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername,
                 Data = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername
+            };
+        }
+        else if (user.IsDeleted)
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status403Forbidden,
+                Message = UserApiResponseMessageConstant.DisabledUser,
+                Data = UserApiResponseMessageConstant.DisabledUser
             };
         }
         var match = CheckPassword(user, login.Password);
@@ -254,9 +266,10 @@ public class UserService : IUserService
                 new Claim("typeId", user.TypeId.ToString()),
                 new Claim(ClaimTypes.Role, user.Type.TypeName),
                 new Claim("locationId", user.LocationId.ToString()),
-                new Claim("location", user.Location.LocationName)
+                new Claim("location", user.Location.LocationName),
+                new Claim("BlTimestamp", DateTime.Now.ToString())
               }),
-            Expires = DateTime.UtcNow.AddDays(7),
+            Expires = DateTime.Now.AddDays(7),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
         };
         var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -273,8 +286,6 @@ public class UserService : IUserService
             }
         };
     }
-
-
     public async Task<ApiResponse> GetById(Guid id)
     {
         var user = await _userRepository.GetByCondition(x => x.Id == id)

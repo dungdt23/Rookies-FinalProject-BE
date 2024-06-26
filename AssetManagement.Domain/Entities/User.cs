@@ -10,7 +10,7 @@ namespace AssetManagement.Domain.Entities
         public override Guid Id { get; set; } = Guid.NewGuid();
         [Required]
         [MaxLength()]
-        public  string StaffCode { get; set; }
+        public string StaffCode { get; set; }
         [Required]
         [MaxLength(200)]
         public string FirstName { get; set; }
@@ -43,11 +43,13 @@ namespace AssetManagement.Domain.Entities
 
         public Guid TypeId { get; set; }
 
+        public DateTime TokenInvalidationTimestamp { get; set; } = DateTime.MinValue;
+
         public Location Location { get; set; }
         public Type Type { get; set; }
 
-        public ICollection<Assignment> AssignedAssignments { get; set; } 
-        public ICollection<Assignment> ReceivedAssignments { get; set; } 
+        public ICollection<Assignment> AssignedAssignments { get; set; }
+        public ICollection<Assignment> ReceivedAssignments { get; set; }
         public ICollection<ReturnRequest> RequestedReturnRequests { get; set; }
         public ICollection<ReturnRequest> RespondedReturnRequests { get; set; }
     }

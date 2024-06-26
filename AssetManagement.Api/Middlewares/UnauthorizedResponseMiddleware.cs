@@ -1,5 +1,4 @@
-
-using AssetManagement.Application.ApiResponses;
+﻿using AssetManagement.Application.ApiResponses;
 using Newtonsoft.Json;
 
 namespace AssetManagement.Api.Middlewares;
@@ -13,6 +12,7 @@ public class UnauthorizedResponseMiddleware
         _next = next;
     }
 
+    // Note: Sơn this is unused code please delete this whenever
     public async Task InvokeAsync(HttpContext context)
     {
 

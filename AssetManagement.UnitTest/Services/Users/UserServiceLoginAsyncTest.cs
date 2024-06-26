@@ -1,6 +1,7 @@
 using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.IRepositories;
+using AssetManagement.Application.IServices;
 using AssetManagement.Application.Services.UserServices;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
@@ -20,6 +21,7 @@ public class UserServiceLoginAsyncTest
     private Mock<IUserRepository> _userRepositoryMock;
     private Mock<IGenericRepository<Assignment>> _assignmentRepositoryMock;
     private Mock<IGenericRepository<Domain.Entities.Type>> _typeRepositoryMock;
+    private Mock<IJwtInvalidationService> _jwtInvalidationServiceMock;
     private Mock<IMapper> _mapperMock;
     private UserService _userService;
     private Mock<User> _userMock;
@@ -32,7 +34,7 @@ public class UserServiceLoginAsyncTest
         _assignmentRepositoryMock = new Mock<IGenericRepository<Assignment>>();
         _typeRepositoryMock = new Mock<IGenericRepository<Domain.Entities.Type>>();
         _mapperMock = new Mock<IMapper>();
-        _userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object, _typeRepositoryMock.Object, _mapperMock.Object);
+        _userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object, _typeRepositoryMock.Object, _mapperMock.Object, _jwtInvalidationServiceMock.Object);
     }
 
     [SetUp]
