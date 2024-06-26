@@ -51,11 +51,10 @@ public class UserRepository : GenericRepository<User>, IUserRepository
             query = query.Where(x => x.Type.TypeName.Equals(type));
         }
         var searchString = filter.SearchString;
-        //if (!string.IsNullOrEmpty(searchString)) searchString = searchString.RemoveDiacritics();
 
         query = query.Where(x =>
         (string.IsNullOrEmpty(searchString) || (!string.IsNullOrEmpty(searchString)
-        && (x.UserName.ToLower().Contains(searchString.ToLower()) || x.FirstName.ToLower().Contains(searchString.ToLower())
+        && (x.FirstName.ToLower().Contains(searchString.ToLower())
         || x.LastName.ToLower().Contains(searchString.ToLower()) || x.StaffCode.Contains(searchString)
         || ((x.LastName + x.FirstName).ToLower().Replace(" ", "").Trim()).Contains(searchString.ToLower().Replace(" ", "").Trim())
         || ((x.FirstName + x.LastName).ToLower().Replace(" ", "").Trim()).Contains(searchString.ToLower().Replace(" ", "").Trim())))));
