@@ -2,8 +2,7 @@
 {
     public interface IJwtInvalidationService
     {
-        Task GlobalInvalidationAsync();
-        Task UserInvalidationAsync(Guid userId);
+        Task UpdateGlobalInvalidationTimeStampAsync();
         Task<DateTime> GetGlobalInvalidationTimestampAsync();
         Task<DateTime> GetUserInvalidationTimestampAsync(Guid userId);
         Task<bool> IsTokenValidAsync(string token, Guid userId);

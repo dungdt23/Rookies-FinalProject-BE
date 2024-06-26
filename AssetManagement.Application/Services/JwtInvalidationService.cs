@@ -16,20 +16,10 @@ namespace AssetManagement.Application.Services
             _userRepository = userRepository;
         }
 
-        public async Task GlobalInvalidationAsync()
+        public async Task UpdateGlobalInvalidationTimeStampAsync()
         {
-            var timestamp = DateTime.UtcNow;
+            var timestamp = DateTime.Now;
             await _globalSettingRepository.UpdateGlobalInvalidationTimestampAsync(timestamp);
-        }
-
-        public async Task UserInvalidationAsync(Guid userId)
-        {
-            var user = await _userRepository.GetByCondition(u => u.Id == userId).FirstOrDefaultAsync();
-            if (user != null)
-            {
-                user.TokenInvalidationTimestamp = DateTime.UtcNow;
-                await _userRepository.UpdateAsync(user);
-            }
         }
 
         public async Task<DateTime> GetGlobalInvalidationTimestampAsync()

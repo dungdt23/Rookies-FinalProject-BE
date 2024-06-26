@@ -1,8 +1,8 @@
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IRepositories;
+using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Infrastructure.Migrations;
-using Diacritics.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace AssetManagement.Infrastructure.Repositories;
@@ -90,5 +90,24 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     public async Task<int> GetTotalCountAsync(Guid locationId, UserFilter filter)
     {
         return await ApplyFilter(locationId, filter).CountAsync();
+    }
+
+    public override async Task<int> DeleteAsync(Guid id)
+    {
+        try
+        {
+            var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+            if (entity == null) return RecordStatus.Invalid;
+            entity.TokenInvalidationTimestamp = DateTime.Now;
+            entity.DeletedAt = DateTime.Now;
+            entity.IsDeleted = true;
+            _dbSet.Update(entity);
+            int status = await _context.SaveChangesAsync();
+            return status;
+        }
+        catch (Exception)
+        {
+            return RecordStatus.Invalid;
+        }
     }
 }
