@@ -254,7 +254,8 @@ public class UserService : IUserService
                 new Claim("typeId", user.TypeId.ToString()),
                 new Claim(ClaimTypes.Role, user.Type.TypeName),
                 new Claim("locationId", user.LocationId.ToString()),
-                new Claim("location", user.Location.LocationName)
+                new Claim("location", user.Location.LocationName),
+                new Claim("BlTimestamp", DateTime.UtcNow.ToString())
               }),
             Expires = DateTime.UtcNow.AddDays(7),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
