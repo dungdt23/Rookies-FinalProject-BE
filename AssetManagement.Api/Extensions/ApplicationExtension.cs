@@ -213,7 +213,7 @@ public static class ApplicationExtension
 						.Include(a => a.Location)
 						.Where(a => a.StaffCode.Equals("SD0001")).AsNoTracking().FirstOrDefault();
 					var assigneesHN = dbContext.Users.Where(a => a.UserName.Equals("trangm") || a.UserName.Equals("linhp")).AsNoTracking().ToList();
-					var assetsHN = GenerateAsset(assetCodes, 5, dbContext, "Hà Nội");
+					var assetsHN = GenerateAsset(assetCodes, 20, dbContext, "Hà Nội");
 					dbContext.ChangeTracker.Clear();
 					for (int i = 0; i < assetsHN.Count; i++)
 					{
@@ -233,7 +233,7 @@ public static class ApplicationExtension
 						.Include(a => a.Location)
 						.Where(a => a.UserName.Equals("dungdt")).AsNoTracking().FirstOrDefault();
 					var assigneeDN = dbContext.Users.Where(a => a.UserName.Equals("huongh")).AsNoTracking().FirstOrDefault();
-					var assetsDN = GenerateAsset(assetCodes, 5, dbContext, "Đà Nẵng");
+					var assetsDN = GenerateAsset(assetCodes, 20, dbContext, "Đà Nẵng");
 					dbContext.ChangeTracker.Clear();
 					for (int i = 0; i < assetsDN.Count; i++)
 					{
@@ -253,7 +253,7 @@ public static class ApplicationExtension
 						.Include(a => a.Location)
 						.Where(a => a.UserName.Equals("sonnvb")).AsNoTracking().FirstOrDefault();
 					var assigneeHCM = dbContext.Users.Where(a => a.UserName.Equals("quynhp")).AsNoTracking().FirstOrDefault();
-					var assetsHCM = GenerateAsset(assetCodes, 5, dbContext, "Hồ Chí Minh");
+					var assetsHCM = GenerateAsset(assetCodes, 20, dbContext, "Hồ Chí Minh");
 					dbContext.ChangeTracker.Clear();
 					for (int i = 0; i < assetsHCM.Count; i++)
 					{
