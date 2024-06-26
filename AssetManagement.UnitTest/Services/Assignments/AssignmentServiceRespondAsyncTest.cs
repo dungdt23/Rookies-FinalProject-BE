@@ -74,7 +74,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 		public async Task RespondAsync_ShouldReturnBadRequest_WhenAssignmentNotWaitingForAcceptance()
 		{
 			//Arrange
-			_assignmentMock.Object.State = TypeAssignmentState.Rejected;
+			_assignmentMock.Object.State = TypeAssignmentState.Declined;
 			_assignmentMock.Object.Asset = new Asset { State = TypeAssetState.Available, CreatedAt = DateTime.Now, IsDeleted = false };
 			var assignmentsMock = new List<Assignment> { _assignmentMock.Object};
 			var assignmentsQueryMock = assignmentsMock.AsQueryable().BuildMock();
