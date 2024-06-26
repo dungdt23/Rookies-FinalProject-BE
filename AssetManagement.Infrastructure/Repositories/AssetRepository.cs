@@ -31,7 +31,7 @@ namespace AssetManagement.Infrastructure.Repositories
                 query = query.Where(x =>
                 ((!filter.state.HasValue) || (filter.state.HasValue) && (x.State == filter.state.Value))
              && ((!filter.category.HasValue) || (filter.category.HasValue && x.CategoryId == filter.category))
-             && ((string.IsNullOrEmpty(filter.search)) || (!string.IsNullOrEmpty(filter.search) && (x.AssetCode.Contains(filter.search) || x.AssetName.Contains(filter.search))))
+             && ((string.IsNullOrEmpty(filter.search)) || (!string.IsNullOrEmpty(filter.search) && ((x.AssetCode.ToLower().Contains(filter.search.ToLower()) || x.AssetName.ToLower().Contains(filter.search.ToLower())))))
              && x.LocationId == locationId
              && !x.IsDeleted);
             }

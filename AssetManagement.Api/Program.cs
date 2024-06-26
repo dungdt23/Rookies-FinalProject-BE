@@ -6,6 +6,7 @@ using AssetManagement.Application.IServices.IAssetServices;
 using AssetManagement.Application.IServices.IAssignmentServices;
 using AssetManagement.Application.IServices.ICategoryServices;
 using AssetManagement.Application.IServices.ILocationServices;
+using AssetManagement.Application.IServices.IReportServices;
 using AssetManagement.Application.IServices.ITypeServices;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Application.Mappings;
@@ -13,6 +14,7 @@ using AssetManagement.Application.Services.AssetServices;
 using AssetManagement.Application.Services.AssignmentServices;
 using AssetManagement.Application.Services.CategoryServices;
 using AssetManagement.Application.Services.LocationServices;
+using AssetManagement.Application.Services.ReportServices;
 using AssetManagement.Application.Services.TypeServices;
 using AssetManagement.Application.Services.UserServices;
 using AssetManagement.Infrastructure.Migrations;
@@ -60,6 +62,7 @@ namespace AssetManagement.Api
             builder.Services.AddScoped<ITypeService, TypeService>();
             builder.Services.AddScoped<IAssetService, AssetService>();
             builder.Services.AddScoped<IAssignmentService, AssignmentService>();
+            builder.Services.AddScoped<IReportService, ReportService>();
 
 
             builder.Services.AddCors(options =>
