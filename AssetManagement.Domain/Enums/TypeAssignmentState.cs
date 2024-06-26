@@ -4,6 +4,6 @@
     {
         WaitingForAcceptance = 0,
         Accepted = 1,
-        Rejected = -1,
+        Declined = -1,
     }
 }
