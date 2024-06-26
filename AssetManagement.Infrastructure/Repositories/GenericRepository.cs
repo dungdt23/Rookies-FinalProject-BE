@@ -58,7 +58,7 @@ namespace AssetManagement.Infrastructure.Repositories
             }
         }
 
-        public async Task<int> DeleteAsync(Guid id)
+        public virtual async Task<int> DeleteAsync(Guid id)
         {
             try
             {
