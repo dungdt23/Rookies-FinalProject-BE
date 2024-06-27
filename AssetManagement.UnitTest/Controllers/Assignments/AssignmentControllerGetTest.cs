@@ -117,7 +117,6 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
 
 			//Act
 			var result = await _controller.Get(It.IsAny<bool>(), _filterMock.Object, index, size);
-			dsads
 			//Assert
 			var okResult = result as OkObjectResult;
 			okResult.Should().NotBeNull();
