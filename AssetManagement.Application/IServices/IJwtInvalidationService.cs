@@ -1,10 +1,11 @@
-﻿namespace AssetManagement.Application.IServices
+﻿using System.IdentityModel.Tokens.Jwt;
+
+namespace AssetManagement.Application.IServices
 {
     public interface IJwtInvalidationService
     {
         Task UpdateGlobalInvalidationTimeStampAsync(DateTime timestamp);
         Task<DateTime> GetGlobalInvalidationTimestampAsync();
-        Task<DateTime> GetUserInvalidationTimestampAsync(Guid userId);
-        Task<bool> IsTokenValidAsync(DateTime tokenIssuedAt, Guid userId);
+        Task<bool> IsTokenValidAsync(JwtSecurityToken jwtToken);
     }
 }
