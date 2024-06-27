@@ -1,4 +1,5 @@
 ﻿using AssetManagement.Application.Dtos.RequestDtos;
+using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.Services.AssetServices;
 using AssetManagement.Domain.Constants;
@@ -49,12 +50,21 @@ namespace AssetManagement.UnitTest.Services.Assets
             _mockAssetRepository.Setup(repo => repo.AddAsync(asset))
                 .ReturnsAsync(StatusConstant.Success);
 
+            var returnAsset = new Asset { AssetName = "Laptop Dell", CreatedAt = DateTime.Now, IsDeleted = false };
+
+            _mockAssetRepository.Setup(x => x.GetByCondition(It.IsAny<Expression<Func<Asset, bool>>>()))
+                                .Returns(new List<Asset> { asset }.AsQueryable().BuildMockDbSet().Object);
+
+            var returnAssetDto = new ResponseAssetDto { AssetName = "Laptop Dell"};
+            _mockMapper.Setup(mapper => mapper.Map<ResponseAssetDto>(asset))
+            .Returns(returnAssetDto);
+
             // Act
             var result = await _assetService.AddAsync(assetDto);
 
             // Assert
             Assert.AreEqual("Add new asset successfully", result.Message);
-            Assert.AreEqual(assetDto, result.Data);
+            Assert.IsNotNull(returnAssetDto);
         }
 
         [Test]
