@@ -53,7 +53,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				};
 			}
 
-			asset.State = TypeAssetState.NotAvailable;
+			asset.State = TypeAssetState.Assigned;
 
 			var assignment = _mapper.Map<Assignment>(request);
 
@@ -99,12 +99,12 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				};
 			}
 
-			if (assignment.State != TypeAssignmentState.WaitingForAcceptance)
+			if (assignment.State == TypeAssignmentState.Accepted)
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status409Conflict,
-					Message = AssignmentApiResponseMessageConstant.AssignmentDeleteNotWaitingForAcceptance,
+					StatusCode = StatusCodes.Status400BadRequest,
+					Message = AssignmentApiResponseMessageConstant.AssignmentDeleteStateConfict,
 					Data = assignment.State.ToString()
 				};
 			}
@@ -232,7 +232,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				};
 			}
 
-			assignment.State = request.IsAccept ? TypeAssignmentState.Accepted : TypeAssignmentState.Rejected;
+			assignment.State = request.IsAccept ? TypeAssignmentState.Accepted : TypeAssignmentState.Declined;
 			assignment.Asset.State = request.IsAccept ? TypeAssetState.Assigned : TypeAssetState.Available;
 
 			if (await _assignmentRepository.UpdateAsync(assignment) > 0)

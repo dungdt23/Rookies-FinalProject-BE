@@ -74,7 +74,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 		{
 			//Arrange
 			var id = Guid.NewGuid();
-			_assignmentMock.Object.State = TypeAssignmentState.Rejected;
+			_assignmentMock.Object.State = TypeAssignmentState.Declined;
 			var assignmentsMock = new List<Assignment> { _assignmentMock.Object };
 			var assignmentsQueryMock = assignmentsMock.AsQueryable().BuildMock();
 
