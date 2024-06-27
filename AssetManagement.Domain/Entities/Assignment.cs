@@ -16,12 +16,13 @@ namespace AssetManagement.Domain.Entities
         public Guid AssigneeId { get; set; }
         public TypeAssignmentState State { get; set; }
         [Required]
-        public  DateTime AssignedDate { get; set; }
+        public DateTime AssignedDate { get; set; }
         [MaxLength(500)]
         public string? Note { get; set; }
 
         public User Assigner { get; set; }
         public User Assignee { get; set; }
         public Asset Asset { get; set; }
+        public ICollection<ReturnRequest> ReturnRequests { get; set; }
     }
 }

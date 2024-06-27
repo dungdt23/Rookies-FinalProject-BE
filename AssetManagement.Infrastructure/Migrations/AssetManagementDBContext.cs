@@ -1,6 +1,5 @@
 ﻿using AssetManagement.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace AssetManagement.Infrastructure.Migrations
 {
@@ -41,9 +40,10 @@ namespace AssetManagement.Infrastructure.Migrations
                 .HasForeignKey(x => x.ResponderId)
                  .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(e => e.Asset)
+                entity.HasOne(e => e.Assignment)
                 .WithMany(d => d.ReturnRequests)
-                .HasForeignKey(x => x.AssetId);
+                .HasForeignKey(x => x.AssignmentId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             });
 

@@ -13,11 +13,11 @@ namespace AssetManagement.Domain.Entities
         [Required]
         public Guid ResponderId { get; set; }
         [Required]
-        public Guid AssetId { get; set; }
-        public User Requestor { get; set; }
-        public User Responder { get; set; }
-        public Asset Asset { get; set; }
+        public Guid AssignmentId { get; set; }
         public TypeRequestState State { get; set; }
         public DateTime ReturnedDate { get; set; }
+        public User Requestor { get; set; }
+        public User Responder { get; set; }
+        public Assignment Assignment { get; set; }
     }
 }
