@@ -16,9 +16,8 @@ namespace AssetManagement.Application.Services
             _userRepository = userRepository;
         }
 
-        public async Task UpdateGlobalInvalidationTimeStampAsync()
+        public async Task UpdateGlobalInvalidationTimeStampAsync(DateTime timestamp)
         {
-            var timestamp = DateTime.Now;
             await _globalSettingRepository.UpdateGlobalInvalidationTimestampAsync(timestamp);
         }
 
@@ -28,40 +27,29 @@ namespace AssetManagement.Application.Services
             return globalSetting?.GlobalInvalidationTimestamp ?? DateTime.MinValue;
         }
 
-        public async Task<DateTime> GetUserInvalidationTimestampAsync(Guid userId)
+        public async Task<bool> IsTokenValidAsync(JwtSecurityToken jwtToken)
         {
+            var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+
+            Guid userId;
+            if (!Guid.TryParse(userIdClaim, out userId))
+                return false;
+
             var user = await _userRepository.GetByCondition(u => u.Id == userId).FirstOrDefaultAsync();
-            return user?.TokenInvalidationTimestamp ?? DateTime.MinValue;
-        }
-
-        public async Task<bool> IsTokenValidAsync(string token, Guid userId)
-        {
-            var globalInvalidationTimestamp = await GetGlobalInvalidationTimestampAsync();
-            var userInvalidationTimestamp = await GetUserInvalidationTimestampAsync(userId);
-
-            var tokenIssuedAt = GetTokenIssuedAt(token);
-
-            if (tokenIssuedAt == null) return false;
-
-            return tokenIssuedAt > globalInvalidationTimestamp && tokenIssuedAt > userInvalidationTimestamp;
-        }
-
-        private DateTime? GetTokenIssuedAt(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
-
-            if (jwtToken == null)
-                return null;
+            if (user == null)
+                return false;
 
             var blTimestampClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "BlTimestamp")?.Value;
+            DateTime tokenIssuedAt;
+            if (!DateTime.TryParse(blTimestampClaim, out tokenIssuedAt))
+                return false;
 
-            if (DateTime.TryParse(blTimestampClaim, out DateTime blTimestamp))
-            {
-                return blTimestamp;
-            }
+            var globalInvalidationTimestamp = await GetGlobalInvalidationTimestampAsync();
+            var userInvalidationTimestamp = user.TokenInvalidationTimestamp;
+            if (tokenIssuedAt <= globalInvalidationTimestamp || tokenIssuedAt <= userInvalidationTimestamp)
+                return false;
 
-            return null;
+            return true;
         }
     }
 }

@@ -3,7 +3,6 @@ using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IRepositories;
-using AssetManagement.Application.IServices;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
@@ -25,20 +24,17 @@ public class UserService : IUserService
     private readonly IGenericRepository<Assignment> _assignmentRepository;
     private readonly IGenericRepository<Domain.Entities.Type> _typeRepository;
     private readonly IMapper _mapper;
-    private readonly IJwtInvalidationService _jwtInvalidationService;
 
     public UserService(IUserRepository userRepository,
         IGenericRepository<Assignment> assignmentRepository,
         IGenericRepository<Domain.Entities.Type> typeRepository,
-        IMapper mapper,
-        IJwtInvalidationService jwtInvalidationService)
+        IMapper mapper)
     {
         _userRepository = userRepository;
         _mapper = mapper;
         _assignmentRepository = assignmentRepository;
         _typeRepository = typeRepository;
         _mapper = mapper;
-        _jwtInvalidationService = jwtInvalidationService;
     }
     public bool CheckPassword(User user, string password)
     {
@@ -131,7 +127,7 @@ public class UserService : IUserService
         }
         return user;
     }
-    public async Task<ApiResponse> UpdateAsync(Guid id, RequestUserEditDto form)
+    public async Task<ApiResponse>  UpdateAsync(Guid id, RequestUserEditDto form)
     {
         var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
 

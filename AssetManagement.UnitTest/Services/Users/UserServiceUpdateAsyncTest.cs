@@ -36,7 +36,7 @@ public class UserServiceUpdateAsyncTest
         _typeRepositoryMock = new Mock<IGenericRepository<Type>>();
         _jwtInvalidationServiceMock = new Mock<IJwtInvalidationService>();
         _mapperMock = new Mock<IMapper>();
-        _userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object, _typeRepositoryMock.Object, _mapperMock.Object, _jwtInvalidationServiceMock.Object);
+        _userService = new UserService(_userRepositoryMock.Object, _assignmentRepositoryMock.Object, _typeRepositoryMock.Object, _mapperMock.Object);
     }
 
     [SetUp]

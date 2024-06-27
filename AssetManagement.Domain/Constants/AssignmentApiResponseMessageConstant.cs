@@ -15,7 +15,7 @@ namespace AssetManagement.Domain.Constants
 		public const string AssignmentUpdateSuccess = "Assignment updated successfully";
 		public const string AssignmentUpdateFail = "There something went wrong while updating assignment, please try again later";
 		public const string AssignmentNotFound = "No assignment found";
-		public const string AssignmentDeleteNotWaitingForAcceptance = "Only assignment waiting for acceptance can be deleted";
+		public const string AssignmentDeleteStateConfict = "Only assignment waiting for acceptance or declined can be deleted";
 		public const string AssignmentDeleteSuccess = "Assignment deleted successfully";
 		public const string AssignmentDeleteFail = "There something went wrong while deleting assignment, please try again later";
 		public const string AssignmentRespondSuccess = "Assignment responded successfully";

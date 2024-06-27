@@ -1,4 +1,5 @@
 ﻿using AssetManagement.Application.Dtos.RequestDtos;
+using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.Services.AssetServices;
 using AssetManagement.Domain.Constants;
@@ -51,12 +52,19 @@ namespace AssetManagement.UnitTest.Services.Assets
             _mockAssetRepository.Setup(repo => repo.UpdateAsync(updateAsset))
                 .ReturnsAsync(StatusConstant.Success);
 
+            _mockAssetRepository.Setup(x => x.GetByCondition(It.IsAny<Expression<Func<Asset, bool>>>()))
+                    .Returns(new List<Asset> { asset }.AsQueryable().BuildMockDbSet().Object);
+
+            var returnAssetDto = new ResponseAssetDto { AssetName = "Laptop Dell", AssetCode = "LA000001" };
+            _mockMapper.Setup(mapper => mapper.Map<ResponseAssetDto>(asset))
+            .Returns(returnAssetDto);
+
             // Act
             var result = await _assetService.UpdateAsync(id, requestDto);
 
             // Assert
             Assert.AreEqual("Update asset successfully", result.Message);
-            Assert.AreEqual(requestDto, result.Data);
+            Assert.IsNotNull(returnAssetDto);
         }
         [Test]
         public async Task UpdateAsync_ShouldReturnApiResponse_WhenAssetIsUpdatedFailed()

@@ -10,16 +10,10 @@ using AssetManagement.Domain.Enums;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AssetManagement.Application.Services.AssignmentServices
 {
-	public class AssignmentService : IAssignmentService
+    public class AssignmentService : IAssignmentService
 	{
 		private readonly IAssignmentRepository _assignmentRepository;
 		private readonly IAssetRepository _assetRepository;
@@ -53,7 +47,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				};
 			}
 
-			asset.State = TypeAssetState.NotAvailable;
+			asset.State = TypeAssetState.Assigned;
 
 			var assignment = _mapper.Map<Assignment>(request);
 
@@ -99,12 +93,12 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				};
 			}
 
-			if (assignment.State != TypeAssignmentState.WaitingForAcceptance)
+			if (assignment.State == TypeAssignmentState.Accepted)
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status409Conflict,
-					Message = AssignmentApiResponseMessageConstant.AssignmentDeleteNotWaitingForAcceptance,
+					StatusCode = StatusCodes.Status400BadRequest,
+					Message = AssignmentApiResponseMessageConstant.AssignmentDeleteStateConfict,
 					Data = assignment.State.ToString()
 				};
 			}
