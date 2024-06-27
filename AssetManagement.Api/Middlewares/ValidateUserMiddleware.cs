@@ -26,25 +26,7 @@ namespace AssetManagement.Api.Middlewares
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
 
-                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-
-                Guid userIdGuid;
-                if (!Guid.TryParse(userIdClaim, out userIdGuid))
-                {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return;
-                }
-
-                var blTimestampClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "BlTimestamp")?.Value;
-                DateTime blTimestamp;
-
-                if (!DateTime.TryParse(blTimestampClaim, out blTimestamp))
-                {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return;
-                }
-
-                if (!await jwtInvalidationService.IsTokenValidAsync(blTimestamp, userIdGuid))
+                if (!await jwtInvalidationService.IsTokenValidAsync(jwtToken))
                 {
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return;

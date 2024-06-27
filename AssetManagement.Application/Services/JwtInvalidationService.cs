@@ -1,6 +1,7 @@
 ﻿using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.IServices;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace AssetManagement.Application.Services
 {
@@ -26,18 +27,29 @@ namespace AssetManagement.Application.Services
             return globalSetting?.GlobalInvalidationTimestamp ?? DateTime.MinValue;
         }
 
-        public async Task<DateTime> GetUserInvalidationTimestampAsync(Guid userId)
+        public async Task<bool> IsTokenValidAsync(JwtSecurityToken jwtToken)
         {
+            var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+
+            Guid userId;
+            if (!Guid.TryParse(userIdClaim, out userId))
+                return false;
+
             var user = await _userRepository.GetByCondition(u => u.Id == userId).FirstOrDefaultAsync();
-            return user?.TokenInvalidationTimestamp ?? DateTime.MinValue;
-        }
+            if (user == null)
+                return false;
 
-        public async Task<bool> IsTokenValidAsync(DateTime tokenIssuedAt, Guid userId)
-        {
+            var blTimestampClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "BlTimestamp")?.Value;
+            DateTime tokenIssuedAt;
+            if (!DateTime.TryParse(blTimestampClaim, out tokenIssuedAt))
+                return false;
+
             var globalInvalidationTimestamp = await GetGlobalInvalidationTimestampAsync();
-            var userInvalidationTimestamp = await GetUserInvalidationTimestampAsync(userId);
+            var userInvalidationTimestamp = user.TokenInvalidationTimestamp;
+            if (tokenIssuedAt <= globalInvalidationTimestamp || tokenIssuedAt <= userInvalidationTimestamp)
+                return false;
 
-            return tokenIssuedAt > globalInvalidationTimestamp && tokenIssuedAt > userInvalidationTimestamp;
+            return true;
         }
     }
 }
