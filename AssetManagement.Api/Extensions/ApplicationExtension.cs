@@ -283,7 +283,17 @@ public static class ApplicationExtension
 					dbContext.UpdateRange(assetToUpdates);
 					dbContext.SaveChanges();
 
-
+					var declinedAssettIds = await dbContext.Assignments
+						.Where(a => a.State == TypeAssignmentState.Declined)
+						.Select(a => a.AssetId)
+						.ToListAsync();
+					var declinedAssetToUpdates = await dbContext.Assets.Where(a => declinedAssettIds.Contains(a.Id)).ToListAsync();
+					foreach (var asset in declinedAssetToUpdates)
+					{
+						asset.State = TypeAssetState.Available;
+					}
+					dbContext.UpdateRange(declinedAssetToUpdates);
+					dbContext.SaveChanges();
 
 				}
 				transaction.Commit();
@@ -347,10 +357,10 @@ public static class ApplicationExtension
 			await dbContext.Database.EnsureCreatedAsync();
 
 			// Delete seed data as needed
-			if (dbContext.Users.Any())
-			{
-				dbContext.Users.RemoveRange(dbContext.Users);
-			}
+			//if (dbContext.Users.Any())
+			//{
+			//	dbContext.Users.RemoveRange(dbContext.Users);
+			//}
 
 			if (dbContext.Assets.Any())
 			{
