@@ -190,8 +190,8 @@ public static class ApplicationExtension
 					var random = new Random();
 					var assigner = dbContext.Users.Where(a => a.StaffCode.Equals("SD0001")).AsNoTracking().FirstOrDefault();
 					var typeStaff = dbContext.Types.Where(a => a.TypeName == "Staff").AsNoTracking().FirstOrDefault();
-					var assignee = dbContext.Users.Where(a => a.TypeId == typeStaff.Id).AsNoTracking().ToList();
-					var assets = GenerateAsset(assetCodes, 50, dbContext);
+					var assignee = dbContext.Users.Where(a => a.TypeId == typeStaff.Id && a.LocationId == assigner.LocationId).AsNoTracking().ToList();
+					var assets = GenerateAsset(assetCodes, 50, dbContext, "Hà Nội");
 					dbContext.ChangeTracker.Clear();
 
 					for (int i = 0; i < assets.Count; i++)
@@ -271,11 +271,14 @@ public static class ApplicationExtension
 
 					dbContext.ChangeTracker.Clear();
 
-					var assignmentsAssetId = await dbContext.Assignments.Select(a => a.AssetId).ToListAsync();
+					var assignmentsAssetId = await dbContext.Assignments
+						.Where(a => a.State == TypeAssignmentState.WaitingForAcceptance || a.State == TypeAssignmentState.Accepted)
+						.Select(a => a.AssetId)
+						.ToListAsync();
 					var assetToUpdates = await dbContext.Assets.Where(a => assignmentsAssetId.Contains(a.Id)).ToListAsync();
 					foreach (var asset in assetToUpdates)
 					{
-						asset.State = TypeAssetState.NotAvailable;
+						asset.State = TypeAssetState.Assigned;
 					}
 					dbContext.UpdateRange(assetToUpdates);
 					dbContext.SaveChanges();

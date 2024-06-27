@@ -18,7 +18,7 @@ public class AssignmentRepository : GenericRepository<Assignment>, IAssignmentRe
         IQueryable<Assignment> query = _dbContext.Assignments.Where(x => !x.IsDeleted && x.Assigner.LocationId == locationId);
         if (userType == UserType.Staff)
         {
-            query = query.Where(x => x.AssigneeId == userId);
+            query = query.Where(x => x.AssigneeId == userId && x.State != Domain.Enums.TypeAssignmentState.Declined);
         }
 
         if (filter.StateFilter.HasValue)
