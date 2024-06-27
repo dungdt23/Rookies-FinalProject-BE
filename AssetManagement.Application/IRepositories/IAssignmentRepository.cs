@@ -5,5 +5,5 @@ namespace AssetManagement.Application.IRepositories;
 
 public interface IAssignmentRepository : IGenericRepository<Assignment>
 {
-    IQueryable<Assignment> GetAll(Func<Assignment, object> sortCondition, AssignmentFilter filter, Guid userId, UserType userType, Guid locationId);
+    IQueryable<Assignment> GetAll(bool? own,Func<Assignment, object> sortCondition, AssignmentFilter filter, Guid userId, UserType userType, Guid locationId);
 }
