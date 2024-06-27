@@ -57,14 +57,15 @@ namespace AssetManagement.UnitTest.Services.Assignments
 			var assignmentsMock = new List<Assignment>();
 			var assignmentsQueryMock = assignmentsMock.AsQueryable().BuildMock();
 
-			_assignmentRepositoryMock.Setup(r => r.GetAll(It.IsAny<Func<Assignment, object>>(), 
+			_assignmentRepositoryMock.Setup(r => r.GetAll(It.IsAny<bool>(),
+															It.IsAny<Func<Assignment, object>>(), 
 															It.IsAny<AssignmentFilter>(), 
 															It.IsAny<Guid>(), 
 															It.IsAny<UserType>(),
 															It.IsAny<Guid>())).Returns(assignmentsQueryMock);
 
 			//Act
-			var result = await _assignmentService.GetAllAsync(_filterMock.Object,It.IsAny<Guid>(),It.IsAny<UserType>(),It.IsAny<Guid>(), index, size);
+			var result = await _assignmentService.GetAllAsync(It.IsAny<bool>(),_filterMock.Object,It.IsAny<Guid>(),It.IsAny<UserType>(),It.IsAny<Guid>(), index, size);
 
 			//Assert
 			result.Should().NotBeNull();
@@ -84,13 +85,14 @@ namespace AssetManagement.UnitTest.Services.Assignments
 			var assignmentsQueryMock = assignmentsMock.AsQueryable().BuildMock();
 			var assignmentDtosMock = new List<ResponseAssignmentDto> { _assignmentDtoMock.Object};
 
-			_assignmentRepositoryMock.Setup(r => r.GetAll(It.IsAny<Func<Assignment, object>>(),
+			_assignmentRepositoryMock.Setup(r => r.GetAll(It.IsAny<bool>(),
+															It.IsAny<Func<Assignment, object>>(),
 															It.IsAny<AssignmentFilter>(),
 															It.IsAny<Guid>(),
 															It.IsAny<UserType>(),
 															It.IsAny<Guid>())).Returns(assignmentsQueryMock); _mapperMock.Setup(m => m.Map<List<ResponseAssignmentDto>>(It.IsAny<List<Assignment>>())).Returns(assignmentDtosMock);
 			//Act
-			var result = await _assignmentService.GetAllAsync(_filterMock.Object, It.IsAny<Guid>(), It.IsAny<UserType>(), It.IsAny<Guid>(), index, size);
+			var result = await _assignmentService.GetAllAsync(It.IsAny<bool>(), _filterMock.Object, It.IsAny<Guid>(), It.IsAny<UserType>(), It.IsAny<Guid>(), index, size);
 
 			//Assert
 			result.Should().NotBeNull();
