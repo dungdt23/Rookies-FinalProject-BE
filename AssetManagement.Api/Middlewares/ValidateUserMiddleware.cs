@@ -35,7 +35,16 @@ namespace AssetManagement.Api.Middlewares
                     return;
                 }
 
-                if (!await jwtInvalidationService.IsTokenValidAsync(token, userIdGuid))
+                var blTimestampClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "BlTimestamp")?.Value;
+                DateTime blTimestamp;
+
+                if (!DateTime.TryParse(blTimestampClaim, out blTimestamp))
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return;
+                }
+
+                if (!await jwtInvalidationService.IsTokenValidAsync(blTimestamp, userIdGuid))
                 {
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return;
