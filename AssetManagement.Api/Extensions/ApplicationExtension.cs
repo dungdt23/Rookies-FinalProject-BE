@@ -138,7 +138,7 @@ public static class ApplicationExtension
 					};
 					await userService.CreateAsync(staffUser4);
 
-					for (int i = 0; i < 50; i++)
+					for (int i = 0; i < 200; i++)
 					{
 						string firstName = firstNames[random.Next(firstNames.Count)];
 						string lastName = lastNames[random.Next(lastNames.Count)];
