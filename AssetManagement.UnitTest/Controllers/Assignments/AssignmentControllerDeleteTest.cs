@@ -64,7 +64,7 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
 		}
 
 		[Test]
-		public async Task Put_ShouldReturnBadRequest_WhenDeleteAssigmentNotWaitingForAcceptance()
+		public async Task Delete_ShouldReturnBadRequest_WhenAssigmentIsAccepted()
 		{
 			//Arrange
 			var id = Guid.NewGuid();
@@ -72,7 +72,7 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
 			var apiResponse = new ApiResponse
 			{
 				StatusCode = StatusCodes.Status400BadRequest,
-				Message = AssignmentApiResponseMessageConstant.AssignmentDeleteNotWaitingForAcceptance,
+				Message = AssignmentApiResponseMessageConstant.AssignmentDeleteStateConfict,
 				Data = "Mock type"
 			};
 
@@ -89,7 +89,7 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
 		}
 
 		[Test]
-		public async Task Put_ShouldReturnError_WhenUpdateAssignmentFail()
+		public async Task Delete_ShouldReturnError_WhenUpdateAssignmentFail()
 		{
 			//Arrange
 			var id = Guid.NewGuid();
