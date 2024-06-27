@@ -49,7 +49,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 		}
 
 		[Test]
-		public async Task GetAllAsync_ReturnNotFound_WhenFoundNoAssignmentRecord()
+		public async Task GetAllAsync_ReturnOk_WhenFoundNoAssignmentRecord()
 		{
 			//Arrange
 			var index = 1;
@@ -69,7 +69,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 			//Assert
 			result.Should().NotBeNull();
 			result.Should().BeOfType(typeof(PagedResponse<ResponseAssignmentDto>));
-			result.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+			result.StatusCode.Should().Be(StatusCodes.Status200OK);
 			result.Message.Should().Be(AssignmentApiResponseMessageConstant.AssignmentGetNotFound);
 			result.TotalCount.Should().Be(0);
 		}

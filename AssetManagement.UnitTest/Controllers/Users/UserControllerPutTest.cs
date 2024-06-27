@@ -9,6 +9,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using MockQueryable.Moq;
 using Moq;
 
 namespace AssetManagement.UnitTest.Controllers.Users;
@@ -67,7 +68,7 @@ public class UserControllerPutTest
         var id = Guid.NewGuid();
         var response = new ApiResponse
         {
-            StatusCode = StatusCodes.Status404NotFound,
+            StatusCode = StatusCodes.Status400BadRequest,
             Message = UserApiResponseMessageConstant.UserNotFound,
             Data = id
         };
@@ -78,10 +79,10 @@ public class UserControllerPutTest
         var result = await _usersController.Put(id, _updateUserFormMock.Object);
 
         // Assert
-        var notFoundResult = result as ObjectResult;
-        notFoundResult.Should().NotBeNull();
-        notFoundResult.StatusCode.Should().Be(StatusCodes.Status404NotFound);
-        notFoundResult.Value.Should().BeEquivalentTo(response);
+        var badRequestResult = result as BadRequestObjectResult;
+		badRequestResult.Should().NotBeNull();
+		badRequestResult.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+		badRequestResult.Value.Should().BeEquivalentTo(response);
     }
 
     [Test]
