@@ -357,10 +357,10 @@ public static class ApplicationExtension
 			await dbContext.Database.EnsureCreatedAsync();
 
 			// Delete seed data as needed
-			//if (dbContext.Users.Any())
-			//{
-			//	dbContext.Users.RemoveRange(dbContext.Users);
-			//}
+			if (dbContext.Users.Any())
+			{
+				dbContext.Users.RemoveRange(dbContext.Users);
+			}
 
 			if (dbContext.Assets.Any())
 			{
