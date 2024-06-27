@@ -53,18 +53,19 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
                 Message = AssignmentApiResponseMessageConstant.AssignmentGetNotFound
             };
 
-            _controller.ControllerContext = new ControllerContext();
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            _controller.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
-            _assignmentServiceMock.Setup(a => a.GetAllAsync(It.IsAny<AssignmentFilter>(),
-                                                            It.IsAny<Guid>(),
-                                                            It.IsAny<UserType>(),
-                                                            It.IsAny<Guid>(),
-                                                            It.IsAny<int?>(),
-                                                            It.IsAny<int?>())).ReturnsAsync(response);
+			_controller.ControllerContext = new ControllerContext();
+			_controller.ControllerContext.HttpContext = new DefaultHttpContext();
+			_controller.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
+			_assignmentServiceMock.Setup(a => a.GetAllAsync(It.IsAny<bool>(),
+															It.IsAny<AssignmentFilter>(), 
+															It.IsAny<Guid>(),
+															It.IsAny<UserType>(),
+															It.IsAny<Guid>(),
+															It.IsAny<int?>(), 
+															It.IsAny<int?>())).ReturnsAsync(response);
 
-            //Act
-            var result = await _controller.Get(_filterMock.Object, index, size);
+			//Act
+			var result = await _controller.Get(It.IsAny<bool>(),_filterMock.Object, index, size);
 
             //Assert
             var notFoundResult = result as NotFoundObjectResult;
@@ -82,8 +83,8 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
             _controller.ControllerContext = new ControllerContext();
             _controller.ControllerContext.HttpContext = new DefaultHttpContext();
 
-            //Act
-            var result = await _controller.Get(_filterMock.Object, index, size);
+			//Act
+			var result = await _controller.Get(It.IsAny<bool>(), _filterMock.Object, index, size);
 
             //Assert
             var unauthorizedResult = result as UnauthorizedResult;
@@ -104,25 +105,25 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
                 Message = AssignmentApiResponseMessageConstant.AssignmentGetSuccess
             };
 
-            _controller.ControllerContext = new ControllerContext();
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            _controller.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
-            _assignmentServiceMock.Setup(a => a.GetAllAsync(It.IsAny<AssignmentFilter>(),
-                                                            It.IsAny<Guid>(),
-                                                            It.IsAny<UserType>(),
-                                                            It.IsAny<Guid>(),
-                                                            It.IsAny<int?>(),
-                                                            It.IsAny<int?>())).ReturnsAsync(response);
+			_controller.ControllerContext = new ControllerContext();
+			_controller.ControllerContext.HttpContext = new DefaultHttpContext();
+			_controller.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
+			_assignmentServiceMock.Setup(a => a.GetAllAsync(It.IsAny<bool>(), It.IsAny<AssignmentFilter>(),
+															It.IsAny<Guid>(),
+															It.IsAny<UserType>(),
+															It.IsAny<Guid>(),
+															It.IsAny<int?>(),
+															It.IsAny<int?>())).ReturnsAsync(response);
 
-            //Act
-            var result = await _controller.Get(_filterMock.Object, index, size);
-
-            //Assert
-            var okResult = result as OkObjectResult;
-            okResult.Should().NotBeNull();
-            okResult.StatusCode.Should().Be(StatusCodes.Status200OK);
-            okResult.Value.Should().BeEquivalentTo(response);
-        }
+			//Act
+			var result = await _controller.Get(It.IsAny<bool>(), _filterMock.Object, index, size);
+			dsads
+			//Assert
+			var okResult = result as OkObjectResult;
+			okResult.Should().NotBeNull();
+			okResult.StatusCode.Should().Be(StatusCodes.Status200OK);
+			okResult.Value.Should().BeEquivalentTo(response);
+		}
 
         [Test]
         public async Task Get_ShouldReturnOk_WhenRecordFound()
