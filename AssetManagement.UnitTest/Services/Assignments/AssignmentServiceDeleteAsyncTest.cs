@@ -70,11 +70,11 @@ namespace AssetManagement.UnitTest.Services.Assignments
 		}
 
 		[Test]
-		public async Task DeleteAsync_ShouldReturnBadRequest_WhenAssignmentNotWaitingForAcceptance()
+		public async Task DeleteAsync_ShouldReturnBadRequest_WhenAssignmentIsAccepted()
 		{
 			//Arrange
 			var id = Guid.NewGuid();
-			_assignmentMock.Object.State = TypeAssignmentState.Declined;
+			_assignmentMock.Object.State = TypeAssignmentState.Accepted;
 			var assignmentsMock = new List<Assignment> { _assignmentMock.Object };
 			var assignmentsQueryMock = assignmentsMock.AsQueryable().BuildMock();
 
@@ -87,7 +87,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 			result.Should().NotBeNull();
 			result.Should().BeOfType(typeof(ApiResponse));
 			result.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
-			result.Message.Should().Be(AssignmentApiResponseMessageConstant.AssignmentDeleteNotWaitingForAcceptance);
+			result.Message.Should().Be(AssignmentApiResponseMessageConstant.AssignmentDeleteStateConfict);
 			result.Data.Should().Be(_assignmentMock.Object.State.ToString());
 		}
 

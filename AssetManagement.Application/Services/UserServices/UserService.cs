@@ -127,7 +127,7 @@ public class UserService : IUserService
         }
         return user;
     }
-    public async Task<ApiResponse> UpdateAsync(Guid id, RequestUserEditDto form)
+    public async Task<ApiResponse>  UpdateAsync(Guid id, RequestUserEditDto form)
     {
         var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
 
