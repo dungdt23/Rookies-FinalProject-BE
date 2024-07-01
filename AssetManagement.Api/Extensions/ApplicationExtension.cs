@@ -11,6 +11,11 @@ namespace AssetManagement.Api.Extensions;
 
 public static class ApplicationExtension
 {
+
+	private static readonly int UserToGenerate = 200;
+	private static readonly int AssetToGenerate = 300;
+	private static readonly int CategoryToGenerate = 100;
+
 	public static async Task<IApplicationBuilder> SeedDataAsync(this IApplicationBuilder app)
 	{
 		using (var scope = app.ApplicationServices.CreateScope())
@@ -138,7 +143,7 @@ public static class ApplicationExtension
 					};
 					await userService.CreateAsync(staffUser4);
 
-					for (int i = 0; i < 200; i++)
+					for (int i = 0; i < UserToGenerate; i++)
 					{
 						string firstName = firstNames[random.Next(firstNames.Count)];
 						string lastName = lastNames[random.Next(lastNames.Count)];
@@ -173,6 +178,14 @@ public static class ApplicationExtension
 
 				if (!dbContext.Categories.Any())
 				{
+					var categoriesFaker = new Faker<Category>()
+						.RuleFor(a => a.CategoryName, f => f.Commerce.ProductName())
+						.RuleFor(a => a.Prefix, (f, a) =>
+						{
+							return $"{a.CategoryName.Substring(0, 2).ToUpper()}";
+						})
+						.Generate(CategoryToGenerate);
+					dbContext.AddRange(categoriesFaker);
 					dbContext.Add(new Category { CategoryName = "Laptop", Prefix = "LA", CreatedAt = DateTime.Now, IsDeleted = false });
 					dbContext.Add(new Category { CategoryName = "Monitor", Prefix = "MO", CreatedAt = DateTime.Now, IsDeleted = false });
 					dbContext.Add(new Category { CategoryName = "PC", Prefix = "PC", CreatedAt = DateTime.Now, IsDeleted = false });
@@ -182,7 +195,7 @@ public static class ApplicationExtension
 				var assetCodes = new Dictionary<Guid, int>();
 				if (!dbContext.Assets.Any())
 				{
-					var assets = GenerateAsset(assetCodes, 350, dbContext);
+					var assets = GenerateAsset(assetCodes, AssetToGenerate, dbContext);
 				}
 
 				if (!dbContext.Assignments.Any())
