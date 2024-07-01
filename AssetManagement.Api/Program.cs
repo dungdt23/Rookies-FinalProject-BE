@@ -64,6 +64,7 @@ namespace AssetManagement.Api
             builder.Services.AddScoped<ILocationService, LocationService>();
             builder.Services.AddScoped<ITypeService, TypeService>();
             builder.Services.AddScoped<IAssetService, AssetService>();
+            builder.Services.AddScoped<IReportService, ReportService>();
             builder.Services.AddScoped<IAssignmentService, AssignmentService>();
             builder.Services.AddScoped<IReportService, ReportService>();
             builder.Services.AddScoped<IJwtInvalidationService, JwtInvalidationService>();

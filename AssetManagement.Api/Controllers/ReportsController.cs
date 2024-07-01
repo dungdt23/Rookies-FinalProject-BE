@@ -1,5 +1,8 @@
-﻿using AssetManagement.Application.IServices.IReportServices;
+﻿using AssetManagement.Application.Filters;
+using AssetManagement.Application.IServices.IReportServices;
+using AssetManagement.Domain.Constants;
 using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AssetManagement.Api.Controllers
@@ -11,17 +14,29 @@ namespace AssetManagement.Api.Controllers
         private readonly IReportService _reportService;
         public ReportsController(IReportService reportService)
         {
-            _reportService = reportService; 
+            _reportService = reportService;
         }
-        [HttpGet("{locationId}")]
-        public async Task<IActionResult> Get(Guid locationId) 
-        { 
+        [HttpGet("export")]
+        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+        public async Task<IActionResult> Get()
+        {
+            var locationIdClaim = HttpContext.GetClaim("locationId");
+            var locationId = new Guid(locationIdClaim);
             XLWorkbook wb = await _reportService.ExportAssetManagementFile(locationId);
             MemoryStream ms = new MemoryStream();
             wb.SaveAs(ms);
-            // Reset the stream position 
-            ms.Position = 0;
-            return File(ms.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "AssetManagement_Report.xlsx");
+            string formattedDate = DateTime.Now.ToString("dd/MM/yyyy");
+            string fileName = "AssetManagement_Report_" + formattedDate + ".xlsx";
+            return File(ms.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+        [HttpGet]
+        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+        public async Task<IActionResult> Get([FromQuery] ReportFilter filter, int index = 1, int size = 10)
+        {
+            var locationIdClaim = HttpContext.GetClaim("locationId");
+            var locationId = new Guid(locationIdClaim);
+            var result = await _reportService.GetReportData(locationId, filter, index, size);
+            return Ok(result);
         }
     }
 }
