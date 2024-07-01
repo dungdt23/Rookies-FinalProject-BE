@@ -41,7 +41,6 @@ namespace AssetManagement.Application.Services
         {
             var user = await _userRepository.GetByCondition(u => u.Id == userId)
                 .FirstOrDefaultAsync();
-            if (user == null) throw new NotFoundException($"User with ID {userId} not found.");
 
             var (returnRequests, totalCount) = await _returnRequestRepository.GetAllAsync(
                 request.Page,
@@ -51,7 +50,7 @@ namespace AssetManagement.Application.Services
                 request.AssetState,
                 request.ReturnedDate,
                 request.Search,
-                user.LocationId);
+                user!.LocationId);
 
             var returnRequestViewModels = _mapper.Map<List<ReturnRequestGetAllViewModel>>(returnRequests);
 
@@ -60,12 +59,12 @@ namespace AssetManagement.Application.Services
 
         public async Task<ReturnRequestViewModel> CreateReturnRequestAsync(
             CreateReturnRequestRequest request,
-            Guid requesterId)
+            Guid userId)
         {
             var assignment = await _assignmentRepository.GetByCondition(a => a.Id == request.AssignmentId)
                 .Include(a => a.Asset)
                 .FirstOrDefaultAsync();
-            var user = await _userRepository.GetByCondition(u => u.Id == requesterId)
+            var user = await _userRepository.GetByCondition(u => u.Id == userId)
                 .Include(u => u.Type)
                 .FirstOrDefaultAsync();
 
@@ -73,7 +72,8 @@ namespace AssetManagement.Application.Services
                 throw new NotFoundException($"Assignment with id {request.AssignmentId} not found.");
 
             // Admin can not create return requests for assignments that have the asset's locaiton different from the admin's
-            if (assignment.Asset.LocationId != user.LocationId)
+            // User always exist because middleware already check its existence
+            if (assignment.Asset.LocationId != user!.LocationId)
                 throw new WrongLocationException($"You do not have access to this assignment.");
 
             // Staff cannot create return requests for assignments that is not their's
@@ -89,7 +89,7 @@ namespace AssetManagement.Application.Services
 
             var newReturnRequest = new ReturnRequest
             {
-                RequestorId = requesterId,
+                RequestorId = userId,
                 AssignmentId = request.AssignmentId,
                 RequestedDate = DateTime.Now,
                 State = TypeRequestState.WaitingForReturning,
@@ -104,7 +104,7 @@ namespace AssetManagement.Application.Services
                 await _assignmentRepository.UpdateAsync(assignment);
                 await _transactionRepository.CommitTransactionAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await _transactionRepository.RollbackTransactionAsync();
                 throw;
@@ -126,7 +126,7 @@ namespace AssetManagement.Application.Services
             if (returnRequest == null)
                 throw new NotFoundException($"Return Request with id {returnRequestId} not found.");
 
-            if (returnRequest.LocationId != user.LocationId)
+            if (returnRequest.LocationId != user!.LocationId)
                 throw new WrongLocationException($"You do not have access to this assignment.");
 
             if (returnRequest.State != TypeRequestState.WaitingForReturning)
@@ -146,7 +146,7 @@ namespace AssetManagement.Application.Services
                 await _returnRequestRepository.UpdateAsync(returnRequest);
                 await _transactionRepository.CommitTransactionAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await _transactionRepository.RollbackTransactionAsync();
                 throw;
@@ -165,7 +165,7 @@ namespace AssetManagement.Application.Services
             if (returnRequest == null)
                 throw new NotFoundException($"Return Request with id {returnRequestId} not found.");
 
-            if (returnRequest.LocationId != user.LocationId)
+            if (returnRequest.LocationId != user!.LocationId)
                 throw new WrongLocationException($"You do not have access to this assignment.");
 
             if (returnRequest.State != TypeRequestState.WaitingForReturning)
@@ -184,7 +184,7 @@ namespace AssetManagement.Application.Services
                 await _returnRequestRepository.UpdateAsync(returnRequest);
                 await _transactionRepository.CommitTransactionAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await _transactionRepository.RollbackTransactionAsync();
                 throw;

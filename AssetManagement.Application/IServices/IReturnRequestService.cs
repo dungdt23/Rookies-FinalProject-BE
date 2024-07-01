@@ -6,7 +6,7 @@ namespace AssetManagement.Application.IServices
     {
         Task<(IEnumerable<ReturnRequestGetAllViewModel>, int totalCount)> GetAllReturnRequestAsync(
             GetAllReturnRequest request,
-            Guid locationId);
+            Guid userId);
         Task<ReturnRequestViewModel> CreateReturnRequestAsync(
             CreateReturnRequestRequest request,
             Guid userId);
