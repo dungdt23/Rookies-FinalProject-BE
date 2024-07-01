@@ -96,7 +96,7 @@ namespace AssetManagement.Application.Services
                 LocationId = assignment.Asset.LocationId,
             };
             assignment.ActiveReturnRequestId = newReturnRequest.Id;
-            assignment.ActiveReturnRequest = newReturnRequest;
+
             await _transactionRepository.BeginTransactionAsync();
             try
             {
@@ -176,7 +176,6 @@ namespace AssetManagement.Application.Services
             returnRequest.ResponderId = user.Id;
             returnRequest.Responder = user;
             returnRequest.Assignment.ActiveReturnRequestId = null;
-            returnRequest.Assignment.ActiveReturnRequest = null;
 
             await _transactionRepository.BeginTransactionAsync();
             try

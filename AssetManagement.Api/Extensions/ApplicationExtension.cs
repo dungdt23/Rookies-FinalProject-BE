@@ -1,5 +1,6 @@
 ﻿using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.IServices.IUserServices;
+using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Migrations;
@@ -11,12 +12,21 @@ namespace AssetManagement.Api.Extensions;
 
 public static class ApplicationExtension
 {
-    private static readonly int numberOfReturnRequests = 10;
-	private static readonly int UserToGenerate = 200;
-	private static readonly int AssetToGenerate = 300;
-	private static readonly int CategoryToGenerate = 100;
+    private static readonly int UserToGenerate = 200;
+    private static readonly int AssetToGenerate = 300;
+    private static readonly int CategoryToGenerate = 100;
 
-    public static async Task<IApplicationBuilder> SeedDataAsync(this IApplicationBuilder app)
+    public static async Task SeedDataAsync(this IApplicationBuilder app)
+    {
+        await app.SeedAllExceptionReturnRequestAsync();
+        using (var scope = app.ApplicationServices.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetService<AssetManagementDBContext>();
+            await dbContext.SeedReturnRequestsAsync();
+        }
+    }
+
+    public static async Task<IApplicationBuilder> SeedAllExceptionReturnRequestAsync(this IApplicationBuilder app)
     {
         using (var scope = app.ApplicationServices.CreateScope())
         {
@@ -143,18 +153,18 @@ public static class ApplicationExtension
                     };
                     await userService.CreateAsync(staffUser4);
 
-					for (int i = 0; i < UserToGenerate; i++)
-					{
-						string firstName = firstNames[random.Next(firstNames.Count)];
-						string lastName = lastNames[random.Next(lastNames.Count)];
-						Domain.Entities.Type type = types[random.Next(types.Count)];
-						Guid locationId = locationIds[random.Next(locationIds.Count)];
-						DateTime dateOfBirth = startDate.AddDays(random.Next(dateOfBirthRange));
-						DateTime joinedDate = dateOfBirth.AddYears(18).AddDays(random.Next(1, 60));
-						if (joinedDate.DayOfWeek == DayOfWeek.Saturday || joinedDate.DayOfWeek == DayOfWeek.Sunday)
-						{
-							joinedDate.AddDays(2);
-						}
+                    for (int i = 0; i < UserToGenerate; i++)
+                    {
+                        string firstName = firstNames[random.Next(firstNames.Count)];
+                        string lastName = lastNames[random.Next(lastNames.Count)];
+                        Domain.Entities.Type type = types[random.Next(types.Count)];
+                        Guid locationId = locationIds[random.Next(locationIds.Count)];
+                        DateTime dateOfBirth = startDate.AddDays(random.Next(dateOfBirthRange));
+                        DateTime joinedDate = dateOfBirth.AddYears(18).AddDays(random.Next(1, 60));
+                        if (joinedDate.DayOfWeek == DayOfWeek.Saturday || joinedDate.DayOfWeek == DayOfWeek.Sunday)
+                        {
+                            joinedDate.AddDays(2);
+                        }
 
 
                         RequestUserCreateDto form = new RequestUserCreateDto
@@ -352,45 +362,83 @@ public static class ApplicationExtension
         return assetFaker;
     }
 
-    //public static async void SeedReturnRequest(this AssetManagementDBContext dbContext)
-    //{
-    //    if (dbContext.ReturnRequests.Any())
-    //    {
-    //        Console.WriteLine("Return Request table is already seeded");
-    //    }
+    public static async Task SeedReturnRequestsAsync(this AssetManagementDBContext dbContext)
+    {
+        if (dbContext.ReturnRequests.Any())
+        {
+            return;
+        }
 
-    //    // Seed Return Request
-    //    var locations = await dbContext.Locations.ToListAsync();
+        var locations = await dbContext.Locations.ToListAsync();
+        var assignments = new List<Assignment>();
+        var returnRequests = new List<ReturnRequest>();
+        foreach (var location in locations)
+        {
+            var acceptedAssignments = await dbContext.Assignments
+               .Where(a => a.State == TypeAssignmentState.Accepted && a.Asset.LocationId == location.Id)
+               .Include(a => a.Asset)
+               .ToListAsync();
+
+            var random = new Random();
+            var requestStates = Enum.GetValues(typeof(TypeRequestState)).Cast<TypeRequestState>().ToArray();
+            var admin = await dbContext.Users
+                .Where(u => u.Type.TypeName == TypeNameConstants.TypeAdmin && u.Location.Id == location.Id)
+                .FirstOrDefaultAsync();
+
+            foreach (var assignment in acceptedAssignments)
+            {
+                var randomState = requestStates[random.Next(requestStates.Length)];
+
+                var past = new Faker().Date.Past(1);
+
+                var newReturnRequest = new ReturnRequest
+                {
+                    Id = Guid.NewGuid(),
+                    RequestorId = new Random().Next(2) == 0 ? assignment.AssigneeId : admin.Id,
+                    AssignmentId = assignment.Id,
+                    RequestedDate = past,
+                    State = randomState,
+                    LocationId = location.Id,
+                };
 
 
-    //    // Generate Return Request as Admin made return request for all 3 locations
-    //    foreach (var location in locations)
-    //    {
-    //        var assignments = dbContext.Assignments.Where(a => a.State == TypeAssignmentState.Accepted 
-    //        && a.ActiveReturnRequest == null
-    //        && a.Asset.LocationId == location.Id)
-    //        .ToListAsync();
+                // Depending on the state, set appropriate properties
+                if (randomState == TypeRequestState.Completed)
+                {
+                    newReturnRequest.ReturnedDate = past;
+                    newReturnRequest.ResponderId = admin.Id;
+                    assignment.IsDeleted = true;
+                    assignment.DeletedAt = DateTime.Now;
+                    assignment.Asset.State = TypeAssetState.Available;
+                    assignment.ActiveReturnRequestId = newReturnRequest.Id;
+                }
+                else if (randomState == TypeRequestState.Rejected)
+                {
+                    newReturnRequest.ReturnedDate = DateTime.Now;
+                    newReturnRequest.ResponderId = admin.Id;
+                    assignment.ActiveReturnRequestId = null;
 
-    //        var admin = dbContext.Users.Where(u => u.Type.TypeName == TypeNameConstants.TypeAdmin).FirstOrDefault();
-    //        for (int i = 0; i < numberOfReturnRequests; i++)
-    //        {
-    //            if (new Random().Next(0, 3) != 0)
-    //            {
-    //                var returnRequestFaker = new Faker<ReturnRequest>()
-    //               .RuleFor(r => r.RequestedDate, f => f.Date.Past(1))
-    //               .RuleFor(r => r.State, f => f.PickRandom<TypeReturnRequestState>())
-    //               .Generate(10);
-    //            }
+                }
 
-    //        }
-    //    }
+                assignments.Add(assignment);
+                returnRequests.Add(newReturnRequest);
+            }
+        }
+        await dbContext.Database.BeginTransactionAsync();
+        try
+        {
+            await dbContext.ReturnRequests.AddRangeAsync(returnRequests);
+            dbContext.Assignments.UpdateRange(assignments);
+            await dbContext.SaveChangesAsync();
+            await dbContext.Database.CommitTransactionAsync();
+        }
+        catch (Exception)
+        {
+            await dbContext.Database.RollbackTransactionAsync();
+            throw;
+        }
+    }
 
-    //    // Generate Return Request as Staff made return request for all 3 locations
-    //    var returnRequestFaker = new Faker<ReturnRequest>()
-    //       .RuleFor(r => r.RequestedDate, f => f.Date.Past(1))
-    //       .RuleFor(r => r.State, f => f.PickRandom<TypeReturnRequestState>())
-    //       .Generate(10);
-    //}
     public static async Task<IApplicationBuilder> DeleteAllDataAsync(this IApplicationBuilder app)
     {
         using (var serviceScope = app.ApplicationServices.CreateScope())
@@ -421,6 +469,10 @@ public static class ApplicationExtension
                 dbContext.Assignments.RemoveRange(dbContext.Assignments);
             }
 
+            if (dbContext.ReturnRequests.Any())
+            {
+                dbContext.ReturnRequests.RemoveRange(dbContext.ReturnRequests);
+            }
             // Save changes to the database
             await dbContext.SaveChangesAsync();
             Console.WriteLine("Successfully delete the database records");

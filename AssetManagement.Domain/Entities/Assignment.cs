@@ -25,7 +25,6 @@ namespace AssetManagement.Domain.Entities
         public User Assigner { get; set; }
         public User Assignee { get; set; }
         public Asset Asset { get; set; }
-        public ReturnRequest? ActiveReturnRequest { get; set; }
         public ICollection<ReturnRequest> ReturnRequests { get; set; }
     }
 }
