@@ -75,6 +75,12 @@ public class UsersController : ControllerBase
     [Authorize(Roles = TypeNameContraint.TypeAdmin)]
     public async Task<IActionResult> Delete(Guid id)
     {
+        var userIdClaim = HttpContext.GetClaim("id");
+        var userId = new Guid(userIdClaim);
+        if (userId == id)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
+        }
         var result = await _userService.DisableUser(id);
         if (result.StatusCode == StatusCodes.Status500InternalServerError)
         {
@@ -95,6 +101,10 @@ public class UsersController : ControllerBase
         if (result.StatusCode == StatusCodes.Status400BadRequest)
         {
             return BadRequest(result);
+        }
+        if (result.StatusCode == StatusCodes.Status403Forbidden)
+        {
+            return Forbid();
         }
         return Ok(result);
     }

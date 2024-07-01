@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AssetManagement.Api.Controllers
 {
-    [Route("assignments")]
+	[Route("assignments")]
 	[ApiController]
 	public class AssignmentsController : ControllerBase
 	{
@@ -93,7 +93,7 @@ namespace AssetManagement.Api.Controllers
 
 		[HttpGet]
 		[Authorize]
-		public async Task<IActionResult> Get([FromQuery] AssignmentFilter filter, int index = 1, int size = 10)
+		public async Task<IActionResult> Get(bool? own, [FromQuery] AssignmentFilter filter, int index = 1, int size = 10)
 		{
 			var locationIdClaim = HttpContext.GetClaim("locationId");
 			Guid locationIdGuid;
@@ -113,7 +113,7 @@ namespace AssetManagement.Api.Controllers
 			{
 				return Unauthorized();
 			}
-			var result = await _assignmentService.GetAllAsync(filter,userIdGuid, (UserType) roleEnum, locationIdGuid, index, size);
+			var result = await _assignmentService.GetAllAsync(own,filter, userIdGuid, (UserType)roleEnum, locationIdGuid, index, size);
 			if (result.StatusCode == StatusCodes.Status404NotFound)
 			{
 				return NotFound(result);

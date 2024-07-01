@@ -76,5 +76,83 @@ namespace AssetManagement.UnitTest.Services.Assets
             Assert.AreEqual("List asset is empty", result.Message);
             Assert.AreEqual(assetDtos, result.Data);
         }
+        [Test]
+        public async Task GetAllAsync_ShouldReturnPagedResponse_WhenSortByAssetName()
+        {
+            // Arrange
+            var filter = new AssetFilter();
+            filter.sort = AssetSort.AssetName;
+            var assets = new List<Asset> { };
+            var assetDtos = new List<ResponseAssetDto> { };
+            Guid locationId = Guid.NewGuid();
+            _mockAssetRepository.Setup(repo => repo.GetAllAsync(It.IsAny<Func<Asset, object>>(), locationId, filter, 1, 10))
+                .ReturnsAsync(assets);
+
+            _mockMapper.Setup(mapper => mapper.Map<IEnumerable<ResponseAssetDto>>(assets))
+                .Returns(assetDtos);
+
+            _mockAssetRepository.Setup(repo => repo.GetTotalCountAsync(locationId, filter))
+                .ReturnsAsync(0);
+
+            // Act
+            var result = await _assetService.GetAllAsync(locationId, filter, 1, 10);
+
+            // Assert
+            Assert.AreEqual(0, result.TotalCount);
+            Assert.AreEqual("List asset is empty", result.Message);
+            Assert.AreEqual(assetDtos, result.Data);
+        }
+        [Test]
+        public async Task GetAllAsync_ShouldReturnPagedResponse_WhenSortByCategoryName()
+        {
+            // Arrange
+            var filter = new AssetFilter();
+            filter.sort = AssetSort.CategoryName;
+            var assets = new List<Asset> { };
+            var assetDtos = new List<ResponseAssetDto> { };
+            Guid locationId = Guid.NewGuid();
+            _mockAssetRepository.Setup(repo => repo.GetAllAsync(It.IsAny<Func<Asset, object>>(), locationId, filter, 1, 10))
+                .ReturnsAsync(assets);
+
+            _mockMapper.Setup(mapper => mapper.Map<IEnumerable<ResponseAssetDto>>(assets))
+                .Returns(assetDtos);
+
+            _mockAssetRepository.Setup(repo => repo.GetTotalCountAsync(locationId, filter))
+                .ReturnsAsync(0);
+
+            // Act
+            var result = await _assetService.GetAllAsync(locationId, filter, 1, 10);
+
+            // Assert
+            Assert.AreEqual(0, result.TotalCount);
+            Assert.AreEqual("List asset is empty", result.Message);
+            Assert.AreEqual(assetDtos, result.Data);
+        }
+        [Test]
+        public async Task GetAllAsync_ShouldReturnPagedResponse_WhenSortByState()
+        {
+            // Arrange
+            var filter = new AssetFilter();
+            filter.sort = AssetSort.State;
+            var assets = new List<Asset> { };
+            var assetDtos = new List<ResponseAssetDto> { };
+            Guid locationId = Guid.NewGuid();
+            _mockAssetRepository.Setup(repo => repo.GetAllAsync(It.IsAny<Func<Asset, object>>(), locationId, filter, 1, 10))
+                .ReturnsAsync(assets);
+
+            _mockMapper.Setup(mapper => mapper.Map<IEnumerable<ResponseAssetDto>>(assets))
+                .Returns(assetDtos);
+
+            _mockAssetRepository.Setup(repo => repo.GetTotalCountAsync(locationId, filter))
+                .ReturnsAsync(0);
+
+            // Act
+            var result = await _assetService.GetAllAsync(locationId, filter, 1, 10);
+
+            // Assert
+            Assert.AreEqual(0, result.TotalCount);
+            Assert.AreEqual("List asset is empty", result.Message);
+            Assert.AreEqual(assetDtos, result.Data);
+        }
     }
 }

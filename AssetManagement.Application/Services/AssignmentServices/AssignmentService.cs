@@ -8,18 +8,13 @@ using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AutoMapper;
+using DocumentFormat.OpenXml.Office2021.DocumentTasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AssetManagement.Application.Services.AssignmentServices
 {
-	public class AssignmentService : IAssignmentService
+    public class AssignmentService : IAssignmentService
 	{
 		private readonly IAssignmentRepository _assignmentRepository;
 		private readonly IAssetRepository _assetRepository;
@@ -53,7 +48,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				};
 			}
 
-			asset.State = TypeAssetState.NotAvailable;
+			asset.State = TypeAssetState.Assigned;
 
 			var assignment = _mapper.Map<Assignment>(request);
 
@@ -99,17 +94,31 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				};
 			}
 
-			if (assignment.State != TypeAssignmentState.WaitingForAcceptance)
+			var asset = await _assetRepository.GetByCondition(a => a.Id == assignment.AssetId).FirstOrDefaultAsync();
+
+			if (asset == null)
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status409Conflict,
-					Message = AssignmentApiResponseMessageConstant.AssignmentDeleteNotWaitingForAcceptance,
+					StatusCode = StatusCodes.Status400BadRequest,
+					Message = AssignmentApiResponseMessageConstant.AssetNotFound,
+					Data = assignment.AssetId
+				};
+			}
+
+			asset.State = TypeAssetState.Available;
+
+			if (assignment.State == TypeAssignmentState.Accepted)
+			{
+				return new ApiResponse
+				{
+					StatusCode = StatusCodes.Status400BadRequest,
+					Message = AssignmentApiResponseMessageConstant.AssignmentDeleteStateConfict,
 					Data = assignment.State.ToString()
 				};
 			}
 
-			if (await _assignmentRepository.DeleteAsync(id) > 0)
+			if (await _assignmentRepository.DeleteAsync(id) > 0 && await _assetRepository.UpdateAsync(asset) > 0)
 			{
 				return new ApiResponse
 				{
@@ -129,7 +138,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			}
 		}
 
-		public async Task<PagedResponse<ResponseAssignmentDto>> GetAllAsync(AssignmentFilter filter, Guid userId, UserType userType, Guid locationId, int? index, int? size)
+		public async Task<PagedResponse<ResponseAssignmentDto>> GetAllAsync(bool? own, AssignmentFilter filter, Guid userId, UserType userType, Guid locationId, int? index, int? size)
 		{
 			Func<Assignment, object> sortCondition = x => x.Asset.AssetCode;
 			switch (filter.FieldFilter)
@@ -150,7 +159,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 					sortCondition = x => x.State;
 					break;
 			}
-			var assignmentsQuery = _assignmentRepository.GetAll(sortCondition, filter, userId,userType,locationId);
+			var assignmentsQuery = _assignmentRepository.GetAll(own,sortCondition, filter, userId, userType, locationId);
 			var totalCount = assignmentsQuery.Count();
 
 			if (totalCount == 0)
@@ -232,7 +241,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				};
 			}
 
-			assignment.State = request.IsAccept ? TypeAssignmentState.Accepted : TypeAssignmentState.Rejected;
+			assignment.State = request.IsAccept ? TypeAssignmentState.Accepted : TypeAssignmentState.Declined;
 			assignment.Asset.State = request.IsAccept ? TypeAssetState.Assigned : TypeAssetState.Available;
 
 			if (await _assignmentRepository.UpdateAsync(assignment) > 0)
@@ -260,21 +269,42 @@ namespace AssetManagement.Application.Services.AssignmentServices
 		public async Task<ApiResponse> UpdateAsync(Guid id, RequestAssignmentDto request)
 		{
 			var assignment = await _assignmentRepository.GetByCondition(a => a.Id == id)
-														.Include(a => a.Assigner)
-														.Include(a => a.Assignee)
-														.Include(a => a.Asset)
 														.FirstOrDefaultAsync();
 			if (assignment == null)
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status404NotFound,
+					StatusCode = StatusCodes.Status400BadRequest,
 					Message = AssignmentApiResponseMessageConstant.AssignmentNotFound,
 					Data = id
 				};
 			}
+
+			var asset = await _assetRepository.GetByCondition(a => a.Id == assignment.AssetId).FirstOrDefaultAsync();
+
+			asset.State = TypeAssetState.Available;
+
+			if (await _assetRepository.UpdateAsync(asset) == 0)
+			{
+				return new ApiResponse
+				{
+					StatusCode = StatusCodes.Status500InternalServerError,
+					Message = AssignmentApiResponseMessageConstant.AssignmentUpdateFail,
+					Data = _mapper.Map<ResponseAssignmentDto>(assignment)
+				};
+
+			}
+
+
 			request.AssignerId = assignment.AssignerId;
+
 			_mapper.Map(request, assignment);
+
+			var newAsset = await _assetRepository.GetByCondition(a => a.Id == assignment.AssetId).FirstOrDefaultAsync();
+
+			newAsset.State = TypeAssetState.Assigned;
+
+			assignment.Asset = newAsset;
 
 			if (await _assignmentRepository.UpdateAsync(assignment) > 0)
 			{

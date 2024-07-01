@@ -1,5 +1,6 @@
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IRepositories;
+using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Infrastructure.Migrations;
 using Microsoft.EntityFrameworkCore;
@@ -53,9 +54,10 @@ public class UserRepository : GenericRepository<User>, IUserRepository
 
         query = query.Where(x =>
         (string.IsNullOrEmpty(searchString) || (!string.IsNullOrEmpty(searchString)
-        && (x.UserName.Contains(searchString) || x.FirstName.Contains(searchString)
-        || x.LastName.Contains(searchString) || x.StaffCode.Contains(searchString)
-        || ((x.LastName + x.FirstName).ToLower().Replace(" ", "").Trim()).Contains(searchString.ToLower().Replace(" ", "").Trim())))));
+        && (x.FirstName.ToLower().Contains(searchString.ToLower())
+        || x.LastName.ToLower().Contains(searchString.ToLower()) || x.StaffCode.Contains(searchString)
+        || ((x.LastName + x.FirstName).ToLower().Replace(" ", "").Trim()).Contains(searchString.ToLower().Replace(" ", "").Trim())
+        || ((x.FirstName + x.LastName).ToLower().Replace(" ", "").Trim()).Contains(searchString.ToLower().Replace(" ", "").Trim())))));
         return query;
     }
     public async Task<IEnumerable<User>> GetAllAsync(Func<User, object> condition, Guid locationId, UserFilter filter, int? index, int? size)
@@ -87,5 +89,24 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     public async Task<int> GetTotalCountAsync(Guid locationId, UserFilter filter)
     {
         return await ApplyFilter(locationId, filter).CountAsync();
+    }
+
+    public override async Task<int> DeleteAsync(Guid id)
+    {
+        try
+        {
+            var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+            if (entity == null) return RecordStatus.Invalid;
+            entity.TokenInvalidationTimestamp = DateTime.Now;
+            entity.DeletedAt = DateTime.Now;
+            entity.IsDeleted = true;
+            _dbSet.Update(entity);
+            int status = await _context.SaveChangesAsync();
+            return status;
+        }
+        catch (Exception)
+        {
+            return RecordStatus.Invalid;
+        }
     }
 }

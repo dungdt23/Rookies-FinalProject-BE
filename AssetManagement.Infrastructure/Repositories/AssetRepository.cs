@@ -17,14 +17,24 @@ namespace AssetManagement.Infrastructure.Repositories
         private IQueryable<Asset> ApplyFilter(Guid locationId, AssetFilter filter)
         {
             IQueryable<Asset> query = _context.Assets
-                .Include(x => x.Location)
-                .Include(x => x.Category)
-                .Where(x =>
-                ((!filter.state.HasValue) || (filter.state.HasValue) && (x.State == filter.state.Value))
-             && ((!filter.category.HasValue) || (filter.category.HasValue && x.CategoryId == filter.category))
-             && ((string.IsNullOrEmpty(filter.search)) || (!string.IsNullOrEmpty(filter.search) && (x.AssetCode.Contains(filter.search) || x.AssetName.Contains(filter.search))))
+                                    .Include(x => x.Location)
+                                    .Include(x => x.Category);
+            if (string.IsNullOrEmpty(filter.search) && !filter.state.HasValue && !filter.category.HasValue)
+            {
+                query = query.Where(x =>
+                (x.State == TypeAssetState.Available || x.State == TypeAssetState.NotAvailable || x.State == TypeAssetState.Assigned)
              && x.LocationId == locationId
              && !x.IsDeleted);
+            }
+            else
+            {
+                query = query.Where(x =>
+                ((!filter.state.HasValue) || (filter.state.HasValue) && (x.State == filter.state.Value))
+             && ((!filter.category.HasValue) || (filter.category.HasValue && x.CategoryId == filter.category))
+             && ((string.IsNullOrEmpty(filter.search)) || (!string.IsNullOrEmpty(filter.search) && ((x.AssetCode.ToLower().Contains(filter.search.ToLower()) || x.AssetName.ToLower().Contains(filter.search.ToLower())))))
+             && x.LocationId == locationId
+             && !x.IsDeleted);
+            }
             return query;
         }
         public async Task<IEnumerable<Asset>> GetAllAsync(Func<Asset, object> sortCondition, Guid locationId, AssetFilter filter, int? index, int? size)

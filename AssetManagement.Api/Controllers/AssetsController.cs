@@ -56,6 +56,10 @@ namespace AssetManagement.Api.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
             }
+            if (result.StatusCode == StatusCodes.Status409Conflict)
+            {
+                return StatusCode(StatusCodes.Status409Conflict, result);
+            }
             return Ok(result);
         }
         [HttpPut("{id}")]

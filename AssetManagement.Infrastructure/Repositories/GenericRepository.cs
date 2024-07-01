@@ -31,43 +31,35 @@ namespace AssetManagement.Infrastructure.Repositories
 
         public async Task<int> AddAsync(T entity)
         {
-            using var transaction = _context.Database.BeginTransaction();
             try
             {
                 await _dbSet.AddAsync(entity);
                 int status = await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
                 return status;
             }
             catch (Exception)
             {
-                await transaction.RollbackAsync();
                 return RecordStatus.Invalid;
             }
         }
 
         public async Task<int> UpdateAsync(T entity)
         {
-            using var transaction = _context.Database.BeginTransaction();
             try
             {
                 entity.UpdatedAt = DateTime.Now;
                 _dbSet.Update(entity);
                 int status = await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
                 return status;
             }
             catch (Exception)
             {
-
-                await transaction.RollbackAsync();
                 return RecordStatus.Invalid;
             }
         }
 
-        public async Task<int> DeleteAsync(Guid id)
+        public virtual async Task<int> DeleteAsync(Guid id)
         {
-            using var transaction = _context.Database.BeginTransaction();
             try
             {
                 var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
@@ -76,12 +68,10 @@ namespace AssetManagement.Infrastructure.Repositories
                 entity.IsDeleted = true;
                 _dbSet.Update(entity);
                 int status = await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
                 return status;
             }
             catch (Exception)
             {
-                await transaction.RollbackAsync();
                 return RecordStatus.Invalid;
             }
         }

@@ -24,6 +24,7 @@ public class UserService : IUserService
     private readonly IGenericRepository<Assignment> _assignmentRepository;
     private readonly IGenericRepository<Domain.Entities.Type> _typeRepository;
     private readonly IMapper _mapper;
+
     public UserService(IUserRepository userRepository,
         IGenericRepository<Assignment> assignmentRepository,
         IGenericRepository<Domain.Entities.Type> typeRepository,
@@ -35,7 +36,6 @@ public class UserService : IUserService
         _typeRepository = typeRepository;
         _mapper = mapper;
     }
-
     public bool CheckPassword(User user, string password)
     {
         bool result;
@@ -46,8 +46,6 @@ public class UserService : IUserService
         }
         return result;
     }
-
-
     public async Task<ApiResponse> CreateAsync(RequestUserCreateDto form)
     {
         var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
@@ -66,7 +64,7 @@ public class UserService : IUserService
 
 
         user.StaffCode = _userRepository.GenerateStaffCode();
-        var usernameToGenerate = $"{user.FirstName.Trim()} {user.LastName.Trim()}";
+        var usernameToGenerate = $"{user.LastName.Trim()} {user.FirstName.Trim()}";
         var usernameRemovedSymbol = usernameToGenerate.RemoveDiacritics();
         user.UserName = _userRepository.GenerateUserName(usernameRemovedSymbol);
         user.TypeId = type.Id;
@@ -101,7 +99,7 @@ public class UserService : IUserService
         switch (filter.FieldFilter)
         {
             case FieldType.FullName:
-                condition = x => (x.LastName + " " + x.FirstName);
+                condition = x => (x.FirstName + " " + x.LastName);
                 break;
             case FieldType.JoinedDate:
                 condition = x => x.JoinedDate;
@@ -120,7 +118,6 @@ public class UserService : IUserService
             TotalCount = totalCount
         };
     }
-
     public User EncryptPassword(User user, string password)
     {
         using (HMACSHA512? hmac = new HMACSHA512())
@@ -130,8 +127,7 @@ public class UserService : IUserService
         }
         return user;
     }
-
-    public async Task<ApiResponse> UpdateAsync(Guid id, RequestUserEditDto form)
+    public async Task<ApiResponse>  UpdateAsync(Guid id, RequestUserEditDto form)
     {
         var type = await _typeRepository.GetByCondition(t => t.TypeName == form.Type).AsNoTracking().FirstOrDefaultAsync();
 
@@ -159,9 +155,15 @@ public class UserService : IUserService
             };
         }
 
+        if (type.Id != user.TypeId)
+        {
+            user.TokenInvalidationTimestamp = DateTime.Now;
+        }
+
         _mapper.Map(form, user);
         user.Type = type;
         user.TypeId = type.Id;
+
 
         if (await _userRepository.UpdateAsync(user) > 0)
         {
@@ -193,7 +195,8 @@ public class UserService : IUserService
             StatusCode = StatusCodes.Status500InternalServerError
         };
         var userValidAssignment = user.ReceivedAssignments
-            .Where(x => x.State != Domain.Enums.TypeAssignmentState.Rejected && !x.IsDeleted);
+            .Where(x => x.State != Domain.Enums.TypeAssignmentState.Declined && !x.IsDeleted);
+
         //check if user have any valid asignment
         if (userValidAssignment.Count() == 0)
         {
@@ -226,6 +229,15 @@ public class UserService : IUserService
                 Data = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername
             };
         }
+        else if (user.IsDeleted)
+        {
+            return new ApiResponse
+            {
+                StatusCode = StatusCodes.Status403Forbidden,
+                Message = UserApiResponseMessageConstant.DisabledUser,
+                Data = UserApiResponseMessageConstant.DisabledUser
+            };
+        }
         var match = CheckPassword(user, login.Password);
         if (!match)
         {
@@ -251,9 +263,10 @@ public class UserService : IUserService
                 new Claim("typeId", user.TypeId.ToString()),
                 new Claim(ClaimTypes.Role, user.Type.TypeName),
                 new Claim("locationId", user.LocationId.ToString()),
-                new Claim("location", user.Location.LocationName)
+                new Claim("location", user.Location.LocationName),
+                new Claim("BlTimestamp", DateTime.Now.ToString())
               }),
-            Expires = DateTime.UtcNow.AddDays(7),
+            Expires = DateTime.Now.AddDays(7),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
         };
         var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -270,8 +283,6 @@ public class UserService : IUserService
             }
         };
     }
-
-
     public async Task<ApiResponse> GetById(Guid id)
     {
         var user = await _userRepository.GetByCondition(x => x.Id == id)
