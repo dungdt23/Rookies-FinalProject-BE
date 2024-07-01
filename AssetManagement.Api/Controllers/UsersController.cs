@@ -22,7 +22,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+    [Authorize(Roles = TypeNameConstants.TypeAdmin)]
     public async Task<IActionResult> Post([FromBody] RequestUserCreateDto createUserForm)
     {
         var locationIdClaim = HttpContext.GetClaim("locationId");
@@ -42,7 +42,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+    [Authorize(Roles = TypeNameConstants.TypeAdmin)]
     public async Task<IActionResult> Put(Guid id, [FromBody] RequestUserEditDto updateUserForm)
     {
         var result = await _userService.UpdateAsync(id, updateUserForm);
@@ -59,7 +59,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+    [Authorize(Roles = TypeNameConstants.TypeAdmin)]
     public async Task<IActionResult> Get([FromQuery] UserFilter filter, int index = 1, int size = 10)
     {
         var locationIdClaim = HttpContext.GetClaim("locationId");
@@ -72,7 +72,7 @@ public class UsersController : ControllerBase
         return Ok(result);
     }
     [HttpDelete("{id}")]
-    [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+    [Authorize(Roles = TypeNameConstants.TypeAdmin)]
     public async Task<IActionResult> Delete(Guid id)
     {
         var userIdClaim = HttpContext.GetClaim("id");
@@ -109,7 +109,7 @@ public class UsersController : ControllerBase
         return Ok(result);
     }
     [HttpGet("{id}")]
-    [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+    [Authorize(Roles = TypeNameConstants.TypeAdmin)]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _userService.GetById(id);

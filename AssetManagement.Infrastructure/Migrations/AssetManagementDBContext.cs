@@ -40,10 +40,15 @@ namespace AssetManagement.Infrastructure.Migrations
                 .HasForeignKey(x => x.ResponderId)
                  .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(e => e.Asset)
+                entity.HasOne(e => e.Assignment)
                 .WithMany(d => d.ReturnRequests)
-                .HasForeignKey(x => x.AssetId);
+                .HasForeignKey(x => x.AssignmentId)
+                .OnDelete(DeleteBehavior.NoAction);
 
+                entity.HasOne(e => e.Location)
+                .WithMany(l => l.ReturnRequests)
+                .HasForeignKey(x => x.LocationId)
+                .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Asset>(entity =>
@@ -76,6 +81,10 @@ namespace AssetManagement.Infrastructure.Migrations
                 .WithMany(d => d.Assignments)
                 .HasForeignKey(x => x.AssetId);
 
+                entity.HasMany(a => a.ReturnRequests)
+                  .WithOne(rr => rr.Assignment)
+                  .HasForeignKey(rr => rr.AssignmentId)
+                  .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<GlobalSetting>().HasData(
