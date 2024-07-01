@@ -4,7 +4,7 @@ using AssetManagement.Domain.Enums;
 
 namespace AssetManagement.Application.IRepositories
 {
-    public interface IReturnRequestRepository
+    public interface IReturnRequestRepository : IGenericRepository<ReturnRequest>
     {
         Task<(IEnumerable<ReturnRequest> ReturnRequests, int TotalCount)> GetAllAsync(
         int pageNumber,

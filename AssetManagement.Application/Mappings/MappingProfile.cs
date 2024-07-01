@@ -49,6 +49,7 @@ namespace AssetManagement.Application.Mappings
                 .ForMember(dest => dest.RequestorUsername, opt => opt.MapFrom(src => src.Requestor.UserName))
                 .ForMember(dest => dest.ResponderUsername, opt => opt.MapFrom(src => src.Responder.UserName))
                 .ForMember(dest => dest.AssignmentAssignedDate, opt => opt.MapFrom(src => src.Assignment.AssignedDate));
+            CreateMap<ReturnRequest, ReturnRequestViewModel>();
         }
     }
 }

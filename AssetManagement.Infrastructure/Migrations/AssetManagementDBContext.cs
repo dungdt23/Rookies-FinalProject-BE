@@ -77,6 +77,10 @@ namespace AssetManagement.Infrastructure.Migrations
                 .WithMany(d => d.Assignments)
                 .HasForeignKey(x => x.AssetId);
 
+                entity.HasOne(e => e.ActiveReturnRequest)
+                .WithMany()
+                .HasForeignKey(x => x.ActiveReturnRequestId)
+                .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<GlobalSetting>().HasData(

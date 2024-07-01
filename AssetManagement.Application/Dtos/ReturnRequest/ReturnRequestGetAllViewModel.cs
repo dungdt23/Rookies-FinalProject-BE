@@ -19,6 +19,7 @@ namespace AssetManagement.Application.Dtos.ReturnRequest
         public string AssetName { get; set; }
 
         public TypeRequestState State { get; set; }
+        public DateTime RequestedDate { get; set; }
         public DateTime? ReturnedDate { get; set; }
     }
 }

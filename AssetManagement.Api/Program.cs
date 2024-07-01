@@ -59,6 +59,7 @@ namespace AssetManagement.Api
             builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
             builder.Services.AddScoped<IReturnRequestRepository, ReturnRequestRepository>();
             builder.Services.AddScoped<IGlobalSettingsRepository, GlobalSettinsgRepository>();
+            builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
 
             builder.Services.AddScoped<IUserService, UserService>();
@@ -132,7 +133,7 @@ namespace AssetManagement.Api
 
             var app = builder.Build();
 
-            if (app.Environment.IsProduction())
+            if (!app.Environment.IsDevelopment())
             {
                 app.UseMiddleware<ApiExceptionHandlingMiddleware>();
             }

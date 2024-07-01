@@ -8,10 +8,10 @@ using System.Linq.Expressions;
 
 namespace AssetManagement.Infrastructure.Repositories;
 
-public class ReturnRequestRepository : IReturnRequestRepository
+public class ReturnRequestRepository : GenericRepository<ReturnRequest>, IReturnRequestRepository
 {
     private readonly AssetManagementDBContext _dbContext;
-    public ReturnRequestRepository(AssetManagementDBContext dbContext)
+    public ReturnRequestRepository(AssetManagementDBContext dbContext) : base(dbContext)
     {
         _dbContext = dbContext;
     }
@@ -96,7 +96,7 @@ public class ReturnRequestRepository : IReturnRequestRepository
 
         if (returnedDate.HasValue)
         {
-            query = query.Where(b => DateOnly.FromDateTime(b.ReturnedDate) == returnedDate.Value);
+            query = query.Where(b => b.ReturnedDate != null && DateOnly.FromDateTime((DateTime)b.ReturnedDate) == returnedDate.Value);
         }
 
         var totalCount = await query.CountAsync();
