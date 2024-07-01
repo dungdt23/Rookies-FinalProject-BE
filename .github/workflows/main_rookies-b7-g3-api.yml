@@ -12,6 +12,10 @@ on:
 jobs:
   clean:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
     steps:
       - name: cleanup
         uses: glassechidna/artifact-cleaner@master
