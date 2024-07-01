@@ -9,7 +9,7 @@ namespace AssetManagement.Application.IServices
             Guid locationId);
         Task<ReturnRequestViewModel> CreateReturnRequestAsync(
             CreateReturnRequestRequest request,
-            Guid requesterId);
+            Guid userId);
         Task CompleteReturnRequestAsync(
             Guid returnRequestId,
             Guid requesterId);
