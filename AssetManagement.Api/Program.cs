@@ -47,6 +47,7 @@ namespace AssetManagement.Api
                 }
 
             );
+            builder.Services.AddDateOnlyTimeOnlyStringConverters();
 
             // The following line enables Application Insights telemetry collection.
             builder.Services.AddApplicationInsightsTelemetry();
@@ -99,6 +100,7 @@ namespace AssetManagement.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
+                options.UseDateOnlyTimeOnlyStringConverters();
                 options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
@@ -130,13 +132,11 @@ namespace AssetManagement.Api
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            // if (app.Environment.IsDevelopment())
-            // {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-            // }
-            // Configure the HTTP request pipeline.
+            if (app.Environment.IsProduction())
+            {
+                app.UseMiddleware<ApiExceptionHandlingMiddleware>();
+            }
+
             // if (app.Environment.IsDevelopment())
             // {
             app.UseSwagger();

@@ -96,7 +96,7 @@ public class ReturnRequestRepository : IReturnRequestRepository
 
         if (returnedDate.HasValue)
         {
-            query = query.Where(b => b.ReturnedDate == returnedDate.Value);
+            query = query.Where(b => DateOnly.FromDateTime(b.ReturnedDate) == returnedDate.Value);
         }
 
         var totalCount = await query.CountAsync();
