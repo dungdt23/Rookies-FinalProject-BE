@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AssetManagement.Application.Services.AssignmentServices
 {
-    public class AssignmentService : IAssignmentService
+	public class AssignmentService : IAssignmentService
 	{
 		private readonly IAssignmentRepository _assignmentRepository;
 		private readonly IAssetRepository _assetRepository;
@@ -159,7 +159,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 					sortCondition = x => x.State;
 					break;
 			}
-			var assignmentsQuery = _assignmentRepository.GetAll(own,sortCondition, filter, userId, userType, locationId);
+			var assignmentsQuery = _assignmentRepository.GetAll(own, sortCondition, filter, userId, userType, locationId);
 			var totalCount = assignmentsQuery.Count();
 
 			if (totalCount == 0)
@@ -280,20 +280,24 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				};
 			}
 
-			var asset = await _assetRepository.GetByCondition(a => a.Id == assignment.AssetId).FirstOrDefaultAsync();
-
-			asset.State = TypeAssetState.Available;
-
-			if (await _assetRepository.UpdateAsync(asset) == 0)
+			if (request.AssetId != assignment.AssetId)
 			{
-				return new ApiResponse
-				{
-					StatusCode = StatusCodes.Status500InternalServerError,
-					Message = AssignmentApiResponseMessageConstant.AssignmentUpdateFail,
-					Data = _mapper.Map<ResponseAssignmentDto>(assignment)
-				};
+				var asset = await _assetRepository.GetByCondition(a => a.Id == assignment.AssetId).FirstOrDefaultAsync();
 
+				asset.State = TypeAssetState.Available;
+
+				if (await _assetRepository.UpdateAsync(asset) == 0)
+				{
+					return new ApiResponse
+					{
+						StatusCode = StatusCodes.Status500InternalServerError,
+						Message = AssignmentApiResponseMessageConstant.AssignmentUpdateFail,
+						Data = _mapper.Map<ResponseAssignmentDto>(assignment)
+					};
+
+				}
 			}
+
 
 
 			request.AssignerId = assignment.AssignerId;
