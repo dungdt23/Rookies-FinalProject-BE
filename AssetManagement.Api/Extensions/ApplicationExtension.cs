@@ -12,6 +12,10 @@ namespace AssetManagement.Api.Extensions;
 public static class ApplicationExtension
 {
     private static readonly int numberOfReturnRequests = 10;
+	private static readonly int UserToGenerate = 200;
+	private static readonly int AssetToGenerate = 300;
+	private static readonly int CategoryToGenerate = 100;
+
     public static async Task<IApplicationBuilder> SeedDataAsync(this IApplicationBuilder app)
     {
         using (var scope = app.ApplicationServices.CreateScope())
@@ -139,18 +143,18 @@ public static class ApplicationExtension
                     };
                     await userService.CreateAsync(staffUser4);
 
-                    for (int i = 0; i < 200; i++)
-                    {
-                        string firstName = firstNames[random.Next(firstNames.Count)];
-                        string lastName = lastNames[random.Next(lastNames.Count)];
-                        Domain.Entities.Type type = types[random.Next(types.Count)];
-                        Guid locationId = locationIds[random.Next(locationIds.Count)];
-                        DateTime dateOfBirth = startDate.AddDays(random.Next(dateOfBirthRange));
-                        DateTime joinedDate = dateOfBirth.AddYears(18).AddDays(random.Next(1, 60));
-                        if (joinedDate.DayOfWeek == DayOfWeek.Saturday || joinedDate.DayOfWeek == DayOfWeek.Sunday)
-                        {
-                            joinedDate.AddDays(2);
-                        }
+					for (int i = 0; i < UserToGenerate; i++)
+					{
+						string firstName = firstNames[random.Next(firstNames.Count)];
+						string lastName = lastNames[random.Next(lastNames.Count)];
+						Domain.Entities.Type type = types[random.Next(types.Count)];
+						Guid locationId = locationIds[random.Next(locationIds.Count)];
+						DateTime dateOfBirth = startDate.AddDays(random.Next(dateOfBirthRange));
+						DateTime joinedDate = dateOfBirth.AddYears(18).AddDays(random.Next(1, 60));
+						if (joinedDate.DayOfWeek == DayOfWeek.Saturday || joinedDate.DayOfWeek == DayOfWeek.Sunday)
+						{
+							joinedDate.AddDays(2);
+						}
 
 
                         RequestUserCreateDto form = new RequestUserCreateDto
