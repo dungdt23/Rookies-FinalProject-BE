@@ -12,6 +12,7 @@ namespace AssetManagement.Domain.Entities
         public required string LocationName { get; set; }
         public ICollection<User> Users { get; set; }
         public ICollection<Asset> Assets { get; set; }
+        public ICollection<ReturnRequest> ReturnRequests { get; set; }
 
     }
 }

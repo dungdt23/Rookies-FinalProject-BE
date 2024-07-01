@@ -11,6 +11,7 @@ namespace AssetManagement.Api.Extensions;
 
 public static class ApplicationExtension
 {
+    private static readonly int numberOfReturnRequests = 10;
     public static async Task<IApplicationBuilder> SeedDataAsync(this IApplicationBuilder app)
     {
         using (var scope = app.ApplicationServices.CreateScope())
@@ -347,7 +348,7 @@ public static class ApplicationExtension
         return assetFaker;
     }
 
-    //public static void SeedReturnRequest(this AssetManagementDBContext dbContext)
+    //public static async void SeedReturnRequest(this AssetManagementDBContext dbContext)
     //{
     //    if (dbContext.ReturnRequests.Any())
     //    {
@@ -355,15 +356,35 @@ public static class ApplicationExtension
     //    }
 
     //    // Seed Return Request
-    //    var assignment = dbContext.Assignments.Where(a => a.State == TypeAssignmentState.Accepted)
+    //    var locations = await dbContext.Locations.ToListAsync();
+
+
+    //    // Generate Return Request as Admin made return request for all 3 locations
+    //    foreach (var location in locations)
+    //    {
+    //        var assignments = dbContext.Assignments.Where(a => a.State == TypeAssignmentState.Accepted 
+    //        && a.ActiveReturnRequest == null
+    //        && a.Asset.LocationId == location.Id)
     //        .ToListAsync();
 
+    //        var admin = dbContext.Users.Where(u => u.Type.TypeName == TypeNameConstants.TypeAdmin).FirstOrDefault();
+    //        for (int i = 0; i < numberOfReturnRequests; i++)
+    //        {
+    //            if (new Random().Next(0, 3) != 0)
+    //            {
+    //                var returnRequestFaker = new Faker<ReturnRequest>()
+    //               .RuleFor(r => r.RequestedDate, f => f.Date.Past(1))
+    //               .RuleFor(r => r.State, f => f.PickRandom<TypeReturnRequestState>())
+    //               .Generate(10);
+    //            }
+
+    //        }
+    //    }
+
+    //    // Generate Return Request as Staff made return request for all 3 locations
     //    var returnRequestFaker = new Faker<ReturnRequest>()
-    //       .RuleFor(r => r.ReturnDate, f => f.Date.Past(1))
-    //       .RuleFor(r => r.Note, f => f.Lorem.Sentence(5))
+    //       .RuleFor(r => r.RequestedDate, f => f.Date.Past(1))
     //       .RuleFor(r => r.State, f => f.PickRandom<TypeReturnRequestState>())
-    //       .RuleFor(r => r.CreatedAt, f => DateTime.Now)
-    //       .RuleFor(r => r.IsDeleted, f => false)
     //       .Generate(10);
     //}
     public static async Task<IApplicationBuilder> DeleteAllDataAsync(this IApplicationBuilder app)

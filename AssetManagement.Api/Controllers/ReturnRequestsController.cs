@@ -2,8 +2,10 @@
 using AssetManagement.Application.Dtos.ReturnRequest;
 using AssetManagement.Application.Exceptions.Assignment;
 using AssetManagement.Application.Exceptions.Common;
+using AssetManagement.Application.Exceptions.ReturnRequest;
 using AssetManagement.Application.IServices;
 using AssetManagement.Domain.Constants;
+using AssetManagement.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,7 +55,7 @@ namespace AssetManagement.Api.Controllers
             try
             {
                 var returnRequest = await _returnRequestService.CreateReturnRequestAsync(request, userId);
-                return Ok(returnRequest);
+                return Created("", returnRequest);
             }
             catch (NotFoundException ex)
             {
@@ -74,6 +76,40 @@ namespace AssetManagement.Api.Controllers
             catch (ActiveReturnRequestAlreadyExistsException ex)
             {
                 return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPost("{returnRequestId}/state")]
+        [Authorize(Roles = TypeNameConstants.TypeAdmin)]
+        public async Task<IActionResult> UpdateState(Guid returnRequestId, [FromBody] UpdateReturnRequestStateRequest request)
+        {
+            if (request.State == TypeRequestState.WaitingForReturning)
+                return BadRequest();
+
+            var userIdClaim = HttpContext.GetClaim("id");
+            Guid userId = Guid.Parse(userIdClaim);
+            try
+            {
+                if (request.State == TypeRequestState.Completed)
+                {
+                    await _returnRequestService.CompleteReturnRequestAsync(returnRequestId, userId);
+                    return NoContent();
+                }
+
+                await _returnRequestService.RejectReturnRequestAsync(returnRequestId, userId);
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (WrongLocationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ReturnRequestNotWaitingException ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }

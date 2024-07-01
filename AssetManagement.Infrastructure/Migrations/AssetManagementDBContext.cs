@@ -45,6 +45,10 @@ namespace AssetManagement.Infrastructure.Migrations
                 .HasForeignKey(x => x.AssignmentId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+                entity.HasOne(e => e.Location)
+                .WithMany(l => l.ReturnRequests)
+                .HasForeignKey(x => x.LocationId)
+                .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Asset>(entity =>

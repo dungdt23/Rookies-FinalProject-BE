@@ -10,5 +10,12 @@ namespace AssetManagement.Application.IServices
         Task<ReturnRequestViewModel> CreateReturnRequestAsync(
             CreateReturnRequestRequest request,
             Guid requesterId);
+        Task CompleteReturnRequestAsync(
+            Guid returnRequestId,
+            Guid requesterId);
+
+        Task RejectReturnRequestAsync(
+            Guid returnRequestId,
+            Guid requesterId);
     }
 }
