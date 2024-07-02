@@ -22,6 +22,14 @@ namespace AssetManagement.Application.Mappings
             //Mapping Category
             CreateMap<Category, ResponseCategoryDto>();
             CreateMap<RequestCategoryDto, Category>();
+            CreateMap<Category, ResponseReportDto>()
+                .ForMember(dest => dest.Total, opt => opt.MapFrom(src => src.Assets.Where(x => !x.IsDeleted).Count()))
+                .ForMember(dest => dest.Assigned, opt => opt.MapFrom(src => src.Assets.Where(x => !x.IsDeleted && x.State == Domain.Enums.TypeAssetState.Assigned).Count()))
+                .ForMember(dest => dest.Available, opt => opt.MapFrom(src => src.Assets.Where(x => !x.IsDeleted && x.State == Domain.Enums.TypeAssetState.Available).Count()))
+                .ForMember(dest => dest.NotAvailable, opt => opt.MapFrom(src => src.Assets.Where(x => !x.IsDeleted && x.State == Domain.Enums.TypeAssetState.NotAvailable).Count()))
+                .ForMember(dest => dest.WaitingForRecycling, opt => opt.MapFrom(src => src.Assets.Where(x => !x.IsDeleted && x.State == Domain.Enums.TypeAssetState.WaitingForRecycling).Count()))
+                .ForMember(dest => dest.Recycled, opt => opt.MapFrom(src => src.Assets.Where(x => !x.IsDeleted && x.State == Domain.Enums.TypeAssetState.Recycled).Count()));
+
             //Mapping Type
             CreateMap<Domain.Entities.Type, ResponseTypeDto>();
             //Mapping Location
