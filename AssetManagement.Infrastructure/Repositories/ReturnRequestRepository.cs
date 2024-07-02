@@ -20,7 +20,7 @@ public class ReturnRequestRepository : GenericRepository<ReturnRequest>, IReturn
         int pageSize,
         ReturnRequestSortField sortField,
         TypeOrder sortOrder,
-        TypeAssetState? assetState,
+        TypeRequestState? requestState,
         DateOnly? returnedDate,
         string? search,
         Guid locationId)
@@ -89,9 +89,9 @@ public class ReturnRequestRepository : GenericRepository<ReturnRequest>, IReturn
 
         //Apply filter (state & return date)
 
-        if (assetState.HasValue)
+        if (requestState.HasValue)
         {
-            query = query.Where(b => b.Assignment.Asset.State == assetState.Value);
+            query = query.Where(b => b.State == requestState.Value);
         }
 
         if (returnedDate.HasValue)

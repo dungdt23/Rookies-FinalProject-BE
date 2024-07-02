@@ -9,7 +9,7 @@ namespace AssetManagement.Application.Dtos.ReturnRequest
         public int PerPage { get; set; } = 15;
         public ReturnRequestSortField SortField { get; set; } = ReturnRequestSortField.CreatedAt;
         public TypeOrder SortOrder { get; set; } = TypeOrder.Ascending;
-        public TypeAssetState? AssetState { get; set; }
+        public TypeRequestState? RequestState { get; set; }
         public DateOnly? ReturnedDate { get; set; }
         [MaxLength(200)]
         public string? Search { get; set; }

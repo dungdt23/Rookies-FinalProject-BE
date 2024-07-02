@@ -92,10 +92,12 @@ namespace AssetManagement.Api
             {
                 //Add custom validation error
                 options.Filters.Add<ValidateModelFilter>();
-            }).ConfigureApiBehaviorOptions(options =>
-            {
-                options.SuppressModelStateInvalidFilter = true;
-            });
+
+            })
+                .ConfigureApiBehaviorOptions(options =>
+                {
+                    options.SuppressModelStateInvalidFilter = true;
+                });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -157,7 +159,7 @@ namespace AssetManagement.Api
 
             if (app.Environment.IsDevelopment())
             {
-                await app.DeleteAllDataAsync();
+                //await app.DeleteAllDataAsync();
                 await app.SeedDataAsync();
             }
 

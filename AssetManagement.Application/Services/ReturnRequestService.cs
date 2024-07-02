@@ -47,7 +47,7 @@ namespace AssetManagement.Application.Services
                 request.PerPage,
                 request.SortField,
                 request.SortOrder,
-                request.AssetState,
+                request.RequestState,
                 request.ReturnedDate,
                 request.Search,
                 user!.LocationId);
