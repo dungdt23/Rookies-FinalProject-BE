@@ -11,7 +11,7 @@ namespace AssetManagement.Application.IRepositories
         int pageSize,
         ReturnRequestSortField sortField,
         TypeOrder sortOrder,
-        TypeAssetState? assetState,
+        TypeRequestState? requestState,
         DateOnly? returnedDate,
         string? search,
         Guid locationId);

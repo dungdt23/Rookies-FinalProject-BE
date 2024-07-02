@@ -20,7 +20,7 @@ public class ReturnRequestRepository : GenericRepository<ReturnRequest>, IReturn
         int pageSize,
         ReturnRequestSortField sortField,
         TypeOrder sortOrder,
-        TypeAssetState? assetState,
+        TypeRequestState? requestState,
         DateOnly? returnedDate,
         string? search,
         Guid locationId)
@@ -35,9 +35,8 @@ public class ReturnRequestRepository : GenericRepository<ReturnRequest>, IReturn
 
         // Ignore SoftDelete and Reject state
         query = query.Where(x => !x.IsDeleted
-        && x.State != TypeRequestState.Rejected
         // Apply location filter
-        && x.Assignment.Asset.LocationId == locationId);
+        && x.LocationId == locationId);
 
         // Apply search
         if (!string.IsNullOrEmpty(search))
@@ -74,7 +73,7 @@ public class ReturnRequestRepository : GenericRepository<ReturnRequest>, IReturn
                 expressionOrder = e => e.State;
                 break;
             default:
-                expressionOrder = e => e.CreatedAt;
+                expressionOrder = e => e.RequestedDate;
                 break;
         }
 
@@ -89,9 +88,13 @@ public class ReturnRequestRepository : GenericRepository<ReturnRequest>, IReturn
 
         //Apply filter (state & return date)
 
-        if (assetState.HasValue)
+        if (requestState.HasValue)
         {
-            query = query.Where(b => b.Assignment.Asset.State == assetState.Value);
+            query = query.Where(b => b.State == requestState.Value);
+        }
+        else
+        {
+            query = query.Where(b => b.State != TypeRequestState.Rejected);
         }
 
         if (returnedDate.HasValue)

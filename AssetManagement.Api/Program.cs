@@ -67,6 +67,7 @@ namespace AssetManagement.Api
             builder.Services.AddScoped<ILocationService, LocationService>();
             builder.Services.AddScoped<ITypeService, TypeService>();
             builder.Services.AddScoped<IAssetService, AssetService>();
+            builder.Services.AddScoped<IReportService, ReportService>();
             builder.Services.AddScoped<IAssignmentService, AssignmentService>();
             builder.Services.AddScoped<IReturnRequestService, ReturnRequestService>();
             builder.Services.AddScoped<IReportService, ReportService>();
@@ -92,10 +93,12 @@ namespace AssetManagement.Api
             {
                 //Add custom validation error
                 options.Filters.Add<ValidateModelFilter>();
-            }).ConfigureApiBehaviorOptions(options =>
-            {
-                options.SuppressModelStateInvalidFilter = true;
-            });
+
+            })
+                .ConfigureApiBehaviorOptions(options =>
+                {
+                    options.SuppressModelStateInvalidFilter = true;
+                });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -157,7 +160,7 @@ namespace AssetManagement.Api
 
             if (app.Environment.IsDevelopment())
             {
-                await app.DeleteAllDataAsync();
+                //await app.DeleteAllDataAsync();
                 await app.SeedDataAsync();
             }
 

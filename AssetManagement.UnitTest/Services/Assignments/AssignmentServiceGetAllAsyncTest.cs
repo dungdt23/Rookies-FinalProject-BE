@@ -1,5 +1,4 @@
 ﻿using AssetManagement.Application.ApiResponses;
-using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IRepositories;
@@ -11,15 +10,10 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using MockQueryable.Moq;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AssetManagement.UnitTest.Services.Assignments
 {
-	[TestFixture]
+    [TestFixture]
 	public class AssignmentServiceGetAllAsyncTest
 	{
 		private Mock<IAssignmentRepository> _assignmentRepositoryMock;
