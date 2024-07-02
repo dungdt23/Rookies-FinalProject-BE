@@ -17,7 +17,7 @@ namespace AssetManagement.Api.Controllers
             _reportService = reportService;
         }
         [HttpGet("export")]
-        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+        [Authorize(Roles = TypeNameConstants.TypeAdmin)]
         public async Task<IActionResult> Get()
         {
             var locationIdClaim = HttpContext.GetClaim("locationId");
@@ -30,7 +30,7 @@ namespace AssetManagement.Api.Controllers
             return File(ms.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
         [HttpGet]
-        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+        [Authorize(Roles = TypeNameConstants.TypeAdmin)]
         public async Task<IActionResult> Get([FromQuery] ReportFilter filter, int index = 1, int size = 10)
         {
             var locationIdClaim = HttpContext.GetClaim("locationId");
