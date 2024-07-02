@@ -11,5 +11,7 @@ public static class UserApiResponseMessageConstant
     public const string UserLoginWrongPasswordOrUsername = "Username or password is incorrect. Please try again";
     public const string UserLoginSuccess = "User login successfully";
     public const string DisabledUser = "Your account has been disabled for admin. You can contact admin for solution!";
-    
+    public const string OldPasswordWrong = "Password is incorrect";
+    public const string ChangePasswordSuccess = "Password changed successfully";
+	public const string ChangePasswordFail = "Password changed failed";
 }

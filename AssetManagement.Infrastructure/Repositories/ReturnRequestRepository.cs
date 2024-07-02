@@ -35,9 +35,8 @@ public class ReturnRequestRepository : GenericRepository<ReturnRequest>, IReturn
 
         // Ignore SoftDelete and Reject state
         query = query.Where(x => !x.IsDeleted
-        && x.State != TypeRequestState.Rejected
         // Apply location filter
-        && x.Assignment.Asset.LocationId == locationId);
+        && x.LocationId == locationId);
 
         // Apply search
         if (!string.IsNullOrEmpty(search))
@@ -92,6 +91,10 @@ public class ReturnRequestRepository : GenericRepository<ReturnRequest>, IReturn
         if (requestState.HasValue)
         {
             query = query.Where(b => b.State == requestState.Value);
+        }
+        else
+        {
+            query = query.Where(b => b.State != TypeRequestState.Rejected);
         }
 
         if (returnedDate.HasValue)
