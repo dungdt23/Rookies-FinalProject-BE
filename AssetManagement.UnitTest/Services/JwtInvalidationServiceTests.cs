@@ -79,7 +79,8 @@ namespace AssetManagement.UnitTest.Services
                 new Claim("BlTimestamp", DateTime.UtcNow.ToString())
             });
 
-            _mockUserRepository.Setup(x => x.GetByCondition(It.IsAny<Expression<Func<User, bool>>>())).Returns(Enumerable.Empty<User>().AsQueryable().BuildMock());
+            _mockUserRepository.Setup(x => x.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
+                .Returns(Enumerable.Empty<User>().AsQueryable().BuildMock());
 
             // Act
             var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);

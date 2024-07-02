@@ -64,12 +64,13 @@ namespace AssetManagement.Application.Services
             var assignment = await _assignmentRepository.GetByCondition(a => a.Id == request.AssignmentId)
                 .Include(a => a.Asset)
                 .FirstOrDefaultAsync();
-            var user = await _userRepository.GetByCondition(u => u.Id == userId)
-                .Include(u => u.Type)
-                .FirstOrDefaultAsync();
 
             if (assignment == null)
                 throw new NotFoundException($"Assignment with id {request.AssignmentId} not found.");
+
+            var user = await _userRepository.GetByCondition(u => u.Id == userId)
+                .Include(u => u.Type)
+                .FirstOrDefaultAsync();
 
             // Admin can not create return requests for assignments that have the asset's locaiton different from the admin's
             // User always exist because middleware already check its existence
@@ -115,9 +116,6 @@ namespace AssetManagement.Application.Services
 
         public async Task CompleteReturnRequestAsync(Guid returnRequestId, Guid requesterId)
         {
-            var user = await _userRepository.GetByCondition(u => u.Id == requesterId)
-                .FirstOrDefaultAsync();
-
             var returnRequest = await _returnRequestRepository.GetByCondition(rr => rr.Id == returnRequestId)
                 .Include(rr => rr.Assignment)
                     .ThenInclude(a => a.Asset)
@@ -126,12 +124,16 @@ namespace AssetManagement.Application.Services
             if (returnRequest == null)
                 throw new NotFoundException($"Return Request with id {returnRequestId} not found.");
 
+            var user = await _userRepository.GetByCondition(u => u.Id == requesterId)
+                .FirstOrDefaultAsync();
+
             if (returnRequest.LocationId != user!.LocationId)
                 throw new WrongLocationException($"You do not have access to this assignment.");
 
             if (returnRequest.State != TypeRequestState.WaitingForReturning)
                 throw new ReturnRequestNotWaitingException("Return Request must be in a waiting state.");
 
+            // Done validation, changes states of others
             returnRequest.State = TypeRequestState.Completed;
             returnRequest.ReturnedDate = DateTime.Now;
             returnRequest.ResponderId = user.Id;
@@ -159,11 +161,12 @@ namespace AssetManagement.Application.Services
                 .Include(rr => rr.Assignment)
                     .ThenInclude(a => a.Asset)
                 .FirstOrDefaultAsync();
-            var user = await _userRepository.GetByCondition(u => u.Id == requesterId)
-                .FirstOrDefaultAsync();
 
             if (returnRequest == null)
                 throw new NotFoundException($"Return Request with id {returnRequestId} not found.");
+
+            var user = await _userRepository.GetByCondition(u => u.Id == requesterId)
+                .FirstOrDefaultAsync();
 
             if (returnRequest.LocationId != user!.LocationId)
                 throw new WrongLocationException($"You do not have access to this assignment.");
@@ -171,6 +174,7 @@ namespace AssetManagement.Application.Services
             if (returnRequest.State != TypeRequestState.WaitingForReturning)
                 throw new ReturnRequestNotWaitingException("Return Request must be in a waiting state.");
 
+            // Done validation, changes states of others
             returnRequest.State = TypeRequestState.Rejected;
             returnRequest.ReturnedDate = DateTime.Now;
             returnRequest.ResponderId = user.Id;

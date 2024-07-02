@@ -28,22 +28,15 @@ namespace AssetManagement.Api.Controllers
         {
             var userIdClaim = HttpContext.GetClaim("id");
             Guid userId = Guid.Parse(userIdClaim);
-            try
+            var (returnRequests, totalCount) = await _returnRequestService.GetAllReturnRequestAsync(request, userId);
+            PaginatedResult<ReturnRequestGetAllViewModel> paginateResult = new PaginatedResult<ReturnRequestGetAllViewModel>
             {
-                var (returnRequests, totalCount) = await _returnRequestService.GetAllReturnRequestAsync(request, userId);
-                PaginatedResult<ReturnRequestGetAllViewModel> paginateResult = new PaginatedResult<ReturnRequestGetAllViewModel>
-                {
-                    Data = returnRequests,
-                    TotalCount = totalCount,
-                    PageNumber = request.Page,
-                    PageSize = request.PerPage
-                };
-                return Ok(paginateResult);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+                Data = returnRequests,
+                TotalCount = totalCount,
+                PageNumber = request.Page,
+                PageSize = request.PerPage
+            };
+            return Ok(paginateResult);
         }
 
         [HttpPost]
