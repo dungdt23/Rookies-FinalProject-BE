@@ -74,7 +74,7 @@ public class ReturnRequestRepository : GenericRepository<ReturnRequest>, IReturn
                 expressionOrder = e => e.State;
                 break;
             default:
-                expressionOrder = e => e.CreatedAt;
+                expressionOrder = e => e.RequestedDate;
                 break;
         }
 
