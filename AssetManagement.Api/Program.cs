@@ -47,6 +47,7 @@ namespace AssetManagement.Api
                 }
 
             );
+            builder.Services.AddDateOnlyTimeOnlyStringConverters();
 
             // The following line enables Application Insights telemetry collection.
             builder.Services.AddApplicationInsightsTelemetry();
@@ -56,7 +57,9 @@ namespace AssetManagement.Api
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IAssetRepository, AssetRepository>();
             builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+            builder.Services.AddScoped<IReturnRequestRepository, ReturnRequestRepository>();
             builder.Services.AddScoped<IGlobalSettingsRepository, GlobalSettinsgRepository>();
+            builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
 
             builder.Services.AddScoped<IUserService, UserService>();
@@ -66,6 +69,7 @@ namespace AssetManagement.Api
             builder.Services.AddScoped<IAssetService, AssetService>();
             builder.Services.AddScoped<IReportService, ReportService>();
             builder.Services.AddScoped<IAssignmentService, AssignmentService>();
+            builder.Services.AddScoped<IReturnRequestService, ReturnRequestService>();
             builder.Services.AddScoped<IReportService, ReportService>();
             builder.Services.AddScoped<IJwtInvalidationService, JwtInvalidationService>();
 
@@ -98,6 +102,7 @@ namespace AssetManagement.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
+                options.UseDateOnlyTimeOnlyStringConverters();
                 options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
@@ -129,13 +134,11 @@ namespace AssetManagement.Api
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            // if (app.Environment.IsDevelopment())
-            // {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-            // }
-            // Configure the HTTP request pipeline.
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseMiddleware<ApiExceptionHandlingMiddleware>();
+            }
+
             // if (app.Environment.IsDevelopment())
             // {
             app.UseSwagger();
@@ -155,7 +158,7 @@ namespace AssetManagement.Api
 
             if (app.Environment.IsDevelopment())
             {
-                //await app.DeleteAllDataAsync();
+                await app.DeleteAllDataAsync();
                 await app.SeedDataAsync();
             }
 

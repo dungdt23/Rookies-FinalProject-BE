@@ -8,16 +8,21 @@ namespace AssetManagement.Domain.Entities
     {
         [Key]
         public override Guid Id { get; set; } = Guid.NewGuid();
+        public TypeRequestState State { get; set; } = TypeRequestState.WaitingForReturning;
+        public DateTime RequestedDate { get; set; } = DateTime.Now;
+        public DateTime? ReturnedDate { get; set; }
         [Required]
         public Guid RequestorId { get; set; }
+        public Guid? ResponderId { get; set; }
         [Required]
-        public Guid ResponderId { get; set; }
+        public Guid AssignmentId { get; set; }
         [Required]
-        public Guid AssetId { get; set; }
+        public Guid LocationId { get; set; }
+
+        // Navigation Properties
         public User Requestor { get; set; }
-        public User Responder { get; set; }
-        public Asset Asset { get; set; }
-        public TypeRequestState State { get; set; }
-        public DateTime ReturnedDate { get; set; }
+        public User? Responder { get; set; }
+        public Assignment Assignment { get; set; }
+        public Location Location { get; set; }
     }
 }

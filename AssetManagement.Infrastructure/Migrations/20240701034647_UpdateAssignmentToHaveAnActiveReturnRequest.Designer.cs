@@ -4,6 +4,7 @@ using AssetManagement.Infrastructure.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssetManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(AssetManagementDBContext))]
-    partial class AssetManagementDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240701034647_UpdateAssignmentToHaveAnActiveReturnRequest")]
+    partial class UpdateAssignmentToHaveAnActiveReturnRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -117,6 +120,8 @@ namespace AssetManagement.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ActiveReturnRequestId");
 
                     b.HasIndex("AssetId");
 
@@ -229,9 +234,6 @@ namespace AssetManagement.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("LocationId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("RequestedDate")
                         .HasColumnType("datetime2");
 
@@ -253,8 +255,6 @@ namespace AssetManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssignmentId");
-
-                    b.HasIndex("LocationId");
 
                     b.HasIndex("RequestorId");
 
@@ -399,6 +399,11 @@ namespace AssetManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("AssetManagement.Domain.Entities.Assignment", b =>
                 {
+                    b.HasOne("AssetManagement.Domain.Entities.ReturnRequest", "ActiveReturnRequest")
+                        .WithMany()
+                        .HasForeignKey("ActiveReturnRequestId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("AssetManagement.Domain.Entities.Asset", "Asset")
                         .WithMany("Assignments")
                         .HasForeignKey("AssetId")
@@ -417,6 +422,8 @@ namespace AssetManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("ActiveReturnRequest");
+
                     b.Navigation("Asset");
 
                     b.Navigation("Assignee");
@@ -432,12 +439,6 @@ namespace AssetManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("AssetManagement.Domain.Entities.Location", "Location")
-                        .WithMany("ReturnRequests")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("AssetManagement.Domain.Entities.User", "Requestor")
                         .WithMany("RequestedReturnRequests")
                         .HasForeignKey("RequestorId")
@@ -450,8 +451,6 @@ namespace AssetManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Assignment");
-
-                    b.Navigation("Location");
 
                     b.Navigation("Requestor");
 
@@ -495,8 +494,6 @@ namespace AssetManagement.Infrastructure.Migrations
             modelBuilder.Entity("AssetManagement.Domain.Entities.Location", b =>
                 {
                     b.Navigation("Assets");
-
-                    b.Navigation("ReturnRequests");
 
                     b.Navigation("Users");
                 });

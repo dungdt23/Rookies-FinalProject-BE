@@ -4,6 +4,7 @@ using AssetManagement.Infrastructure.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssetManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(AssetManagementDBContext))]
-    partial class AssetManagementDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240701010429_AddReturnRequest")]
+    partial class AddReturnRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,9 +83,6 @@ namespace AssetManagement.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ActiveReturnRequestId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("AssetId")
@@ -229,19 +229,13 @@ namespace AssetManagement.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("LocationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("RequestedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<Guid>("RequestorId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ResponderId")
+                    b.Property<Guid>("ResponderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("ReturnedDate")
+                    b.Property<DateTime>("ReturnedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("State")
@@ -253,8 +247,6 @@ namespace AssetManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssignmentId");
-
-                    b.HasIndex("LocationId");
 
                     b.HasIndex("RequestorId");
 
@@ -432,12 +424,6 @@ namespace AssetManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("AssetManagement.Domain.Entities.Location", "Location")
-                        .WithMany("ReturnRequests")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("AssetManagement.Domain.Entities.User", "Requestor")
                         .WithMany("RequestedReturnRequests")
                         .HasForeignKey("RequestorId")
@@ -447,11 +433,10 @@ namespace AssetManagement.Infrastructure.Migrations
                     b.HasOne("AssetManagement.Domain.Entities.User", "Responder")
                         .WithMany("RespondedReturnRequests")
                         .HasForeignKey("ResponderId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Assignment");
-
-                    b.Navigation("Location");
 
                     b.Navigation("Requestor");
 
@@ -495,8 +480,6 @@ namespace AssetManagement.Infrastructure.Migrations
             modelBuilder.Entity("AssetManagement.Domain.Entities.Location", b =>
                 {
                     b.Navigation("Assets");
-
-                    b.Navigation("ReturnRequests");
 
                     b.Navigation("Users");
                 });
