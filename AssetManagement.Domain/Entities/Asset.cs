@@ -23,14 +23,13 @@ namespace AssetManagement.Domain.Entities
         [MaxLength(500)]
         public string Specification { get; set; }
         [Required]
-        public DateTime InstalledDate {  get; set; }
+        public DateTime InstalledDate { get; set; }
         [Required]
         public TypeAssetState State { get; set; } = TypeAssetState.Available;
 
         public Category Category { get; set; }
         public Location Location { get; set; }
-
         public ICollection<Assignment> Assignments { get; set; }
-        public ICollection<ReturnRequest> ReturnRequests { get; set; }
+
     }
 }

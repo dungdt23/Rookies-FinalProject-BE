@@ -20,7 +20,7 @@ namespace AssetManagement.Api.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+        [Authorize(Roles = TypeNameConstants.TypeAdmin)]
         public async Task<IActionResult> Get([FromQuery] AssetFilter filter, int index = 1, int size = 10)
         {
             var locationIdClaim = HttpContext.GetClaim("locationId");
@@ -34,7 +34,7 @@ namespace AssetManagement.Api.Controllers
             return Ok(result);
         }
         [HttpPost]
-        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+        [Authorize(Roles = TypeNameConstants.TypeAdmin)]
         public async Task<IActionResult> Post([FromBody] RequestAssetDto requestAssetDto)
         {
             var locationIdClaim = HttpContext.GetClaim("locationId");
@@ -48,7 +48,7 @@ namespace AssetManagement.Api.Controllers
             return Ok(result);
         }
         [HttpDelete("{id}")]
-        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+        [Authorize(Roles = TypeNameConstants.TypeAdmin)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _assetService.DeleteAsync(id);
@@ -63,7 +63,7 @@ namespace AssetManagement.Api.Controllers
             return Ok(result);
         }
         [HttpPut("{id}")]
-        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+        [Authorize(Roles = TypeNameConstants.TypeAdmin)]
         public async Task<IActionResult> Put(Guid id, [FromBody] RequestAssetDto requestAssetDto)
         {
             var locationIdClaim = HttpContext.GetClaim("locationId");
@@ -77,7 +77,7 @@ namespace AssetManagement.Api.Controllers
             return Ok(result);
         }
         [HttpGet("{id}")]
-        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+        [Authorize(Roles = TypeNameConstants.TypeAdmin)]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _assetService.GetByIdAysnc(id);

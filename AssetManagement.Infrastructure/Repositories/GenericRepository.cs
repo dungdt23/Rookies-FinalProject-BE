@@ -29,7 +29,7 @@ namespace AssetManagement.Infrastructure.Repositories
             return query;
         }
 
-        public async Task<int> AddAsync(T entity)
+        public virtual async Task<int> AddAsync(T entity)
         {
             try
             {

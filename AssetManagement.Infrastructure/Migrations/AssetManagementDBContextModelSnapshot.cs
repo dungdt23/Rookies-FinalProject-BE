@@ -82,6 +82,9 @@ namespace AssetManagement.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ActiveReturnRequestId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("AssetId")
                         .HasColumnType("uniqueidentifier");
 
@@ -214,7 +217,7 @@ namespace AssetManagement.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AssetId")
+                    b.Property<Guid>("AssignmentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -226,13 +229,19 @@ namespace AssetManagement.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("RequestedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("RequestorId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ResponderId")
+                    b.Property<Guid?>("ResponderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ReturnedDate")
+                    b.Property<DateTime?>("ReturnedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("State")
@@ -243,7 +252,9 @@ namespace AssetManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssetId");
+                    b.HasIndex("AssignmentId");
+
+                    b.HasIndex("LocationId");
 
                     b.HasIndex("RequestorId");
 
@@ -415,10 +426,16 @@ namespace AssetManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("AssetManagement.Domain.Entities.ReturnRequest", b =>
                 {
-                    b.HasOne("AssetManagement.Domain.Entities.Asset", "Asset")
+                    b.HasOne("AssetManagement.Domain.Entities.Assignment", "Assignment")
                         .WithMany("ReturnRequests")
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("AssetManagement.Domain.Entities.Location", "Location")
+                        .WithMany("ReturnRequests")
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("AssetManagement.Domain.Entities.User", "Requestor")
@@ -430,10 +447,11 @@ namespace AssetManagement.Infrastructure.Migrations
                     b.HasOne("AssetManagement.Domain.Entities.User", "Responder")
                         .WithMany("RespondedReturnRequests")
                         .HasForeignKey("ResponderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Asset");
+                    b.Navigation("Assignment");
+
+                    b.Navigation("Location");
 
                     b.Navigation("Requestor");
 
@@ -462,7 +480,10 @@ namespace AssetManagement.Infrastructure.Migrations
             modelBuilder.Entity("AssetManagement.Domain.Entities.Asset", b =>
                 {
                     b.Navigation("Assignments");
+                });
 
+            modelBuilder.Entity("AssetManagement.Domain.Entities.Assignment", b =>
+                {
                     b.Navigation("ReturnRequests");
                 });
 
@@ -474,6 +495,8 @@ namespace AssetManagement.Infrastructure.Migrations
             modelBuilder.Entity("AssetManagement.Domain.Entities.Location", b =>
                 {
                     b.Navigation("Assets");
+
+                    b.Navigation("ReturnRequests");
 
                     b.Navigation("Users");
                 });

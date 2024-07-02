@@ -20,7 +20,7 @@ namespace AssetManagement.Api.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+        [Authorize(Roles = TypeNameConstants.TypeAdmin)]
         public async Task<IActionResult> Get()
         {
             var result = await _categoryService.GetAllAsync(null, null);
@@ -32,7 +32,7 @@ namespace AssetManagement.Api.Controllers
             return Ok(result);
         }
         [HttpPost]
-        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+        [Authorize(Roles = TypeNameConstants.TypeAdmin)]
         public async Task<IActionResult> Post([FromBody] RequestCategoryDto requestCategoryDto)
         {
             var result = await _categoryService.AddAsync(requestCategoryDto);
@@ -44,7 +44,7 @@ namespace AssetManagement.Api.Controllers
             return Ok(result);
         }
         [HttpGet("unique-prefix-name")]
-        [Authorize(Roles = TypeNameContraint.TypeAdmin)]
+        [Authorize(Roles = TypeNameConstants.TypeAdmin)]
         public async Task<IActionResult> CheckUnique([FromQuery]PrefixNameFilter prefixName)
         {
             var result = await _categoryService.IsUniqueAsync(prefixName.isPrefix, prefixName.value);
