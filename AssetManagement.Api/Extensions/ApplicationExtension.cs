@@ -399,25 +399,34 @@ public static class ApplicationExtension
                     RequestedDate = past,
                     State = randomState,
                     LocationId = location.Id,
+                    CreatedAt = past,
                 };
 
 
                 // Depending on the state, set appropriate properties
                 if (randomState == TypeRequestState.Completed)
                 {
-                    newReturnRequest.ReturnedDate = past;
+                    newReturnRequest.ReturnedDate = DateTime.Now;
                     newReturnRequest.ResponderId = admin.Id;
+                    newReturnRequest.UpdatedAt = DateTime.Now;
+
                     assignment.IsDeleted = true;
                     assignment.DeletedAt = DateTime.Now;
-                    assignment.Asset.State = TypeAssetState.Available;
                     assignment.ActiveReturnRequestId = newReturnRequest.Id;
+                    assignment.UpdatedAt = DateTime.Now;
+
+                    assignment.Asset.State = TypeAssetState.Available;
+                    assignment.Asset.UpdatedAt = DateTime.Now;
+
                 }
                 else if (randomState == TypeRequestState.Rejected)
                 {
                     newReturnRequest.ReturnedDate = DateTime.Now;
                     newReturnRequest.ResponderId = admin.Id;
-                    assignment.ActiveReturnRequestId = null;
+                    newReturnRequest.UpdatedAt = DateTime.Now;
 
+                    assignment.ActiveReturnRequestId = null;
+                    assignment.UpdatedAt = DateTime.Now;
                 }
 
                 assignments.Add(assignment);

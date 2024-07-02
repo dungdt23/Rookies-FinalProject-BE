@@ -7,7 +7,7 @@ namespace AssetManagement.Application.Dtos.ReturnRequest
     {
         public int Page { get; set; } = 1;
         public int PerPage { get; set; } = 15;
-        public ReturnRequestSortField SortField { get; set; } = ReturnRequestSortField.CreatedAt;
+        public ReturnRequestSortField SortField { get; set; } = ReturnRequestSortField.RequestedDate;
         public TypeOrder SortOrder { get; set; } = TypeOrder.Ascending;
         public TypeRequestState? RequestState { get; set; }
         public DateOnly? ReturnedDate { get; set; }
@@ -17,7 +17,7 @@ namespace AssetManagement.Application.Dtos.ReturnRequest
 
     public enum ReturnRequestSortField
     {
-        CreatedAt = 1,
+        RequestedDate = 1,
         AssetCode,
         AssetName,
         RequestBy,
