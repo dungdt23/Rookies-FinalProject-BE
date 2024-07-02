@@ -16,4 +16,5 @@ public interface IUserService
     Task<PagedResponse<ResponseUserDto>> GetAllAsync(Guid locationId, UserFilter filter, int? index, int? size);
     Task<ApiResponse> DisableUser(Guid id);
     Task<ApiResponse> GetById(Guid id);
+    Task<ApiResponse> ChangePasswordAsync(string? oldPassword, string newPassword, Guid userId, bool isFirstTime);
 }
