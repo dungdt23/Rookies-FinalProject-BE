@@ -23,7 +23,7 @@ namespace AssetManagement.UnitTests.Controllers
             _controller = new ReturnRequestsController(_mockReturnRequestService.Object);
             _controller.ControllerContext = new ControllerContext();
             _controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            _controller.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
+            _controller.ControllerContext.HttpContext.Request.Headers["Authorization"] = _authorizeHeaderMock;
         }
 
         [Fact]
