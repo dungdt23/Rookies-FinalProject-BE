@@ -154,7 +154,10 @@ namespace AssetManagement.Api
 
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseMiddleware<ValidateUserMiddleware>();
+            app.UseWhen(context => !context.Request.Path.StartsWithSegments("/users/change-password-first-time"), appBuilder =>
+            {
+                appBuilder.UseMiddleware<ValidateUserMiddleware>();
+            });
 
             app.MapControllers();
 
