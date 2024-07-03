@@ -11,6 +11,7 @@ using Diacritics.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -251,7 +252,7 @@ public class UserService : IUserService
 
 
 		//var IsPasswordChanged = !string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
-		var isPasswordChanged = user.IsPasswordChanged;
+		var isPasswordChangedFirstTime = user.IsPasswordChanged;
 
 
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -265,8 +266,8 @@ public class UserService : IUserService
                 new Claim(ClaimNameConstants.Role, user.Type.TypeName),
                 new Claim(ClaimNameConstants.LocationId, user.LocationId.ToString()),
                 new Claim(ClaimNameConstants.Location, user.Location.LocationName),
-                new Claim(ClaimNameConstants.IsPasswordChangedFirstTime, IsPasswordChanged ? "1" : "0"),
-                new Claim(ClaimNameConstants.BlackListTimeStamp, DateTime.Now.ToString())
+                new Claim(ClaimNameConstants.IsPasswordChangedFirstTime, isPasswordChangedFirstTime ? "1" : "0"),
+                new Claim(ClaimNameConstants.BlackListTimeStamp, DateTime.Now.ToString("yyyy-MM-ddTHH\\:mm\\:ss.fffffffzzz", CultureInfo.InvariantCulture))
               }),
             Expires = DateTime.Now.AddDays(7),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
@@ -337,6 +338,7 @@ public class UserService : IUserService
 
 		user = EncryptPassword(user, newPassword);
 		user.TokenInvalidationTimestamp = DateTime.Now;
+        user.IsPasswordChanged = true;
 
         if (await _userRepository.UpdateAsync(user) > 0)
         {

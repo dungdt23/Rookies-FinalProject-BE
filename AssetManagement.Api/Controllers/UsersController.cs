@@ -94,6 +94,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost("Login")]
+    [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] RequestLoginDto login)
     {
         var key = Encoding.ASCII.GetBytes(_applicationSettings.Secret);

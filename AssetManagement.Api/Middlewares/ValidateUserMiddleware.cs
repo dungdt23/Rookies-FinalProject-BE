@@ -1,6 +1,7 @@
 ﻿using AssetManagement.Application.Exceptions.Common;
 using AssetManagement.Application.Exceptions.Token;
 using AssetManagement.Application.IServices;
+using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace AssetManagement.Api.Middlewares
@@ -16,7 +17,14 @@ namespace AssetManagement.Api.Middlewares
 
         public async Task InvokeAsync(HttpContext context, IJwtInvalidationService jwtInvalidationService)
         {
-            if (context.Request.Headers.ContainsKey("Authorization"))
+			var endpoint = context.GetEndpoint();
+			if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
+			{
+				await _next(context);
+				return;
+			}
+
+			if (context.Request.Headers.ContainsKey("Authorization"))
             {
                 var authorizationHeader = context.Request.Headers["Authorization"].FirstOrDefault();
                 if (authorizationHeader == null)

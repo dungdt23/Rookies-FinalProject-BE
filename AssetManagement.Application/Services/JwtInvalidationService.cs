@@ -60,7 +60,7 @@ namespace AssetManagement.Application.Services
 
             var globalInvalidationTimestamp = await GetGlobalInvalidationTimestampAsync();
             var userInvalidationTimestamp = user.TokenInvalidationTimestamp;
-            if (tokenIssuedAt <= globalInvalidationTimestamp || tokenIssuedAt <= userInvalidationTimestamp)
+            if (tokenIssuedAt < globalInvalidationTimestamp || tokenIssuedAt < userInvalidationTimestamp)
                 throw new TokenInvalidException("The token is invalid due to a global or user-specific invalidation timestamp.");
         }
     }
