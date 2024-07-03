@@ -18,7 +18,11 @@ namespace AssetManagement.Infrastructure.Repositories
         {
             IQueryable<Asset> query = _context.Assets
                                     .Include(x => x.Location)
-                                    .Include(x => x.Category);
+                                    .Include(x => x.Category)
+                                    .Include(x => x.Assignments.OrderBy(a => a.CreatedAt).Take(3).Where(a => !a.IsDeleted))
+                                    .ThenInclude(x => x.Assignee)
+                                    .Include(x => x.Assignments.OrderBy(a => a.CreatedAt).Take(3).Where(a => !a.IsDeleted))
+                                    .ThenInclude(x => x.Assigner);
             if (string.IsNullOrEmpty(filter.search) && !filter.state.HasValue && !filter.category.HasValue)
             {
                 query = query.Where(x =>

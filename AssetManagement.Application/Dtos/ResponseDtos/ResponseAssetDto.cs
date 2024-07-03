@@ -12,5 +12,6 @@ namespace AssetManagement.Application.Dtos.ResponseDtos
         public string Specification { get; set; }
         public DateTime InstalledDate { get; set; }
         public TypeAssetState State { get; set; }
+        public ICollection<ResponseAssignmentDto> Assignments { get; set; }
     }
 }

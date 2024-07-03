@@ -402,6 +402,7 @@ public static class ApplicationExtension
                     CreatedAt = past,
                 };
 
+                assignment.ActiveReturnRequestId = newReturnRequest.Id;
 
                 // Depending on the state, set appropriate properties
                 if (randomState == TypeRequestState.Completed)
@@ -412,7 +413,6 @@ public static class ApplicationExtension
 
                     assignment.IsDeleted = true;
                     assignment.DeletedAt = DateTime.Now;
-                    assignment.ActiveReturnRequestId = newReturnRequest.Id;
                     assignment.UpdatedAt = DateTime.Now;
 
                     assignment.Asset.State = TypeAssetState.Available;
