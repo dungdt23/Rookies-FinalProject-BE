@@ -250,7 +250,8 @@ public class UserService : IUserService
 		}
 
 
-		var IsPasswordChanged = !string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
+		//var IsPasswordChanged = !string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
+		var isPasswordChanged = user.IsPasswordChanged;
 
 
 		var tokenHandler = new JwtSecurityTokenHandler();
@@ -279,7 +280,7 @@ public class UserService : IUserService
 			{
 				TokenType = "Bearer",
 				Token = encrypterToken,
-				IsPasswordChanged = IsPasswordChanged
+				IsPasswordChanged = isPasswordChanged,
 			}
 		};
 	}
@@ -333,8 +334,8 @@ public class UserService : IUserService
 			};
 		}
 
-
 		user = EncryptPassword(user, newPassword);
+		user.TokenInvalidationTimestamp = DateTime.Now;
 
 		if (await _userRepository.UpdateAsync(user) > 0)
 		{

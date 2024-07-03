@@ -45,6 +45,8 @@ namespace AssetManagement.Domain.Entities
 
         public DateTime TokenInvalidationTimestamp { get; set; } = DateTime.MinValue;
 
+        public bool IsPasswordChanged { get; set; } = false;
+
         public Location Location { get; set; }
         public Type Type { get; set; }
 
