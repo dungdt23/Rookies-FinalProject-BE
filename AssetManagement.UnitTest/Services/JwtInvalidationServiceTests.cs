@@ -1,5 +1,8 @@
-﻿using AssetManagement.Application.IRepositories;
+﻿using AssetManagement.Application.Exceptions.Common;
+using AssetManagement.Application.Exceptions.Token;
+using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.Services;
+using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using MockQueryable.Moq;
 using Moq;
@@ -53,89 +56,27 @@ namespace AssetManagement.UnitTest.Services
         }
 
         [Fact]
-        public async Task IsTokenValidAsync_ShouldReturnFalse_WhenUserIdClaimIsMissing()
-        {
-            // Arrange
-            var jwtToken = new JwtSecurityToken(claims: new[]
-            {
-                new Claim("BlTimestamp", DateTime.UtcNow.ToString())
-            });
-
-            // Act
-            var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);
-
-            // Assert
-            Assert.False(result);
-        }
-
-        [Fact]
-        public async Task IsTokenValidAsync_ShouldReturnFalse_WhenUserNotFound()
+        public async Task ValidateJwtTokenAsync_ShouldThrowNotFoundException_WhenUserNotFound()
         {
             // Arrange
             var userId = Guid.NewGuid();
             var jwtToken = new JwtSecurityToken(claims: new[]
             {
-                new Claim("id", userId.ToString()),
-                new Claim("BlTimestamp", DateTime.UtcNow.ToString())
+                new Claim(ClaimNameConstants.UserId, userId.ToString()),
+                new Claim(ClaimNameConstants.BlackListTimeStamp, DateTime.UtcNow.ToString())
             });
 
             _mockUserRepository.Setup(x => x.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
                 .Returns(Enumerable.Empty<User>().AsQueryable().BuildMock());
 
-            // Act
-            var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);
+            var service = new JwtInvalidationService(_mockGlobalSettingsRepository.Object, _mockUserRepository.Object);
 
-            // Assert
-            Assert.False(result);
+            // Act & Assert
+            await Assert.ThrowsAsync<NotFoundException>(() => service.ValidateJwtTokenAsync(jwtToken));
         }
 
         [Fact]
-        public async Task IsTokenValidAsync_ShouldReturnFalse_WhenBlTimestampClaimIsMissing()
-        {
-            // Arrange
-            var userId = Guid.NewGuid();
-            var user = new User { Id = userId };
-            var mock = new[] { user }.AsQueryable().BuildMock();
-
-            _mockUserRepository.Setup(x => x.GetByCondition(It.IsAny<Expression<Func<User, bool>>>())).Returns(mock);
-
-            var jwtToken = new JwtSecurityToken(claims: new[]
-            {
-                new Claim("id", userId.ToString())
-            });
-
-            // Act
-            var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);
-
-            // Assert
-            Assert.False(result);
-        }
-
-        [Fact]
-        public async Task IsTokenValidAsync_ShouldReturnFalse_WhenTokenIssuedAtIsInvalid()
-        {
-            // Arrange
-            var userId = Guid.NewGuid();
-            var user = new User { Id = userId };
-            var mock = new[] { user }.AsQueryable().BuildMock();
-
-            _mockUserRepository.Setup(x => x.GetByCondition(It.IsAny<Expression<Func<User, bool>>>())).Returns(mock);
-
-            var jwtToken = new JwtSecurityToken(claims: new[]
-            {
-                new Claim("id", userId.ToString()),
-                new Claim("BlTimestamp", "invalid_date")
-            });
-
-            // Act
-            var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);
-
-            // Assert
-            Assert.False(result);
-        }
-
-        [Fact]
-        public async Task IsTokenValidAsync_ShouldReturnFalse_WhenTokenIsOlderThanGlobalInvalidationTimestamp()
+        public async Task ValidateJwtTokenAsync_ShouldThrowTokenInvalidException_WhenTokenIsOlderThanGlobalInvalidationTimestamp()
         {
             // Arrange
             var userId = Guid.NewGuid();
@@ -149,19 +90,18 @@ namespace AssetManagement.UnitTest.Services
 
             var jwtToken = new JwtSecurityToken(claims: new[]
             {
-                new Claim("id", userId.ToString()),
-                new Claim("BlTimestamp", tokenIssuedAt.ToString())
+                new Claim(ClaimNameConstants.UserId, userId.ToString()),
+                new Claim(ClaimNameConstants.BlackListTimeStamp, tokenIssuedAt.ToString())
             });
 
-            // Act
-            var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);
+            var service = new JwtInvalidationService(_mockGlobalSettingsRepository.Object, _mockUserRepository.Object);
 
-            // Assert
-            Assert.False(result);
+            // Act & Assert
+            await Assert.ThrowsAsync<TokenInvalidException>(() => service.ValidateJwtTokenAsync(jwtToken));
         }
 
         [Fact]
-        public async Task IsTokenValidAsync_ShouldReturnFalse_WhenTokenIsOlderThanUserInvalidationTimestamp()
+        public async Task ValidateJwtTokenAsync_ShouldThrowTokenInvalidException_WhenTokenIsOlderThanUserInvalidationTimestamp()
         {
             // Arrange
             var userId = Guid.NewGuid();
@@ -175,19 +115,18 @@ namespace AssetManagement.UnitTest.Services
 
             var jwtToken = new JwtSecurityToken(claims: new[]
             {
-                new Claim("id", userId.ToString()),
-                new Claim("BlTimestamp", tokenIssuedAt.ToString())
+                new Claim(ClaimNameConstants.UserId, userId.ToString()),
+                new Claim(ClaimNameConstants.BlackListTimeStamp, tokenIssuedAt.ToString())
             });
 
-            // Act
-            var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);
+            var service = new JwtInvalidationService(_mockGlobalSettingsRepository.Object, _mockUserRepository.Object);
 
-            // Assert
-            Assert.False(result);
+            // Act & Assert
+            await Assert.ThrowsAsync<TokenInvalidException>(() => service.ValidateJwtTokenAsync(jwtToken));
         }
 
         [Fact]
-        public async Task IsTokenValidAsync_ShouldReturnTrue_WhenTokenIsValid()
+        public async Task ValidateJwtTokenAsync_ShouldThrowPasswordNotChangedFirstTimeException_WhenTokenIsOlderThanUserInvalidationTimestamp()
         {
             // Arrange
             var userId = Guid.NewGuid();
@@ -202,15 +141,44 @@ namespace AssetManagement.UnitTest.Services
 
             var jwtToken = new JwtSecurityToken(claims: new[]
             {
-                new Claim("id", userId.ToString()),
-                new Claim("BlTimestamp", tokenIssuedAt.ToString())
+                new Claim(ClaimNameConstants.UserId, userId.ToString()),
+                new Claim(ClaimNameConstants.BlackListTimeStamp, tokenIssuedAt.ToString()),
+                new Claim(ClaimNameConstants.IsPasswordChangedFirstTime, "0")
+            });
+
+            var service = new JwtInvalidationService(_mockGlobalSettingsRepository.Object, _mockUserRepository.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<PasswordNotChangedFirstTimeException>(() => service.ValidateJwtTokenAsync(jwtToken));
+        }
+
+        [Fact]
+        public async Task ValidateJwtTokenAsync_ShouldRunOnce_WhenTokenIsValid()
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
+            var globalTimestamp = DateTime.UtcNow.AddHours(-3);
+            var userTimestamp = DateTime.UtcNow.AddHours(-2);
+            var tokenIssuedAt = DateTime.UtcNow;
+            var user = new User { Id = userId, TokenInvalidationTimestamp = userTimestamp };
+            var mock = new[] { user }.AsQueryable().BuildMock();
+
+            _mockGlobalSettingsRepository.Setup(x => x.GetGlobalSettingAsync()).ReturnsAsync(new GlobalSetting { GlobalInvalidationTimestamp = globalTimestamp });
+            _mockUserRepository.Setup(x => x.GetByCondition(It.IsAny<Expression<Func<User, bool>>>())).Returns(mock);
+
+            var jwtToken = new JwtSecurityToken(claims: new[]
+            {
+                new Claim(ClaimNameConstants.UserId, userId.ToString()),
+                new Claim(ClaimNameConstants.BlackListTimeStamp, tokenIssuedAt.ToString()),
+                new Claim(ClaimNameConstants.IsPasswordChangedFirstTime, "1")
             });
 
             // Act
-            var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);
+            await _jwtInvalidationService.ValidateJwtTokenAsync(jwtToken);
 
             // Assert
-            Assert.True(result);
+            _mockGlobalSettingsRepository.Verify(x => x.GetGlobalSettingAsync(), Times.Once);
+            _mockUserRepository.Verify(x => x.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()), Times.Once);
         }
     }
 }

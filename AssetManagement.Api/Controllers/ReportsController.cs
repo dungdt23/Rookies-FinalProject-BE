@@ -25,7 +25,7 @@ namespace AssetManagement.Api.Controllers
             XLWorkbook wb = await _reportService.ExportAssetManagementFile(locationId);
             MemoryStream ms = new MemoryStream();
             wb.SaveAs(ms);
-            string formattedDate = DateTime.Now.ToString("dd/MM/yyyy");
+            string formattedDate = DateTime.Now.ToString("ddMMyyyy");
             string fileName = "AssetManagement_Report_" + formattedDate + ".xlsx";
             return File(ms.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }

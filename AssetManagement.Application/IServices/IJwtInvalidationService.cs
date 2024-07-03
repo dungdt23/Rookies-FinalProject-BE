@@ -6,6 +6,6 @@ namespace AssetManagement.Application.IServices
     {
         Task UpdateGlobalInvalidationTimeStampAsync(DateTime timestamp);
         Task<DateTime> GetGlobalInvalidationTimestampAsync();
-        Task<bool> IsTokenValidAsync(JwtSecurityToken jwtToken);
+        Task ValidateJwtTokenAsync(JwtSecurityToken jwtToken);
     }
 }

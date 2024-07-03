@@ -1,5 +1,8 @@
-﻿using AssetManagement.Application.IRepositories;
+﻿using AssetManagement.Application.Exceptions.Common;
+using AssetManagement.Application.Exceptions.Token;
+using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.IServices;
+using AssetManagement.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -27,29 +30,38 @@ namespace AssetManagement.Application.Services
             return globalSetting?.GlobalInvalidationTimestamp ?? DateTime.MinValue;
         }
 
-        public async Task<bool> IsTokenValidAsync(JwtSecurityToken jwtToken)
+        public async Task ValidateJwtTokenAsync(JwtSecurityToken jwtToken)
         {
-            var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+            var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimNameConstants.UserId)?.Value;
 
-            Guid userId;
-            if (!Guid.TryParse(userIdClaim, out userId))
-                return false;
+            // Check if user exists
+            Guid userId = Guid.Parse(userIdClaim!);
 
             var user = await _userRepository.GetByCondition(u => u.Id == userId).FirstOrDefaultAsync();
             if (user == null)
-                return false;
+                throw new NotFoundException("Wrong token format");
 
-            var blTimestampClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "BlTimestamp")?.Value;
-            DateTime tokenIssuedAt;
-            if (!DateTime.TryParse(blTimestampClaim, out tokenIssuedAt))
-                return false;
+
+            // Check the timestamp on token
+            var blTimestampClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimNameConstants.BlackListTimeStamp)?.Value;
+            if (blTimestampClaim == null)
+                throw new NotFoundException("Wrong token format");
+
+            DateTime tokenIssuedAt = DateTime.Parse(blTimestampClaim);
 
             var globalInvalidationTimestamp = await GetGlobalInvalidationTimestampAsync();
             var userInvalidationTimestamp = user.TokenInvalidationTimestamp;
             if (tokenIssuedAt <= globalInvalidationTimestamp || tokenIssuedAt <= userInvalidationTimestamp)
-                return false;
+                throw new TokenInvalidException("The token is invalid due to a global or user-specific invalidation timestamp.");
 
-            return true;
+
+            // Check if user has changed their password for the first time
+            var isPasswordChangedFirstTime = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimNameConstants.IsPasswordChangedFirstTime)?.Value;
+            if (isPasswordChangedFirstTime == null)
+                throw new NotFoundException("Wrong token format");
+
+            if (isPasswordChangedFirstTime == "0")
+                throw new PasswordNotChangedFirstTimeException("You need to change your password first before having access to the api.");
         }
     }
 }
