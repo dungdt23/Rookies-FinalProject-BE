@@ -61,7 +61,7 @@ namespace AssetManagement.Application.Services
                 throw new NotFoundException("Wrong token format");
 
             if (isPasswordChangedFirstTime == "0")
-                throw new PasswordNotChangedException("You need to change your password first before having access to the api.");
+                throw new PasswordNotChangedFirstTimeException("You need to change your password first before having access to the api.");
         }
     }
 }

@@ -17,14 +17,14 @@ namespace AssetManagement.Api.Middlewares
 
         public async Task InvokeAsync(HttpContext context, IJwtInvalidationService jwtInvalidationService)
         {
-			var endpoint = context.GetEndpoint();
-			if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
-			{
-				await _next(context);
-				return;
-			}
+            var endpoint = context.GetEndpoint();
+            if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
+            {
+                await _next(context);
+                return;
+            }
 
-			if (context.Request.Headers.ContainsKey("Authorization"))
+            if (context.Request.Headers.ContainsKey("Authorization"))
             {
                 var authorizationHeader = context.Request.Headers["Authorization"].FirstOrDefault();
                 if (authorizationHeader == null)
@@ -56,7 +56,7 @@ namespace AssetManagement.Api.Middlewares
                     await context.Response.WriteAsync(ex.Message);
                     return;
                 }
-                catch (PasswordNotChangedException ex)
+                catch (PasswordNotChangedFirstTimeException ex)
                 {
                     context.Response.ContentType = "text/plain";
                     context.Response.StatusCode = StatusCodes.Status403Forbidden;
