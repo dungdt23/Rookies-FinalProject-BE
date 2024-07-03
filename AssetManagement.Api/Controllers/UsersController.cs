@@ -144,7 +144,7 @@ public class UsersController : ControllerBase
 
 	[HttpPut("change-password-first-time")]
 	[Authorize]
-	public async Task<IActionResult> ChangePasswordFirstTime([FromBody] string newPassword)
+	public async Task<IActionResult> ChangePasswordFirstTime([FromBody]RequestChangePasswordFirstTimeDto request)
 	{
 		var userIdClaim = HttpContext.GetClaim("id");
 		Guid userIdGuid;
@@ -152,7 +152,7 @@ public class UsersController : ControllerBase
 		{
 			return Unauthorized();
 		}
-		var result = await _userService.ChangePasswordAsync(null, newPassword, userIdGuid, true);
+		var result = await _userService.ChangePasswordAsync(null, request.Password, userIdGuid, true);
 		if (result.StatusCode == StatusCodes.Status400BadRequest)
 		{
 			return BadRequest(result);
