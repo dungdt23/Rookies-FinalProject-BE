@@ -42,15 +42,6 @@ namespace AssetManagement.Application.Services
                 throw new NotFoundException("Wrong token format");
 
 
-            // Check if user has changed their password for the first time
-            var isPasswordChangedFirstTime = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimNameConstants.IsPasswordChangedFirstTime)?.Value;
-            if (isPasswordChangedFirstTime == null)
-                throw new NotFoundException("Wrong token format");
-
-            if (isPasswordChangedFirstTime == "0")
-                throw new PasswordNotChangedException("You need to change your password first before having access to the api.");
-
-
             // Check the timestamp on token
             var blTimestampClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimNameConstants.BlackListTimeStamp)?.Value;
             if (blTimestampClaim == null)
@@ -60,8 +51,17 @@ namespace AssetManagement.Application.Services
 
             var globalInvalidationTimestamp = await GetGlobalInvalidationTimestampAsync();
             var userInvalidationTimestamp = user.TokenInvalidationTimestamp;
-            if (tokenIssuedAt < globalInvalidationTimestamp || tokenIssuedAt < userInvalidationTimestamp)
+            if (tokenIssuedAt <= globalInvalidationTimestamp || tokenIssuedAt <= userInvalidationTimestamp)
                 throw new TokenInvalidException("The token is invalid due to a global or user-specific invalidation timestamp.");
+
+
+            // Check if user has changed their password for the first time
+            var isPasswordChangedFirstTime = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimNameConstants.IsPasswordChangedFirstTime)?.Value;
+            if (isPasswordChangedFirstTime == null)
+                throw new NotFoundException("Wrong token format");
+
+            if (isPasswordChangedFirstTime == "0")
+                throw new PasswordNotChangedException("You need to change your password first before having access to the api.");
         }
     }
 }
