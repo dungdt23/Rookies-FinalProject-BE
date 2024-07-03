@@ -62,7 +62,7 @@ namespace AssetManagement.UnitTest.Services
             });
 
             // Act
-            var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);
+            var result = await _jwtInvalidationService.ValidateJwtTokenAsync(jwtToken);
 
             // Assert
             Assert.False(result);
@@ -83,7 +83,7 @@ namespace AssetManagement.UnitTest.Services
                 .Returns(Enumerable.Empty<User>().AsQueryable().BuildMock());
 
             // Act
-            var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);
+            var result = await _jwtInvalidationService.ValidateJwtTokenAsync(jwtToken);
 
             // Assert
             Assert.False(result);
@@ -105,7 +105,7 @@ namespace AssetManagement.UnitTest.Services
             });
 
             // Act
-            var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);
+            var result = await _jwtInvalidationService.ValidateJwtTokenAsync(jwtToken);
 
             // Assert
             Assert.False(result);
@@ -128,7 +128,7 @@ namespace AssetManagement.UnitTest.Services
             });
 
             // Act
-            var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);
+            var result = await _jwtInvalidationService.ValidateJwtTokenAsync(jwtToken);
 
             // Assert
             Assert.False(result);
@@ -154,7 +154,7 @@ namespace AssetManagement.UnitTest.Services
             });
 
             // Act
-            var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);
+            var result = await _jwtInvalidationService.ValidateJwtTokenAsync(jwtToken);
 
             // Assert
             Assert.False(result);
@@ -180,7 +180,7 @@ namespace AssetManagement.UnitTest.Services
             });
 
             // Act
-            var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);
+            var result = await _jwtInvalidationService.ValidateJwtTokenAsync(jwtToken);
 
             // Assert
             Assert.False(result);
@@ -207,7 +207,7 @@ namespace AssetManagement.UnitTest.Services
             });
 
             // Act
-            var result = await _jwtInvalidationService.IsTokenValidAsync(jwtToken);
+            var result = await _jwtInvalidationService.ValidateJwtTokenAsync(jwtToken);
 
             // Assert
             Assert.True(result);

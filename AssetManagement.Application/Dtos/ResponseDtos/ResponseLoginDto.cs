@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AssetManagement.Application.Dtos.ResponseDtos
+﻿namespace AssetManagement.Application.Dtos.ResponseDtos
 {
-	public class ResponseLoginDto
-	{
-		public string TokenType { get; set; } = "Bearer";
-		public string Token { get; set; }
-		public bool IsPasswordChanged {  get; set; }
-	}
+    public class ResponseLoginDto
+    {
+        public string TokenType { get; set; } = "Bearer";
+        public string Token { get; set; }
+    }
 }
