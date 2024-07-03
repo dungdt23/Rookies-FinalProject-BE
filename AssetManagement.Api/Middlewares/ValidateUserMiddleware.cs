@@ -1,4 +1,6 @@
-﻿using AssetManagement.Application.IServices;
+﻿using AssetManagement.Application.Exceptions.Common;
+using AssetManagement.Application.Exceptions.Token;
+using AssetManagement.Application.IServices;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace AssetManagement.Api.Middlewares
@@ -19,16 +21,38 @@ namespace AssetManagement.Api.Middlewares
                 var authorizationHeader = context.Request.Headers["Authorization"].FirstOrDefault();
                 if (authorizationHeader == null)
                 {
+                    context.Response.ContentType = "text/plain";
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await context.Response.WriteAsync("Authorization header is missing.");
                     return;
                 }
                 var token = authorizationHeader.Substring("Bearer ".Length).Trim();
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
-
-                if (!await jwtInvalidationService.IsTokenValidAsync(jwtToken))
+                try
                 {
+                    // There always should be a valid token because other middlewares check for it
+                    await jwtInvalidationService.ValidateJwtTokenAsync(jwtToken!);
+                }
+                catch (NotFoundException ex)
+                {
+                    context.Response.ContentType = "text/plain";
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await context.Response.WriteAsync(ex.Message);
+                    return;
+                }
+                catch (TokenInvalidException ex)
+                {
+                    context.Response.ContentType = "text/plain";
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await context.Response.WriteAsync(ex.Message);
+                    return;
+                }
+                catch (PasswordNotChangedException ex)
+                {
+                    context.Response.ContentType = "text/plain";
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    await context.Response.WriteAsync(ex.Message);
                     return;
                 }
             }
