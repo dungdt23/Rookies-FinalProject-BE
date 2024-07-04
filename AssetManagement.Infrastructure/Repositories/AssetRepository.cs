@@ -1,5 +1,6 @@
 ﻿using AssetManagement.Application.Filters;
 using AssetManagement.Application.IRepositories;
+using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Migrations;
@@ -19,9 +20,9 @@ namespace AssetManagement.Infrastructure.Repositories
             IQueryable<Asset> query = _context.Assets
                                     .Include(x => x.Location)
                                     .Include(x => x.Category)
-                                    .Include(x => x.Assignments.OrderBy(a => a.CreatedAt).Take(3))
+                                    .Include(x => x.Assignments.Take(HistoryAssignmentConstant.DefaultDisplay))
                                     .ThenInclude(x => x.Assignee)
-                                    .Include(x => x.Assignments.OrderBy(a => a.CreatedAt).Take(3))
+                                    .Include(x => x.Assignments.Take(HistoryAssignmentConstant.DefaultDisplay))
                                     .ThenInclude(x => x.Assigner);
             if (string.IsNullOrEmpty(filter.search) && !filter.state.HasValue && !filter.category.HasValue)
             {
