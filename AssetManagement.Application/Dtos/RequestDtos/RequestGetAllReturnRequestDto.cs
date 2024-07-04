@@ -1,9 +1,9 @@
 ﻿using AssetManagement.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace AssetManagement.Application.Dtos.ReturnRequest
+namespace AssetManagement.Application.Dtos.RequestDtos
 {
-    public class GetAllReturnRequest
+    public class RequestGetAllReturnRequestDto
     {
         public int Page { get; set; } = 1;
         public int PerPage { get; set; } = 15;

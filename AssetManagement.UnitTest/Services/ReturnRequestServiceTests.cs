@@ -35,8 +35,8 @@ namespace AssetManagement.UnitTest.Services
 
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<ReturnRequest, ReturnRequestViewModel>();
-                cfg.CreateMap<ReturnRequest, ReturnRequestGetAllViewModel>()
+                cfg.CreateMap<ReturnRequest, ResponseReturnRequestDto>();
+                cfg.CreateMap<ReturnRequest, ResponseReturnRequestGetAllDto>()
                     .ForMember(dest => dest.AssetId, opt => opt.MapFrom(src => src.Assignment.Asset.Id))
                     .ForMember(dest => dest.AssetCode, opt => opt.MapFrom(src => src.Assignment.Asset.AssetCode))
                     .ForMember(dest => dest.AssetName, opt => opt.MapFrom(src => src.Assignment.Asset.AssetName))
@@ -61,7 +61,7 @@ namespace AssetManagement.UnitTest.Services
             var requestorId = Guid.NewGuid();
             var requestor = new User { Id = requestorId, LocationId = Guid.NewGuid() };
             var returnRequests = new List<ReturnRequest> { new ReturnRequest() };
-            var returnRequestViewModels = _mapper.Map<List<ReturnRequestGetAllViewModel>>(returnRequests);
+            var returnRequestViewModels = _mapper.Map<List<ResponseReturnRequestGetAllDto>>(returnRequests);
             var totalCount = 1;
 
             _mockUserRepository.Setup(x => x.GetByCondition(u => u.Id == requestorId))
@@ -78,7 +78,7 @@ namespace AssetManagement.UnitTest.Services
                 It.IsAny<Guid>()))
                 .ReturnsAsync((returnRequests, totalCount));
 
-            var request = new GetAllReturnRequest();
+            var request = new RequestGetAllReturnRequestDto();
 
             // Act
             var result = await _service.GetAllReturnRequestAsync(request, requestorId);
@@ -102,7 +102,7 @@ namespace AssetManagement.UnitTest.Services
         public async Task CreateReturnRequestAsync_ShouldThrowNotFoundException_WhenAssignmentNotFound()
         {
             // Arrange
-            var request = new CreateReturnRequestRequest { AssignmentId = Guid.NewGuid() };
+            var request = new RequestCreateReturnRequestDto { AssignmentId = Guid.NewGuid() };
             var userId = Guid.NewGuid();
 
             _mockAssignmentRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<Assignment, bool>>>()))
@@ -116,7 +116,7 @@ namespace AssetManagement.UnitTest.Services
         public async Task CreateReturnRequestAsync_ShouldThrowWrongLocationException_WhenLocationMismatched()
         {
             // Arrange
-            var request = new CreateReturnRequestRequest { AssignmentId = Guid.NewGuid() };
+            var request = new RequestCreateReturnRequestDto { AssignmentId = Guid.NewGuid() };
             var userId = Guid.NewGuid();
             var assignment = new Assignment
             {
@@ -141,7 +141,7 @@ namespace AssetManagement.UnitTest.Services
         public async Task CreateReturnRequestAsync_ShouldThrowUnauthorizedAssignmentAccessException_WhenStaffTriesToCreateForOtherAssignment()
         {
             // Arrange
-            var request = new CreateReturnRequestRequest { AssignmentId = Guid.NewGuid() };
+            var request = new RequestCreateReturnRequestDto { AssignmentId = Guid.NewGuid() };
             var userId = Guid.NewGuid();
             var assignment = new Assignment
             {
@@ -167,7 +167,7 @@ namespace AssetManagement.UnitTest.Services
         public async Task CreateReturnRequestAsync_ShouldThrowAssignmentNotAcceptedException_WhenAssignmentNotAccepted()
         {
             // Arrange
-            var request = new CreateReturnRequestRequest { AssignmentId = Guid.NewGuid() };
+            var request = new RequestCreateReturnRequestDto { AssignmentId = Guid.NewGuid() };
             var userId = Guid.NewGuid();
             var assignment = new Assignment
             {
@@ -194,7 +194,7 @@ namespace AssetManagement.UnitTest.Services
         public async Task CreateReturnRequestAsync_ShouldThrowActiveReturnRequestAlreadyExistsException_WhenActiveReturnRequestExists()
         {
             // Arrange
-            var request = new CreateReturnRequestRequest { AssignmentId = Guid.NewGuid() };
+            var request = new RequestCreateReturnRequestDto { AssignmentId = Guid.NewGuid() };
             var userId = Guid.NewGuid();
             var assignment = new Assignment
             {
@@ -222,7 +222,7 @@ namespace AssetManagement.UnitTest.Services
         public async Task CreateReturnRequestAsync_ShouldCreateReturnRequestSuccessfully()
         {
             // Arrange
-            var request = new CreateReturnRequestRequest { AssignmentId = Guid.NewGuid() };
+            var request = new RequestCreateReturnRequestDto { AssignmentId = Guid.NewGuid() };
             var userId = Guid.NewGuid();
             var assignment = new Assignment
             {

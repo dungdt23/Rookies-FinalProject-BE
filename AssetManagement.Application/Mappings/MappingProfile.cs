@@ -1,6 +1,5 @@
 ﻿using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
-using AssetManagement.Application.Dtos.ReturnRequest;
 using AssetManagement.Domain.Entities;
 using AutoMapper;
 
@@ -50,14 +49,14 @@ namespace AssetManagement.Application.Mappings
                 .ForMember(dest => dest.Specification, opt => opt.MapFrom(src => src.Asset.Specification));
 
             //Mapping Return Request
-            CreateMap<ReturnRequest, ReturnRequestGetAllViewModel>()
+            CreateMap<ReturnRequest, ResponseReturnRequestGetAllDto>()
                 .ForMember(dest => dest.AssetId, opt => opt.MapFrom(src => src.Assignment.Asset.Id))
                 .ForMember(dest => dest.AssetCode, opt => opt.MapFrom(src => src.Assignment.Asset.AssetCode))
                 .ForMember(dest => dest.AssetName, opt => opt.MapFrom(src => src.Assignment.Asset.AssetName))
                 .ForMember(dest => dest.RequestorUsername, opt => opt.MapFrom(src => src.Requestor.UserName))
                 .ForMember(dest => dest.ResponderUsername, opt => opt.MapFrom(src => src.Responder.UserName))
                 .ForMember(dest => dest.AssignmentAssignedDate, opt => opt.MapFrom(src => src.Assignment.AssignedDate));
-            CreateMap<ReturnRequest, ReturnRequestViewModel>();
+            CreateMap<ReturnRequest, ResponseReturnRequestDto>();
         }
     }
 }
