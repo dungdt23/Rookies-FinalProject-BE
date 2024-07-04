@@ -1,4 +1,5 @@
-﻿using AssetManagement.Application.Dtos.ReturnRequest;
+﻿using AssetManagement.Application.Dtos.RequestDtos;
+using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.Exceptions.Assignment;
 using AssetManagement.Application.Exceptions.Common;
 using AssetManagement.Application.Exceptions.ReturnRequest;
@@ -35,13 +36,14 @@ namespace AssetManagement.Application.Services
             _transactionRepository = transactionRepository;
         }
 
-        public async Task<(IEnumerable<ReturnRequestGetAllViewModel>, int totalCount)> GetAllReturnRequestAsync(
-            GetAllReturnRequest request,
-            Guid userId)
+        public async Task<(IEnumerable<ResponseReturnRequestGetAllDto>, int totalCount)> GetAllReturnRequestAsync(
+            RequestGetAllReturnRequestDto request,
+            Guid requestorId)
         {
-            var user = await _userRepository.GetByCondition(u => u.Id == userId)
+            var requestor = await _userRepository.GetByCondition(u => u.Id == requestorId)
                 .FirstOrDefaultAsync();
 
+            // User always exist because middleware already check its existence
             var (returnRequests, totalCount) = await _returnRequestRepository.GetAllAsync(
                 request.Page,
                 request.PerPage,
@@ -50,15 +52,15 @@ namespace AssetManagement.Application.Services
                 request.RequestState,
                 request.ReturnedDate,
                 request.Search,
-                user!.LocationId);
+                requestor!.LocationId);
 
-            var returnRequestViewModels = _mapper.Map<List<ReturnRequestGetAllViewModel>>(returnRequests);
+            var returnRequestViewModels = _mapper.Map<List<ResponseReturnRequestGetAllDto>>(returnRequests);
 
             return (returnRequestViewModels, totalCount);
         }
 
-        public async Task<ReturnRequestViewModel> CreateReturnRequestAsync(
-            CreateReturnRequestRequest request,
+        public async Task<ResponseReturnRequestDto> CreateReturnRequestAsync(
+            RequestCreateReturnRequestDto request,
             Guid userId)
         {
             var assignment = await _assignmentRepository.GetByCondition(a => a.Id == request.AssignmentId)
@@ -111,7 +113,7 @@ namespace AssetManagement.Application.Services
                 throw;
             }
 
-            return _mapper.Map<ReturnRequestViewModel>(newReturnRequest);
+            return _mapper.Map<ResponseReturnRequestDto>(newReturnRequest);
         }
 
         public async Task CompleteReturnRequestAsync(Guid returnRequestId, Guid requesterId)

@@ -1,9 +1,9 @@
 ﻿using AssetManagement.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace AssetManagement.Application.Dtos.ReturnRequest
+namespace AssetManagement.Application.Dtos.RequestDtos
 {
-    public class UpdateReturnRequestStateRequest
+    public class RequestUpdateReturnRequestStateDto
     {
         [Required]
         public TypeRequestState State { get; set; }
