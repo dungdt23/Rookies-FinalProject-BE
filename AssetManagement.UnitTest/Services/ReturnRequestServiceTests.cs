@@ -8,6 +8,7 @@ using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AutoMapper;
+using FluentAssertions;
 using MockQueryable.Moq;
 using Moq;
 using System.Linq.Expressions;
@@ -35,7 +36,13 @@ namespace AssetManagement.UnitTest.Services
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ReturnRequest, ReturnRequestViewModel>();
-                cfg.CreateMap<ReturnRequest, ReturnRequestGetAllViewModel>();
+                cfg.CreateMap<ReturnRequest, ReturnRequestGetAllViewModel>()
+                    .ForMember(dest => dest.AssetId, opt => opt.MapFrom(src => src.Assignment.Asset.Id))
+                    .ForMember(dest => dest.AssetCode, opt => opt.MapFrom(src => src.Assignment.Asset.AssetCode))
+                    .ForMember(dest => dest.AssetName, opt => opt.MapFrom(src => src.Assignment.Asset.AssetName))
+                    .ForMember(dest => dest.RequestorUsername, opt => opt.MapFrom(src => src.Requestor.UserName))
+                    .ForMember(dest => dest.ResponderUsername, opt => opt.MapFrom(src => src.Responder.UserName))
+                    .ForMember(dest => dest.AssignmentAssignedDate, opt => opt.MapFrom(src => src.Assignment.AssignedDate));
             });
             _mapper = config.CreateMapper();
 
@@ -45,6 +52,50 @@ namespace AssetManagement.UnitTest.Services
                 _mapper,
                 _mockUserRepository.Object,
                 _mockTransactionRepository.Object);
+        }
+
+        [Fact]
+        public async Task GetAllReturnRequestAsync_ShouldReturnReturnRequests_WhenRequestorExists()
+        {
+            // Arrange
+            var requestorId = Guid.NewGuid();
+            var requestor = new User { Id = requestorId, LocationId = Guid.NewGuid() };
+            var returnRequests = new List<ReturnRequest> { new ReturnRequest() };
+            var returnRequestViewModels = _mapper.Map<List<ReturnRequestGetAllViewModel>>(returnRequests);
+            var totalCount = 1;
+
+            _mockUserRepository.Setup(x => x.GetByCondition(u => u.Id == requestorId))
+                .Returns(new List<User> { requestor }.AsQueryable().BuildMock());
+
+            _mockReturnRequestRepository.Setup(x => x.GetAllAsync(
+                It.IsAny<int>(),
+                It.IsAny<int>(),
+                It.IsAny<ReturnRequestSortField>(),
+                It.IsAny<TypeOrder>(),
+                It.IsAny<TypeRequestState?>(),
+                It.IsAny<DateOnly?>(),
+                It.IsAny<string?>(),
+                It.IsAny<Guid>()))
+                .ReturnsAsync((returnRequests, totalCount));
+
+            var request = new GetAllReturnRequest();
+
+            // Act
+            var result = await _service.GetAllReturnRequestAsync(request, requestorId);
+
+            // Assert
+            _mockUserRepository.Verify(x => x.GetByCondition(u => u.Id == requestorId), Times.Once);
+            _mockReturnRequestRepository.Verify(x => x.GetAllAsync(
+                request.Page,
+                request.PerPage,
+                request.SortField,
+                request.SortOrder,
+                request.RequestState,
+                request.ReturnedDate,
+                request.Search,
+                requestor.LocationId), Times.Once);
+            returnRequestViewModels.Should().BeEquivalentTo(result.Item1);
+            Assert.Equal(totalCount, result.Item2);
         }
 
         [Fact]

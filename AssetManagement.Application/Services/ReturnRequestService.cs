@@ -37,11 +37,12 @@ namespace AssetManagement.Application.Services
 
         public async Task<(IEnumerable<ReturnRequestGetAllViewModel>, int totalCount)> GetAllReturnRequestAsync(
             GetAllReturnRequest request,
-            Guid userId)
+            Guid requestorId)
         {
-            var user = await _userRepository.GetByCondition(u => u.Id == userId)
+            var requestor = await _userRepository.GetByCondition(u => u.Id == requestorId)
                 .FirstOrDefaultAsync();
 
+            // User always exist because middleware already check its existence
             var (returnRequests, totalCount) = await _returnRequestRepository.GetAllAsync(
                 request.Page,
                 request.PerPage,
@@ -50,7 +51,7 @@ namespace AssetManagement.Application.Services
                 request.RequestState,
                 request.ReturnedDate,
                 request.Search,
-                user!.LocationId);
+                requestor!.LocationId);
 
             var returnRequestViewModels = _mapper.Map<List<ReturnRequestGetAllViewModel>>(returnRequests);
 
