@@ -1,14 +1,15 @@
-﻿using AssetManagement.Application.Dtos.ReturnRequest;
+﻿using AssetManagement.Application.Dtos.RequestDtos;
+using AssetManagement.Application.Dtos.ResponseDtos;
 
 namespace AssetManagement.Application.IServices
 {
     public interface IReturnRequestService
     {
-        Task<(IEnumerable<ReturnRequestGetAllViewModel>, int totalCount)> GetAllReturnRequestAsync(
-            GetAllReturnRequest request,
-            Guid userId);
-        Task<ReturnRequestViewModel> CreateReturnRequestAsync(
-            CreateReturnRequestRequest request,
+        Task<(IEnumerable<ResponseReturnRequestGetAllDto>, int totalCount)> GetAllReturnRequestAsync(
+            RequestGetAllReturnRequestDto request,
+            Guid requestorId);
+        Task<ResponseReturnRequestDto> CreateReturnRequestAsync(
+            RequestCreateReturnRequestDto request,
             Guid userId);
         Task CompleteReturnRequestAsync(
             Guid returnRequestId,

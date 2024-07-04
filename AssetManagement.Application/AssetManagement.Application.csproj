@@ -5,9 +5,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Dtos\ReturnRequest\ReturnRequestGetAllViewModel.cs~RF12707021.TMP" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="ClosedXML" Version="0.102.2" />
     <PackageReference Include="Diacritics" Version="3.3.29" />
