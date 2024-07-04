@@ -64,7 +64,6 @@ namespace AssetManagement.Application.Mappings
                 .ForMember(dest => dest.ResponderUsername, opt => opt.MapFrom(src => src.Responder.UserName))
                 .ForMember(dest => dest.AssignmentAssignedDate, opt => opt.MapFrom(src => src.Assignment.AssignedDate));
             CreateMap<ReturnRequest, ResponseReturnRequestDto>();
-            CreateMap<ReturnRequest, ReturnRequestViewModel>();
             CreateMap<ReturnRequest, ResponseHistoryReturnRequestDto>();
         }
     }
