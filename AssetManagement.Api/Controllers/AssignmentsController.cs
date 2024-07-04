@@ -133,5 +133,12 @@ namespace AssetManagement.Api.Controllers
             return Ok(result);
 
         }
+        [HttpGet("asset-historical/{assetId}")]
+        [Authorize(Roles = TypeNameConstants.TypeAdmin)]
+        public async Task<IActionResult> GetByAssetId(Guid assetId,int index = PaginationConstant.DefaultIndex, int size = PaginationConstant.DefaultSize)
+        {
+            var result = await _assignmentService.GetByAssetIdAsync(assetId, index, size);
+            return Ok(result);
+        }
     }
 }

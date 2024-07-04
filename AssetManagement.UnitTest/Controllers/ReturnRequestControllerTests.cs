@@ -1,7 +1,7 @@
 ﻿using AssetManagement.Api.Controllers;
 using AssetManagement.Application.Dtos.Common;
 using AssetManagement.Application.Dtos.ResponseDtos;
-using AssetManagement.Application.Dtos.ReturnRequest;
+using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.IServices;
 using AssetManagement.Domain.Enums;
 using Microsoft.AspNetCore.Http;
