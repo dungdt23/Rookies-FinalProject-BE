@@ -1,5 +1,5 @@
-﻿using AssetManagement.Application.Exceptions.Common;
-using AssetManagement.Application.Exceptions.Token;
+﻿using AssetManagement.Application.Exceptions.Token;
+using AssetManagement.Application.Exceptions.User;
 using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.Services;
 using AssetManagement.Domain.Constants;
@@ -56,7 +56,46 @@ namespace AssetManagement.UnitTest.Services
         }
 
         [Fact]
-        public async Task ValidateJwtTokenAsync_ShouldThrowNotFoundException_WhenUserNotFound()
+        public async Task ValidateJwtTokenAsync_ShouldThrowWrongTokenFormatException_WhenUserIdClaimNotExist()
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
+            var jwtToken = new JwtSecurityToken(claims: new[]
+            {
+                new Claim(ClaimNameConstants.BlackListTimeStamp, DateTime.UtcNow.ToString())
+            });
+
+            _mockUserRepository.Setup(x => x.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
+                .Returns(Enumerable.Empty<User>().AsQueryable().BuildMock());
+
+            var service = new JwtInvalidationService(_mockGlobalSettingsRepository.Object, _mockUserRepository.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<WrongTokenFormatException>(() => service.ValidateJwtTokenAsync(jwtToken));
+        }
+
+        [Fact]
+        public async Task ValidateJwtTokenAsync_ShouldThrowWrongTokenFormatException_WhenBLTimestampClaimNotExist()
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
+            var jwtToken = new JwtSecurityToken(claims: new[]
+            {
+                new Claim(ClaimNameConstants.UserId, userId.ToString()),
+            });
+            var user = new User { Id = userId, TokenInvalidationTimestamp = DateTime.UtcNow.AddHours(-1) };
+            var mock = new[] { user }.AsQueryable().BuildMock();
+
+            _mockUserRepository.Setup(x => x.GetByCondition(It.IsAny<Expression<Func<User, bool>>>())).Returns(mock);
+
+            var service = new JwtInvalidationService(_mockGlobalSettingsRepository.Object, _mockUserRepository.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<WrongTokenFormatException>(() => service.ValidateJwtTokenAsync(jwtToken));
+        }
+
+        [Fact]
+        public async Task ValidateJwtTokenAsync_ShouldThrowUserNotExistException_WhenUserNotFound()
         {
             // Arrange
             var userId = Guid.NewGuid();
@@ -72,7 +111,7 @@ namespace AssetManagement.UnitTest.Services
             var service = new JwtInvalidationService(_mockGlobalSettingsRepository.Object, _mockUserRepository.Object);
 
             // Act & Assert
-            await Assert.ThrowsAsync<NotFoundException>(() => service.ValidateJwtTokenAsync(jwtToken));
+            await Assert.ThrowsAsync<UserNotExistException>(() => service.ValidateJwtTokenAsync(jwtToken));
         }
 
         [Fact]
@@ -133,7 +172,7 @@ namespace AssetManagement.UnitTest.Services
             var globalTimestamp = DateTime.UtcNow.AddHours(-3);
             var userTimestamp = DateTime.UtcNow.AddHours(-2);
             var tokenIssuedAt = DateTime.UtcNow;
-            var user = new User { Id = userId, TokenInvalidationTimestamp = userTimestamp };
+            var user = new User { Id = userId, TokenInvalidationTimestamp = userTimestamp, IsPasswordChanged = false };
             var mock = new[] { user }.AsQueryable().BuildMock();
 
             _mockGlobalSettingsRepository.Setup(x => x.GetGlobalSettingAsync()).ReturnsAsync(new GlobalSetting { GlobalInvalidationTimestamp = globalTimestamp });
@@ -143,7 +182,6 @@ namespace AssetManagement.UnitTest.Services
             {
                 new Claim(ClaimNameConstants.UserId, userId.ToString()),
                 new Claim(ClaimNameConstants.BlackListTimeStamp, tokenIssuedAt.ToString()),
-                new Claim(ClaimNameConstants.IsPasswordChangedFirstTime, "0")
             });
 
             var service = new JwtInvalidationService(_mockGlobalSettingsRepository.Object, _mockUserRepository.Object);
@@ -160,7 +198,7 @@ namespace AssetManagement.UnitTest.Services
             var globalTimestamp = DateTime.UtcNow.AddHours(-3);
             var userTimestamp = DateTime.UtcNow.AddHours(-2);
             var tokenIssuedAt = DateTime.UtcNow;
-            var user = new User { Id = userId, TokenInvalidationTimestamp = userTimestamp };
+            var user = new User { Id = userId, TokenInvalidationTimestamp = userTimestamp, IsPasswordChanged = true };
             var mock = new[] { user }.AsQueryable().BuildMock();
 
             _mockGlobalSettingsRepository.Setup(x => x.GetGlobalSettingAsync()).ReturnsAsync(new GlobalSetting { GlobalInvalidationTimestamp = globalTimestamp });
@@ -170,7 +208,6 @@ namespace AssetManagement.UnitTest.Services
             {
                 new Claim(ClaimNameConstants.UserId, userId.ToString()),
                 new Claim(ClaimNameConstants.BlackListTimeStamp, tokenIssuedAt.ToString()),
-                new Claim(ClaimNameConstants.IsPasswordChangedFirstTime, "1")
             });
 
             // Act
