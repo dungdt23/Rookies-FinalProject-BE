@@ -1,4 +1,5 @@
 ﻿using AssetManagement.Application.Dtos.RequestDtos;
+using AssetManagement.Application.IServices;
 using AssetManagement.Application.IServices.IUserServices;
 using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
@@ -22,7 +23,10 @@ public static class ApplicationExtension
         using (var scope = app.ApplicationServices.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetService<AssetManagementDBContext>();
-            await dbContext.SeedReturnRequestsAsync();
+            await dbContext!.SeedReturnRequestsAsync();
+
+            var jwtInvalidationService = scope.ServiceProvider.GetService<IJwtInvalidationService>();
+            await jwtInvalidationService!.UpdateGlobalInvalidationTimeStampAsync(null);
         }
     }
 
