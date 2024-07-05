@@ -29,7 +29,7 @@ namespace AssetManagement.UnitTest.Services.Assets
             // Arrange
             var filter = new AssetFilter();
             var assets = new List<Asset> {
-                new Asset { AssetName = "Laptop Dell", AssetCode = "LA000001", CreatedAt = DateTime.Now, IsDeleted = false }
+                new Asset { AssetName = "Laptop Dell", AssetCode = "LA000001", CreatedAt = DateTime.UtcNow, IsDeleted = false }
             };
             Guid locationId = Guid.NewGuid();
             var assetDtos = new List<ResponseAssetDto> { new ResponseAssetDto { AssetName = "Laptop Dell", AssetCode = "LA000001" } };

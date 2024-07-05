@@ -45,16 +45,16 @@ public static class ApplicationExtension
 
                 if (!dbContext.Types.Any())
                 {
-                    dbContext.Add(new Domain.Entities.Type { TypeName = "Staff", Description = "Staff of system", CreatedAt = DateTime.Now, IsDeleted = false });
-                    dbContext.Add(new Domain.Entities.Type { TypeName = "Admin", Description = "Administration of system", CreatedAt = DateTime.Now, IsDeleted = false });
+                    dbContext.Add(new Domain.Entities.Type { TypeName = "Staff", Description = "Staff of system", CreatedAt = DateTime.UtcNow, IsDeleted = false });
+                    dbContext.Add(new Domain.Entities.Type { TypeName = "Admin", Description = "Administration of system", CreatedAt = DateTime.UtcNow, IsDeleted = false });
                     dbContext.SaveChanges();
                 }
 
                 if (!dbContext.Locations.Any())
                 {
-                    dbContext.Add(new Location { LocationName = "Hà Nội", CreatedAt = DateTime.Now, IsDeleted = false });
-                    dbContext.Add(new Location { LocationName = "Đà Nẵng", CreatedAt = DateTime.Now, IsDeleted = false });
-                    dbContext.Add(new Location { LocationName = "Hồ Chí Minh", CreatedAt = DateTime.Now, IsDeleted = false });
+                    dbContext.Add(new Location { LocationName = "Hà Nội", CreatedAt = DateTime.UtcNow, IsDeleted = false });
+                    dbContext.Add(new Location { LocationName = "Đà Nẵng", CreatedAt = DateTime.UtcNow, IsDeleted = false });
+                    dbContext.Add(new Location { LocationName = "Hồ Chí Minh", CreatedAt = DateTime.UtcNow, IsDeleted = false });
                     dbContext.SaveChanges();
                 }
 
@@ -248,10 +248,10 @@ public static class ApplicationExtension
                         .Generate(CategoryToGenerate);
 
                     dbContext.AddRange(categoriesFaker);
-                    dbContext.Add(new Category { CategoryName = "Laptop", Prefix = "LA", CreatedAt = DateTime.Now, IsDeleted = false });
-                    dbContext.Add(new Category { CategoryName = "Monitor", Prefix = "MO", CreatedAt = DateTime.Now, IsDeleted = false });
-                    dbContext.Add(new Category { CategoryName = "PC", Prefix = "PC", CreatedAt = DateTime.Now, IsDeleted = false });
-                    dbContext.Add(new Category { CategoryName = "Keyboard", Prefix = "KE", CreatedAt = DateTime.Now, IsDeleted = false });
+                    dbContext.Add(new Category { CategoryName = "Laptop", Prefix = "LA", CreatedAt = DateTime.UtcNow, IsDeleted = false });
+                    dbContext.Add(new Category { CategoryName = "Monitor", Prefix = "MO", CreatedAt = DateTime.UtcNow, IsDeleted = false });
+                    dbContext.Add(new Category { CategoryName = "PC", Prefix = "PC", CreatedAt = DateTime.UtcNow, IsDeleted = false });
+                    dbContext.Add(new Category { CategoryName = "Keyboard", Prefix = "KE", CreatedAt = DateTime.UtcNow, IsDeleted = false });
                     dbContext.SaveChanges();
                 }
                 var assetCodes = new Dictionary<Guid, int>();
@@ -460,7 +460,7 @@ public static class ApplicationExtension
                 var categoryPrefix = categories.First(c => c.Id == a.CategoryId).Prefix;
                 return $"{categoryPrefix}{assetCodes[a.CategoryId]++.ToString("D6")}";
             })
-            .RuleFor(a => a.CreatedAt, f => DateTime.Now)
+            .RuleFor(a => a.CreatedAt, f => DateTime.UtcNow)
             .RuleFor(a => a.IsDeleted, f => false)
             .Generate(amount);
 
@@ -514,26 +514,26 @@ public static class ApplicationExtension
                 // Depending on the state, set appropriate properties
                 if (randomState == TypeRequestState.Completed)
                 {
-                    newReturnRequest.ReturnedDate = DateTime.Now;
+                    newReturnRequest.ReturnedDate = DateTime.UtcNow;
                     newReturnRequest.ResponderId = admin.Id;
-                    newReturnRequest.UpdatedAt = DateTime.Now;
+                    newReturnRequest.UpdatedAt = DateTime.UtcNow;
 
                     assignment.IsDeleted = true;
-                    assignment.DeletedAt = DateTime.Now;
-                    assignment.UpdatedAt = DateTime.Now;
+                    assignment.DeletedAt = DateTime.UtcNow;
+                    assignment.UpdatedAt = DateTime.UtcNow;
 
                     assignment.Asset.State = TypeAssetState.Available;
-                    assignment.Asset.UpdatedAt = DateTime.Now;
+                    assignment.Asset.UpdatedAt = DateTime.UtcNow;
 
                 }
                 else if (randomState == TypeRequestState.Rejected)
                 {
-                    newReturnRequest.ReturnedDate = DateTime.Now;
+                    newReturnRequest.ReturnedDate = DateTime.UtcNow;
                     newReturnRequest.ResponderId = admin.Id;
-                    newReturnRequest.UpdatedAt = DateTime.Now;
+                    newReturnRequest.UpdatedAt = DateTime.UtcNow;
 
                     assignment.ActiveReturnRequestId = null;
-                    assignment.UpdatedAt = DateTime.Now;
+                    assignment.UpdatedAt = DateTime.UtcNow;
                 }
 
                 assignments.Add(assignment);
