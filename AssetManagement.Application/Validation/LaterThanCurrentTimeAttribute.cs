@@ -16,7 +16,7 @@ namespace AssetManagement.Application.Validation
 			{
 				return new ValidationResult("Incorrect date format");
 			}
-			if (dateValue.Date < DateTime.Now.Date)
+			if (dateValue.Date < DateTime.UtcNow.Date)
 			{
 				return new ValidationResult("Inputted date must be later than current time");
 			}

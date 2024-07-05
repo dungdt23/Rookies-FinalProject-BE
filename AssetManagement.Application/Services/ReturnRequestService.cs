@@ -94,7 +94,7 @@ namespace AssetManagement.Application.Services
             {
                 RequestorId = userId,
                 AssignmentId = request.AssignmentId,
-                RequestedDate = DateTime.Now,
+                RequestedDate = DateTime.UtcNow,
                 State = TypeRequestState.WaitingForReturning,
                 LocationId = assignment.Asset.LocationId,
             };
@@ -137,11 +137,11 @@ namespace AssetManagement.Application.Services
 
             // Done validation, changes states of others
             returnRequest.State = TypeRequestState.Completed;
-            returnRequest.ReturnedDate = DateTime.Now;
+            returnRequest.ReturnedDate = DateTime.UtcNow;
             returnRequest.ResponderId = user.Id;
             returnRequest.Responder = user;
             returnRequest.Assignment.IsDeleted = true;
-            returnRequest.Assignment.DeletedAt = DateTime.Now;
+            returnRequest.Assignment.DeletedAt = DateTime.UtcNow;
             returnRequest.Assignment.Asset.State = TypeAssetState.Available;
 
             await _transactionRepository.BeginTransactionAsync();
@@ -178,7 +178,7 @@ namespace AssetManagement.Application.Services
 
             // Done validation, changes states of others
             returnRequest.State = TypeRequestState.Rejected;
-            returnRequest.ReturnedDate = DateTime.Now;
+            returnRequest.ReturnedDate = DateTime.UtcNow;
             returnRequest.ResponderId = user.Id;
             returnRequest.Responder = user;
             returnRequest.Assignment.ActiveReturnRequestId = null;
