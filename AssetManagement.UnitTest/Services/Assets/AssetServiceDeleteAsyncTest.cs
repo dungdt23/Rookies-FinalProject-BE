@@ -31,7 +31,7 @@ namespace AssetManagement.UnitTest.Services.Assets
         {
             // Arrange
             var id = Guid.NewGuid();
-            var asset = new Asset { AssetName = "Laptop Dell", CreatedAt = DateTime.Now, IsDeleted = false };
+            var asset = new Asset { AssetName = "Laptop Dell", CreatedAt = DateTime.UtcNow, IsDeleted = false };
             var assignments = new List<Assignment>();
             asset.Assignments = assignments;
             var typeListMock = new List<Asset> { asset };
@@ -54,9 +54,9 @@ namespace AssetManagement.UnitTest.Services.Assets
         {
             // Arrange
             var id = Guid.NewGuid();
-            var asset = new Asset { AssetName = "Laptop Dell", CreatedAt = DateTime.Now, IsDeleted = false };
+            var asset = new Asset { AssetName = "Laptop Dell", CreatedAt = DateTime.UtcNow, IsDeleted = false };
             var assignments = new List<Assignment>();
-            assignments.Add(new Assignment { AssigneeId = Guid.NewGuid(), AssignerId = Guid.NewGuid(), CreatedAt = DateTime.Now, IsDeleted = false });
+            assignments.Add(new Assignment { AssigneeId = Guid.NewGuid(), AssignerId = Guid.NewGuid(), CreatedAt = DateTime.UtcNow, IsDeleted = false });
             asset.Assignments = assignments;
             var typeListMock = new List<Asset> { asset };
             var mockQueryable = typeListMock.AsQueryable().BuildMock();
@@ -76,7 +76,7 @@ namespace AssetManagement.UnitTest.Services.Assets
         {
             // Arrange
             var id = Guid.NewGuid();
-            var asset = new Asset { AssetName = "Laptop Dell", CreatedAt = DateTime.Now, IsDeleted = false };
+            var asset = new Asset { AssetName = "Laptop Dell", CreatedAt = DateTime.UtcNow, IsDeleted = false };
             var assignments = new List<Assignment>();
             asset.Assignments = assignments;
             var typeListMock = new List<Asset> { asset };

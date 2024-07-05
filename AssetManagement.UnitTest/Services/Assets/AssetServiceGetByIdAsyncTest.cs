@@ -29,7 +29,7 @@ namespace AssetManagement.UnitTest.Services.Assets
             // Arrange
             Guid id = Guid.NewGuid();
             var assets = new List<Asset> {
-                new Asset { Id = id, AssetName = "Laptop Dell", AssetCode = "LA000001", CreatedAt = DateTime.Now, IsDeleted = false }
+                new Asset { Id = id, AssetName = "Laptop Dell", AssetCode = "LA000001", CreatedAt = DateTime.UtcNow, IsDeleted = false }
             };
             var assetDto = new ResponseAssetDto { AssetName = "Laptop Dell", AssetCode = "LA000001" };
 
@@ -52,7 +52,7 @@ namespace AssetManagement.UnitTest.Services.Assets
             // Arrange
             Guid id = Guid.NewGuid();
             var assets = new List<Asset> {
-                new Asset { Id = id, AssetName = "Laptop Dell", AssetCode = "LA000001", CreatedAt = DateTime.Now, IsDeleted = false }
+                new Asset { Id = id, AssetName = "Laptop Dell", AssetCode = "LA000001", CreatedAt = DateTime.UtcNow, IsDeleted = false }
             };
             var assetDto = new ResponseAssetDto {};
 
