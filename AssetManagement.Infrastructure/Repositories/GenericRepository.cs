@@ -47,7 +47,7 @@ namespace AssetManagement.Infrastructure.Repositories
         {
             try
             {
-                entity.UpdatedAt = DateTime.Now;
+                entity.UpdatedAt = DateTime.UtcNow;
                 _dbSet.Update(entity);
                 int status = await _context.SaveChangesAsync();
                 return status;
@@ -64,7 +64,7 @@ namespace AssetManagement.Infrastructure.Repositories
             {
                 var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
                 if (entity == null) return RecordStatus.Invalid;
-                entity.DeletedAt = DateTime.Now;
+                entity.DeletedAt = DateTime.UtcNow;
                 entity.IsDeleted = true;
                 _dbSet.Update(entity);
                 int status = await _context.SaveChangesAsync();

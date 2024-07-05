@@ -97,8 +97,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         {
             var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
             if (entity == null) return RecordStatus.Invalid;
-            entity.TokenInvalidationTimestamp = DateTime.Now;
-            entity.DeletedAt = DateTime.Now;
+            entity.TokenInvalidationTimestamp = DateTime.UtcNow;
+            entity.DeletedAt = DateTime.UtcNow;
             entity.IsDeleted = true;
             _dbSet.Update(entity);
             int status = await _context.SaveChangesAsync();

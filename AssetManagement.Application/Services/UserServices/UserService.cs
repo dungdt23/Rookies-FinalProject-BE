@@ -158,7 +158,7 @@ public class UserService : IUserService
 
 		if (type.Id != user.TypeId)
 		{
-			user.TokenInvalidationTimestamp = DateTime.Now;
+			user.TokenInvalidationTimestamp = DateTime.UtcNow;
 		}
 
 		_mapper.Map(form, user);
@@ -267,9 +267,9 @@ public class UserService : IUserService
 				new Claim(ClaimNameConstants.LocationId, user.LocationId.ToString()),
 				new Claim(ClaimNameConstants.Location, user.Location.LocationName),
 				new Claim(ClaimNameConstants.IsPasswordChangedFirstTime, isPasswordChangedFirstTime ? "1" : "0"),
-				new Claim(ClaimNameConstants.BlackListTimeStamp, DateTime.Now.ToString("yyyy-MM-ddTHH\\:mm\\:ss.fffffffzzz", CultureInfo.InvariantCulture))
+				new Claim(ClaimNameConstants.BlackListTimeStamp, DateTime.UtcNow.ToString("yyyy-MM-ddTHH\\:mm\\:ss.fffffffzzz", CultureInfo.InvariantCulture))
 			  }),
-			Expires = DateTime.Now.AddDays(7),
+			Expires = DateTime.UtcNow.AddDays(7),
 			SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
 		};
 		var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -337,7 +337,7 @@ public class UserService : IUserService
 
 
 		user = EncryptPassword(user, newPassword);
-		user.TokenInvalidationTimestamp = DateTime.Now;
+		user.TokenInvalidationTimestamp = DateTime.UtcNow;
 		user.IsPasswordChanged = true;
 
 		if (await _userRepository.UpdateAsync(user) > 0)

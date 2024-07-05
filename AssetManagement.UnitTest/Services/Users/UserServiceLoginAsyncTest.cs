@@ -59,8 +59,8 @@ public class UserServiceLoginAsyncTest
         var key = Encoding.UTF8.GetBytes(_secret);
         _userMock.Object.UserName = username;
         _userMock.Object.DateOfBirth = new DateTime(2002, 01, 01);
-        _userMock.Object.Type = new Domain.Entities.Type { TypeName = "staff", CreatedAt = DateTime.Now, IsDeleted = false };
-        _userMock.Object.Location = new Location { LocationName = "Ha Noi", CreatedAt = DateTime.Now, IsDeleted = false };
+        _userMock.Object.Type = new Domain.Entities.Type { TypeName = "staff", CreatedAt = DateTime.UtcNow, IsDeleted = false };
+        _userMock.Object.Location = new Location { LocationName = "Ha Noi", CreatedAt = DateTime.UtcNow, IsDeleted = false };
 
         var mockList = new List<User> { _userMock.Object };
         var mockQueryable = mockList.AsQueryable().BuildMock();

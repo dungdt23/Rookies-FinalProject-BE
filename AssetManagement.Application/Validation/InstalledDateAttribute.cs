@@ -11,7 +11,7 @@ namespace AssetManagement.Application.Validation
             {
                 return new ValidationResult("Incorrect date format");
             }
-            if (dateValue > DateTime.Now)
+            if (dateValue > DateTime.UtcNow)
             {
                 return new ValidationResult("Installed date must be in the past");
             }

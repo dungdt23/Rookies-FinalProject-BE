@@ -9,7 +9,7 @@ namespace AssetManagement.Domain.Entities
         [Key]
         public override Guid Id { get; set; } = Guid.NewGuid();
         public TypeRequestState State { get; set; } = TypeRequestState.WaitingForReturning;
-        public DateTime RequestedDate { get; set; } = DateTime.Now;
+        public DateTime RequestedDate { get; set; } = DateTime.UtcNow;
         public DateTime? ReturnedDate { get; set; }
         [Required]
         public Guid RequestorId { get; set; }
