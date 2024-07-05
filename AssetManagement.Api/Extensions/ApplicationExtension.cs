@@ -444,13 +444,12 @@ public static class ApplicationExtension
         {
             locations = dbContext.Locations.Where(x => x.LocationName == locationName).ToList();
         }
-
         var assetFaker = new Faker<Asset>()
             .RuleFor(a => a.CategoryId, f => f.PickRandom(categories).Id)
             .RuleFor(a => a.LocationId, f => f.PickRandom(locations).Id)
             .RuleFor(a => a.Specification, f => f.Commerce.ProductDescription())
             .RuleFor(a => a.InstalledDate, f => f.Date.Past(2))
-            .RuleFor(a => a.State, f => (TypeAssetState)random.Next(1, 6))
+            .RuleFor(a => a.State, f => (TypeAssetState)f.PickRandom(new int[4] { 1, 2, 4, 5 }))
             .RuleFor(a => a.AssetName, f => f.Commerce.ProductName())
             .RuleFor(a => a.AssetCode, (f, a) =>
             {
