@@ -163,7 +163,7 @@ namespace AssetManagement.Api
 
             if (app.Environment.IsDevelopment())
             {
-                //await app.DeleteAllDataAsync();
+                await app.DeleteAllDataAsync();
                 await app.SeedDataAsync();
             }
 
