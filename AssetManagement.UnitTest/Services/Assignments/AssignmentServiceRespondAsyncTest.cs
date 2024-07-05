@@ -75,7 +75,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 		{
 			//Arrange
 			_assignmentMock.Object.State = TypeAssignmentState.Declined;
-			_assignmentMock.Object.Asset = new Asset { State = TypeAssetState.Available, CreatedAt = DateTime.Now, IsDeleted = false };
+			_assignmentMock.Object.Asset = new Asset { State = TypeAssetState.Available, CreatedAt = DateTime.UtcNow, IsDeleted = false };
 			var assignmentsMock = new List<Assignment> { _assignmentMock.Object};
 			var assignmentsQueryMock = assignmentsMock.AsQueryable().BuildMock();
 
@@ -99,7 +99,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 			//Arrange
 			_requestDtoMock.Object.IsAccept = false;
 			_assignmentMock.Object.State = TypeAssignmentState.WaitingForAcceptance;
-			_assignmentMock.Object.Asset = new Asset { State = TypeAssetState.Available, CreatedAt = DateTime.Now, IsDeleted = false };
+			_assignmentMock.Object.Asset = new Asset { State = TypeAssetState.Available, CreatedAt = DateTime.UtcNow, IsDeleted = false };
 			var assignmentsMock = new List<Assignment> { _assignmentMock.Object };
 			var assignmentsQueryMock = assignmentsMock.AsQueryable().BuildMock();
 
@@ -123,7 +123,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 		{
 			//Arrange
 			_assignmentMock.Object.State = TypeAssignmentState.WaitingForAcceptance;
-			_assignmentMock.Object.Asset = new Asset { State = TypeAssetState.Available, CreatedAt = DateTime.Now, IsDeleted = false };
+			_assignmentMock.Object.Asset = new Asset { State = TypeAssetState.Available, CreatedAt = DateTime.UtcNow, IsDeleted = false };
 			var assignmentsMock = new List<Assignment> { _assignmentMock.Object };
 			var assignmentsQueryMock = assignmentsMock.AsQueryable().BuildMock();
 

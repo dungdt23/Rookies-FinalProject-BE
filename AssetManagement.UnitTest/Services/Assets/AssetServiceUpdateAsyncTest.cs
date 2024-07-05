@@ -36,7 +36,7 @@ namespace AssetManagement.UnitTest.Services.Assets
             var requestDto = new RequestAssetDto();
 
 
-            var asset = new Asset { Id = id, AssetName = "Laptop Dell", AssetCode = "LA000001", CreatedAt = DateTime.Now, IsDeleted = false };
+            var asset = new Asset { Id = id, AssetName = "Laptop Dell", AssetCode = "LA000001", CreatedAt = DateTime.UtcNow, IsDeleted = false };
 
             var typeListMock = new List<Asset> { asset };
             var mockQueryable = typeListMock.AsQueryable().BuildMock();
@@ -44,7 +44,7 @@ namespace AssetManagement.UnitTest.Services.Assets
             _mockAssetRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<Asset, bool>>>()))
                 .Returns(mockQueryable);
 
-            var updateAsset = new Asset { Id = id, AssetName = "Laptop Lenovo", AssetCode = "LA000001", CreatedAt = DateTime.Now, IsDeleted = false };
+            var updateAsset = new Asset { Id = id, AssetName = "Laptop Lenovo", AssetCode = "LA000001", CreatedAt = DateTime.UtcNow, IsDeleted = false };
 
             _mockMapper.Setup(mapper => mapper.Map<Asset>(requestDto))
                 .Returns(updateAsset);
@@ -72,13 +72,13 @@ namespace AssetManagement.UnitTest.Services.Assets
             // Arrange
             var id = Guid.NewGuid();
             var requestDto = new RequestAssetDto();
-            var asset = new Asset { Id = id, AssetName = "Laptop Dell", AssetCode = "LA000001", CreatedAt = DateTime.Now, IsDeleted = false };
+            var asset = new Asset { Id = id, AssetName = "Laptop Dell", AssetCode = "LA000001", CreatedAt = DateTime.UtcNow, IsDeleted = false };
             var typeListMock = new List<Asset> { asset };
             var mockQueryable = typeListMock.AsQueryable().BuildMock();
             _mockAssetRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<Asset, bool>>>()))
                 .Returns(mockQueryable);
 
-            var updateAsset = new Asset { Id = id, AssetName = "Laptop Lenovo", AssetCode = "LA000001", CreatedAt = DateTime.Now, IsDeleted = false };
+            var updateAsset = new Asset { Id = id, AssetName = "Laptop Lenovo", AssetCode = "LA000001", CreatedAt = DateTime.UtcNow, IsDeleted = false };
 
             _mockMapper.Setup(mapper => mapper.Map<Asset>(requestDto))
                 .Returns(updateAsset);
@@ -115,7 +115,7 @@ namespace AssetManagement.UnitTest.Services.Assets
             // Arrange
             var id = Guid.NewGuid();
             var requestDto = new RequestAssetDto();
-            var asset = new Asset { Id = id, AssetName = "Laptop Dell", State = TypeAssetState.Assigned, AssetCode = "LA000001", CreatedAt = DateTime.Now, IsDeleted = false };
+            var asset = new Asset { Id = id, AssetName = "Laptop Dell", State = TypeAssetState.Assigned, AssetCode = "LA000001", CreatedAt = DateTime.UtcNow, IsDeleted = false };
             var typeListMock = new List<Asset> { asset };
             var mockQueryable = typeListMock.AsQueryable().BuildMock();
             _mockAssetRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<Asset, bool>>>()))

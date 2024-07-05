@@ -31,7 +31,7 @@ namespace AssetManagement.UnitTest.Services
         public async Task UpdateGlobalInvalidationTimeStampAsync_ShouldUpdateTimestamp()
         {
             // Arrange
-            var expectedTimestamp = DateTime.Now;
+            var expectedTimestamp = DateTime.UtcNow;
 
             // Act
             await _jwtInvalidationService.UpdateGlobalInvalidationTimeStampAsync(expectedTimestamp);
@@ -44,7 +44,7 @@ namespace AssetManagement.UnitTest.Services
         public async Task GetGlobalInvalidationTimestampAsync_ShouldReturnTimestamp()
         {
             // Arrange
-            var expectedTimestamp = DateTime.Now;
+            var expectedTimestamp = DateTime.UtcNow;
             var globalSetting = new GlobalSetting { GlobalInvalidationTimestamp = expectedTimestamp };
             _mockGlobalSettingsRepository.Setup(x => x.GetGlobalSettingAsync()).ReturnsAsync(globalSetting);
 

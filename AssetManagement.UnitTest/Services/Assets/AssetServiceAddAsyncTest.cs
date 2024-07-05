@@ -34,8 +34,8 @@ namespace AssetManagement.UnitTest.Services.Assets
         {
             // Arrange
             var assetDto = new RequestAssetDto { AssetName = "Laptop Dell", CategoryId = Guid.NewGuid() };
-            var asset = new Asset { AssetName = "Laptop Dell", CreatedAt = DateTime.Now, IsDeleted = false };
-            var category = new Category { Id = assetDto.CategoryId, CategoryName = "Laptop", Prefix = "LA", CreatedAt = DateTime.Now, IsDeleted = false };
+            var asset = new Asset { AssetName = "Laptop Dell", CreatedAt = DateTime.UtcNow, IsDeleted = false };
+            var category = new Category { Id = assetDto.CategoryId, CategoryName = "Laptop", Prefix = "LA", CreatedAt = DateTime.UtcNow, IsDeleted = false };
             var typeListMock = new List<Category> { category }.AsQueryable().BuildMock();
 
             _mockCategoryRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<Category, bool>>>()))
@@ -50,7 +50,7 @@ namespace AssetManagement.UnitTest.Services.Assets
             _mockAssetRepository.Setup(repo => repo.AddAsync(asset))
                 .ReturnsAsync(StatusConstant.Success);
 
-            var returnAsset = new Asset { AssetName = "Laptop Dell", CreatedAt = DateTime.Now, IsDeleted = false };
+            var returnAsset = new Asset { AssetName = "Laptop Dell", CreatedAt = DateTime.UtcNow, IsDeleted = false };
 
             _mockAssetRepository.Setup(x => x.GetByCondition(It.IsAny<Expression<Func<Asset, bool>>>()))
                                 .Returns(new List<Asset> { asset }.AsQueryable().BuildMockDbSet().Object);
@@ -72,8 +72,8 @@ namespace AssetManagement.UnitTest.Services.Assets
         {
             // Arrange
             var assetDto = new RequestAssetDto { AssetName = "Laptop Dell", CategoryId = Guid.NewGuid() };
-            var asset = new Asset { AssetName = "Laptop Dell", CreatedAt = DateTime.Now, IsDeleted = false };
-            var category = new Category { Id = assetDto.CategoryId, CategoryName = "Laptop", Prefix = "LA", CreatedAt = DateTime.Now, IsDeleted = false };
+            var asset = new Asset { AssetName = "Laptop Dell", CreatedAt = DateTime.UtcNow, IsDeleted = false };
+            var category = new Category { Id = assetDto.CategoryId, CategoryName = "Laptop", Prefix = "LA", CreatedAt = DateTime.UtcNow, IsDeleted = false };
             var typeListMock = new List<Category> { category }.AsQueryable().BuildMock();
 
             _mockCategoryRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<Category, bool>>>()))

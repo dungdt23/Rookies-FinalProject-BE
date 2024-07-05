@@ -18,11 +18,11 @@ public class AssignmentRepository : GenericRepository<Assignment>, IAssignmentRe
 		IQueryable<Assignment> query = _dbContext.Assignments.Where(x => !x.IsDeleted && x.Assigner.LocationId == locationId);
 		if (userType == UserType.Staff)
 		{
-			query = query.Where(x => x.AssigneeId == userId && x.State != Domain.Enums.TypeAssignmentState.Declined && x.AssignedDate.Date <= DateTime.Now.Date);
+			query = query.Where(x => x.AssigneeId == userId && x.State != Domain.Enums.TypeAssignmentState.Declined && x.AssignedDate.Date <= DateTime.UtcNow.Date);
 		}
 		else if (own.HasValue && own.Value)
 		{
-			query = query.Where(x => x.AssigneeId == userId && x.State != Domain.Enums.TypeAssignmentState.Declined && x.AssignedDate.Date <= DateTime.Now.Date);
+			query = query.Where(x => x.AssigneeId == userId && x.State != Domain.Enums.TypeAssignmentState.Declined && x.AssignedDate.Date <= DateTime.UtcNow.Date);
 		}
 
 

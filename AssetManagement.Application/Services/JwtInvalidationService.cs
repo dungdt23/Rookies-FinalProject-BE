@@ -21,7 +21,7 @@ namespace AssetManagement.Application.Services
 
         public async Task UpdateGlobalInvalidationTimeStampAsync(DateTime? timestamp)
         {
-            await _globalSettingRepository.UpdateGlobalInvalidationTimestampAsync(timestamp ?? DateTime.Now);
+            await _globalSettingRepository.UpdateGlobalInvalidationTimestampAsync(timestamp ?? DateTime.UtcNow);
         }
 
         public async Task<DateTime> GetGlobalInvalidationTimestampAsync()

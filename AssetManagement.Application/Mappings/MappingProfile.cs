@@ -53,7 +53,7 @@ namespace AssetManagement.Application.Mappings
                 .ForMember(dest => dest.AssetCode, opt => opt.MapFrom(src => src.Asset.AssetCode))
                 .ForMember(dest => dest.AssetName, opt => opt.MapFrom(src => src.Asset.AssetName))
                 .ForMember(dest => dest.Specification, opt => opt.MapFrom(src => src.Asset.Specification))
-                .ForMember(dest => dest.ReturnRequest, opt => opt.MapFrom(src => src.ReturnRequests.FirstOrDefault(x => x.State == Domain.Enums.TypeRequestState.Completed)));
+                .ForMember(dest => dest.ReturnRequest, opt => opt.MapFrom(src => src.ReturnRequests.FirstOrDefault(x => x.Id == src.ActiveReturnRequestId)));
 
             //Mapping Return Request
             CreateMap<ReturnRequest, ResponseReturnRequestGetAllDto>()
