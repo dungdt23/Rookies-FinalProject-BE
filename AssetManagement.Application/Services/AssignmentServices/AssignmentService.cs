@@ -8,7 +8,6 @@ using AssetManagement.Domain.Constants;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AutoMapper;
-using DocumentFormat.OpenXml.Office2021.DocumentTasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -268,7 +267,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 
         public async Task<ApiResponse> UpdateAsync(Guid id, RequestAssignmentDto request)
         {
-            var assignment = await _assignmentRepository.GetByCondition(a => a.Id == id)
+            var assignment = await _assignmentRepository.GetByCondition(a => a.Id == id && a.IsDeleted)
                                                         .FirstOrDefaultAsync();
             if (assignment == null)
             {
@@ -332,14 +331,14 @@ namespace AssetManagement.Application.Services.AssignmentServices
         }
         public async Task<PagedResponse<ResponseHistoryAsmDto>> GetByAssetIdAsync(Guid assetId, int index, int size)
         {
-            var historicalAsm = _assignmentRepository.GetByCondition(x => x.AssetId == assetId)
+            var historicalAsm = await _assignmentRepository.GetByCondition(x => x.AssetId == assetId)
                 .Include(x => x.Asset)
                 .Include(x => x.Assigner)
                 .Include(x => x.Assignee)
                 .Include(x => x.ReturnRequests)
                 .OrderByDescending(x => x.CreatedAt)
                 .Skip((index - 1) * size).Take(size)
-                .ToList();
+                .ToListAsync();
             var historicalAsmDto = _mapper.Map<IEnumerable<ResponseHistoryAsmDto>>(historicalAsm);
             return new PagedResponse<ResponseHistoryAsmDto>
             {

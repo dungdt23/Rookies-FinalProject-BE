@@ -136,7 +136,7 @@ namespace AssetManagement.Application.Services.AssetServices
                 };
             }
             //check if asset belong to any historical assignment
-            var historicalAssignment = asset.Assignments.FirstOrDefault(x => !x.IsDeleted);
+            var historicalAssignment = asset.Assignments.FirstOrDefault();
             if (historicalAssignment != null) return new ApiResponse
             {
                 Message = "Can not be deleted! Asset belong to an historical assignment",
