@@ -18,12 +18,27 @@ namespace AssetManagement.Infrastructure.Repositories
         private IQueryable<Asset> ApplyFilter(Guid locationId, AssetFilter filter)
         {
             IQueryable<Asset> query = _context.Assets
-                                    .Include(x => x.Location)
-                                    .Include(x => x.Category)
-                                    .Include(x => x.Assignments.Take(HistoryAssignmentConstant.DefaultDisplay))
-                                    .ThenInclude(x => x.Assignee)
-                                    .Include(x => x.Assignments.Take(HistoryAssignmentConstant.DefaultDisplay))
-                                    .ThenInclude(x => x.Assigner);
+                                        .Include(x => x.Location)
+                                        .Include(x => x.Category)
+                                        .Select(asset => new Asset
+                                        {
+                                            Id = asset.Id,
+                                            AssetCode = asset.AssetCode,
+                                            AssetName = asset.AssetName,
+                                            State = asset.State,
+                                            LocationId = asset.LocationId,
+                                            CategoryId = asset.CategoryId,
+                                            IsDeleted = asset.IsDeleted,
+                                            Location = asset.Location,
+                                            Category = asset.Category,
+                                            Assignments = asset.Assignments.Take(HistoryAssignmentConstant.DefaultDisplay).Select(a => new Assignment
+                                            {
+                                                Id = a.Id,
+                                                Assignee = new User { UserName = a.Assignee.UserName },
+                                                Assigner = new User { UserName = a.Assigner.UserName }
+                                            }).ToList()
+                                        });
+
             if (string.IsNullOrEmpty(filter.search) && !filter.state.HasValue && !filter.category.HasValue)
             {
                 query = query.Where(x =>
