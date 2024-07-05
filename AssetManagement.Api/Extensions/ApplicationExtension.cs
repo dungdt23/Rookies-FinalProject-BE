@@ -6,6 +6,7 @@ using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Migrations;
 using Bogus;
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -25,9 +26,10 @@ public static class ApplicationExtension
 		{
 			var dbContext = scope.ServiceProvider.GetService<AssetManagementDBContext>();
 
-			if (dbContext!.ReturnRequests.Any())
+			if (!dbContext!.ReturnRequests.Any())
 			{
 				await dbContext!.SeedReturnRequestsAsync();
+
 				await dbContext!.SeedAssignmentHistoriesAsync("Hà Nội");
 				await dbContext!.SeedAssignmentHistoriesAsync("Đà Nẵng");
 				await dbContext!.SeedAssignmentHistoriesAsync("Hồ Chí Minh");
