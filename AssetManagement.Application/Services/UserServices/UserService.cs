@@ -252,7 +252,7 @@ public class UserService : IUserService
 
 
 		//var IsPasswordChanged = !string.Equals($"{user.UserName}@{user.DateOfBirth:ddMMyyyy}", login.Password);
-		var isPasswordChangedFirstTime = !user.IsPasswordChanged;
+		var isPasswordChangedFirstTime = user.IsPasswordChanged;
 
 
 		var tokenHandler = new JwtSecurityTokenHandler();
