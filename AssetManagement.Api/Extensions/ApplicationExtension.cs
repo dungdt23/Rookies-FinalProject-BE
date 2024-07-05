@@ -26,9 +26,10 @@ public static class ApplicationExtension
 		{
 			var dbContext = scope.ServiceProvider.GetService<AssetManagementDBContext>();
 
-			if (dbContext!.ReturnRequests.Any())
+			if (!dbContext!.ReturnRequests.Any())
 			{
 				await dbContext!.SeedReturnRequestsAsync();
+
 				await dbContext!.SeedAssignmentHistoriesAsync("Hà Nội");
 				await dbContext!.SeedAssignmentHistoriesAsync("Đà Nẵng");
 				await dbContext!.SeedAssignmentHistoriesAsync("Hồ Chí Minh");
