@@ -13,22 +13,31 @@ namespace AssetManagement.Api.Extensions;
 
 public static class ApplicationExtension
 {
-    private static readonly int UserToGenerate = 200;
-    private static readonly int AssetToGenerate = 300;
-    private static readonly int CategoryToGenerate = 15;
+	private static readonly int UserToGenerate = 200;
+	private static readonly int AssetToGenerate = 300;
+	private static readonly int CategoryToGenerate = 15;
+	private static readonly int MaxAssignmentHistory = 10;
 
-    public static async Task SeedDataAsync(this IApplicationBuilder app)
-    {
-        await app.SeedAllExceptionReturnRequestAsync();
-        using (var scope = app.ApplicationServices.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetService<AssetManagementDBContext>();
-            await dbContext!.SeedReturnRequestsAsync();
+	public static async Task SeedDataAsync(this IApplicationBuilder app)
+	{
+		await app.SeedAllExceptionReturnRequestAsync();
+		using (var scope = app.ApplicationServices.CreateScope())
+		{
+			var dbContext = scope.ServiceProvider.GetService<AssetManagementDBContext>();
 
-            var jwtInvalidationService = scope.ServiceProvider.GetService<IJwtInvalidationService>();
-            await jwtInvalidationService!.UpdateGlobalInvalidationTimeStampAsync(null);
-        }
-    }
+			if (dbContext!.ReturnRequests.Any())
+			{
+				await dbContext!.SeedReturnRequestsAsync();
+				await dbContext!.SeedAssignmentHistoriesAsync("Hà Nội");
+				await dbContext!.SeedAssignmentHistoriesAsync("Đà Nẵng");
+				await dbContext!.SeedAssignmentHistoriesAsync("Hồ Chí Minh");
+			}
+
+
+			var jwtInvalidationService = scope.ServiceProvider.GetService<IJwtInvalidationService>();
+			await jwtInvalidationService!.UpdateGlobalInvalidationTimeStampAsync(null);
+		}
+	}
 
     public static async Task<IApplicationBuilder> SeedAllExceptionReturnRequestAsync(this IApplicationBuilder app)
     {
@@ -418,17 +427,19 @@ public static class ApplicationExtension
                     dbContext.UpdateRange(declinedAssetToUpdates);
                     dbContext.SaveChanges();
 
-                }
-                transaction.Commit();
-            }
-            catch (Exception ex)
-            {
-                transaction.Rollback();
-                throw ex;
-            }
-            return app;
-        }
-    }
+
+
+				}
+				transaction.Commit();
+			}
+			catch (Exception ex)
+			{
+				transaction.Rollback();
+				throw ex;
+			}
+			return app;
+		}
+	}
 
     public static List<Asset> GenerateAsset(Dictionary<Guid, int> assetCodes, int amount, AssetManagementDBContext dbContext, string? locationName = null)
     {
@@ -469,12 +480,66 @@ public static class ApplicationExtension
         return assetFaker;
     }
 
-    public static async Task SeedReturnRequestsAsync(this AssetManagementDBContext dbContext)
-    {
-        if (dbContext.ReturnRequests.Any())
-        {
-            return;
-        }
+	public static async Task SeedAssignmentHistoriesAsync(this AssetManagementDBContext dBContext, string locationName)
+	{
+		var assets = dBContext.Assets.Where(a => a.IsDeleted == false && a.Location.LocationName == locationName)
+			.Include(a => a.Location)
+			.AsNoTracking()
+			.ToList();
+		var assigner = dBContext.Users.Where(a => a.IsDeleted == false && a.Type.TypeName == "Admin" && a.Location.LocationName == locationName)
+			.Include(a => a.Type)
+			.Include(a => a.Location)
+			.AsNoTracking()
+			 .ToList();
+		var assignee = dBContext.Users.Where(a => a.IsDeleted == false && a.Type.TypeName == "Staff" && a.Location.LocationName == locationName)
+			.Include(a => a.Type)
+			.Include(a => a.Location)
+			.AsNoTracking()
+			.ToList();
+
+		var random = new Random();
+		foreach (var asset in assets)
+		{
+			var assignmentFaker = new Faker<Assignment>()
+									   .RuleFor(a => a.AssetId, f => asset.Id)
+									   .RuleFor(a => a.AssignerId, f => f.PickRandom(assigner).Id)
+									   .RuleFor(a => a.AssigneeId, f => f.PickRandom(assignee).Id)
+									   .RuleFor(a => a.State, f => TypeAssignmentState.Accepted)
+									   .RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
+									   .RuleFor(a => a.Note, f => f.Lorem.Sentence(5))
+									   .RuleFor(a => a.IsDeleted, f => true)
+									   .RuleFor(a => a.DeletedAt, f => f.Date.Past(1))
+									   .Generate(random.Next(0, MaxAssignmentHistory + 1));
+
+			foreach (var assignment in assignmentFaker)
+			{
+				var returnRequestFaker = new Faker<ReturnRequest>()
+					.RuleFor(r => r.AssignmentId, f => assignment.Id)
+					.RuleFor(r => r.RequestorId, f => f.PickRandom(assigner).Id)
+					.RuleFor(r => r.RequestedDate, f => assignment.AssignedDate.AddDays(random.Next(0, 100)))
+					.RuleFor(r => r.LocationId, f => asset.LocationId)
+					.RuleFor(r => r.CreatedAt, (f, a) => a.RequestedDate)
+					.RuleFor(r => r.State, f => TypeRequestState.Completed)
+					.RuleFor(r => r.ResponderId, f => f.PickRandom(assigner).Id)
+					.RuleFor(r => r.ReturnedDate, (f, a) => a.RequestedDate.AddDays(random.Next(0, 50)))
+					.Generate(1);
+				await dBContext.AddRangeAsync(returnRequestFaker);
+
+			}
+			await dBContext.AddRangeAsync(assignmentFaker);
+			//		RequestorId = new Random().Next(2) == 0 ? assignment.AssigneeId : admin.Id,
+			//		AssignmentId = assignment.Id,
+			//		RequestedDate = past,
+			//		State = randomState,
+			//		LocationId = location.Id,
+			//		CreatedAt = past,
+		}
+		await dBContext.SaveChangesAsync();
+	}
+
+	public static async Task SeedReturnRequestsAsync(this AssetManagementDBContext dbContext)
+	{
+
 
         var locations = await dbContext.Locations.ToListAsync();
         var assignments = new List<Assignment>();
@@ -536,24 +601,26 @@ public static class ApplicationExtension
                     assignment.UpdatedAt = DateTime.UtcNow;
                 }
 
-                assignments.Add(assignment);
-                returnRequests.Add(newReturnRequest);
-            }
-        }
-        await dbContext.Database.BeginTransactionAsync();
-        try
-        {
-            await dbContext.ReturnRequests.AddRangeAsync(returnRequests);
-            dbContext.Assignments.UpdateRange(assignments);
-            await dbContext.SaveChangesAsync();
-            await dbContext.Database.CommitTransactionAsync();
-        }
-        catch (Exception)
-        {
-            await dbContext.Database.RollbackTransactionAsync();
-            throw;
-        }
-    }
+				assignments.Add(assignment);
+				returnRequests.Add(newReturnRequest);
+			}
+		}
+		await dbContext.Database.BeginTransactionAsync();
+		try
+		{
+			await dbContext.ReturnRequests.AddRangeAsync(returnRequests);
+			dbContext.Assignments.UpdateRange(assignments);
+
+
+			await dbContext.SaveChangesAsync();
+			await dbContext.Database.CommitTransactionAsync();
+		}
+		catch (Exception)
+		{
+			await dbContext.Database.RollbackTransactionAsync();
+			throw;
+		}
+	}
 
     public static async Task<IApplicationBuilder> DeleteAllDataAsync(this IApplicationBuilder app)
     {
