@@ -444,7 +444,6 @@ public static class ApplicationExtension
         {
             locations = dbContext.Locations.Where(x => x.LocationName == locationName).ToList();
         }
-
         var assetFaker = new Faker<Asset>()
             .RuleFor(a => a.CategoryId, f => f.PickRandom(categories).Id)
             .RuleFor(a => a.LocationId, f => f.PickRandom(locations).Id)
