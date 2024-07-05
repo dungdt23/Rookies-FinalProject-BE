@@ -1,6 +1,5 @@
 ﻿using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
-using AssetManagement.Application.Dtos.ReturnRequest;
 using AssetManagement.Domain.Entities;
 using AutoMapper;
 
@@ -48,16 +47,24 @@ namespace AssetManagement.Application.Mappings
                 .ForMember(dest => dest.AssetCode, opt => opt.MapFrom(src => src.Asset.AssetCode))
                 .ForMember(dest => dest.AssetName, opt => opt.MapFrom(src => src.Asset.AssetName))
                 .ForMember(dest => dest.Specification, opt => opt.MapFrom(src => src.Asset.Specification));
+            CreateMap<Assignment, ResponseHistoryAsmDto>()
+                 .ForMember(dest => dest.AssignedBy, opt => opt.MapFrom(src => src.Assigner.UserName))
+                .ForMember(dest => dest.AssignedTo, opt => opt.MapFrom(src => src.Assignee.UserName))
+                .ForMember(dest => dest.AssetCode, opt => opt.MapFrom(src => src.Asset.AssetCode))
+                .ForMember(dest => dest.AssetName, opt => opt.MapFrom(src => src.Asset.AssetName))
+                .ForMember(dest => dest.Specification, opt => opt.MapFrom(src => src.Asset.Specification))
+                .ForMember(dest => dest.ReturnRequest, opt => opt.MapFrom(src => src.ReturnRequests.FirstOrDefault(x => x.State == Domain.Enums.TypeRequestState.Completed)));
 
             //Mapping Return Request
-            CreateMap<ReturnRequest, ReturnRequestGetAllViewModel>()
+            CreateMap<ReturnRequest, ResponseReturnRequestGetAllDto>()
                 .ForMember(dest => dest.AssetId, opt => opt.MapFrom(src => src.Assignment.Asset.Id))
                 .ForMember(dest => dest.AssetCode, opt => opt.MapFrom(src => src.Assignment.Asset.AssetCode))
                 .ForMember(dest => dest.AssetName, opt => opt.MapFrom(src => src.Assignment.Asset.AssetName))
                 .ForMember(dest => dest.RequestorUsername, opt => opt.MapFrom(src => src.Requestor.UserName))
                 .ForMember(dest => dest.ResponderUsername, opt => opt.MapFrom(src => src.Responder.UserName))
                 .ForMember(dest => dest.AssignmentAssignedDate, opt => opt.MapFrom(src => src.Assignment.AssignedDate));
-            CreateMap<ReturnRequest, ReturnRequestViewModel>();
+            CreateMap<ReturnRequest, ResponseReturnRequestDto>();
+            CreateMap<ReturnRequest, ResponseHistoryReturnRequestDto>();
         }
     }
 }

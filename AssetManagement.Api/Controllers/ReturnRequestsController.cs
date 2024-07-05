@@ -1,5 +1,6 @@
 ﻿using AssetManagement.Application.Dtos.Common;
-using AssetManagement.Application.Dtos.ReturnRequest;
+using AssetManagement.Application.Dtos.RequestDtos;
+using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.Exceptions.Assignment;
 using AssetManagement.Application.Exceptions.Common;
 using AssetManagement.Application.Exceptions.ReturnRequest;
@@ -24,12 +25,12 @@ namespace AssetManagement.Api.Controllers
 
         [HttpGet]
         [Authorize(Roles = TypeNameConstants.TypeAdmin)]
-        public async Task<IActionResult> GetAll([FromQuery] GetAllReturnRequest request)
+        public async Task<IActionResult> GetAll([FromQuery] RequestGetAllReturnRequestDto request)
         {
             var userIdClaim = HttpContext.GetClaim("id");
             Guid userId = Guid.Parse(userIdClaim);
             var (returnRequests, totalCount) = await _returnRequestService.GetAllReturnRequestAsync(request, userId);
-            PaginatedResult<ReturnRequestGetAllViewModel> paginateResult = new PaginatedResult<ReturnRequestGetAllViewModel>
+            ResponsePaginatedResultDto<ResponseReturnRequestGetAllDto> paginateResult = new ResponsePaginatedResultDto<ResponseReturnRequestGetAllDto>
             {
                 Data = returnRequests,
                 TotalCount = totalCount,
@@ -41,7 +42,7 @@ namespace AssetManagement.Api.Controllers
 
         [HttpPost]
         [Authorize(Roles = $"{TypeNameConstants.TypeAdmin}, {TypeNameConstants.TypeStaff}")]
-        public async Task<IActionResult> Create([FromBody] CreateReturnRequestRequest request)
+        public async Task<IActionResult> Create([FromBody] RequestCreateReturnRequestDto request)
         {
             var userIdClaim = HttpContext.GetClaim("id");
             Guid userId = Guid.Parse(userIdClaim);
@@ -74,7 +75,7 @@ namespace AssetManagement.Api.Controllers
 
         [HttpPost("{returnRequestId}/state")]
         [Authorize(Roles = TypeNameConstants.TypeAdmin)]
-        public async Task<IActionResult> UpdateState(Guid returnRequestId, [FromBody] UpdateReturnRequestStateRequest request)
+        public async Task<IActionResult> UpdateState(Guid returnRequestId, [FromBody] RequestUpdateReturnRequestStateDto request)
         {
             if (request.State == TypeRequestState.WaitingForReturning)
                 return BadRequest();

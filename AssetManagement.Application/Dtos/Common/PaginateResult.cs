@@ -1,6 +1,6 @@
 ﻿namespace AssetManagement.Application.Dtos.Common
 {
-    public class PaginatedResult<T>
+    public class ResponsePaginatedResultDto<T>
     {
         public IEnumerable<T> Data { get; set; }
         public int PageNumber { get; set; }

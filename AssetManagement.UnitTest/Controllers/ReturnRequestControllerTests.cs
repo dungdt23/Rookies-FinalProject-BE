@@ -1,6 +1,7 @@
 ﻿using AssetManagement.Api.Controllers;
 using AssetManagement.Application.Dtos.Common;
-using AssetManagement.Application.Dtos.ReturnRequest;
+using AssetManagement.Application.Dtos.ResponseDtos;
+using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.IServices;
 using AssetManagement.Domain.Enums;
 using Microsoft.AspNetCore.Http;
@@ -30,12 +31,12 @@ namespace AssetManagement.UnitTests.Controllers
         public async Task GetAll_ShouldReturnOk_WhenReturnRequestsExist()
         {
             // Arrange
-            var returnRequests = new List<ReturnRequestGetAllViewModel>
+            var returnRequests = new List<ResponseReturnRequestGetAllDto>
             {
-                new ReturnRequestGetAllViewModel { Id = Guid.NewGuid(), ReturnedDate = DateTime.Today }
+                new ResponseReturnRequestGetAllDto { Id = Guid.NewGuid(), ReturnedDate = DateTime.Today }
             };
             var totalCount = 1;
-            var request = new GetAllReturnRequest();
+            var request = new RequestGetAllReturnRequestDto();
 
 
             _mockReturnRequestService
@@ -47,7 +48,7 @@ namespace AssetManagement.UnitTests.Controllers
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var paginatedResult = Assert.IsType<PaginatedResult<ReturnRequestGetAllViewModel>>(okResult.Value);
+            var paginatedResult = Assert.IsType<ResponsePaginatedResultDto<ResponseReturnRequestGetAllDto>>(okResult.Value);
             Assert.Equal(returnRequests, paginatedResult.Data);
             Assert.Equal(totalCount, paginatedResult.TotalCount);
         }
@@ -56,8 +57,8 @@ namespace AssetManagement.UnitTests.Controllers
         public async Task Create_ShouldReturnCreated_WhenReturnRequestCreated()
         {
             // Arrange
-            var request = new CreateReturnRequestRequest();
-            var returnRequestViewModel = new ReturnRequestViewModel();
+            var request = new RequestCreateReturnRequestDto();
+            var returnRequestViewModel = new ResponseReturnRequestDto();
 
             _mockReturnRequestService
                 .Setup(service => service.CreateReturnRequestAsync(request, It.IsAny<Guid>()))
@@ -76,7 +77,7 @@ namespace AssetManagement.UnitTests.Controllers
         {
             // Arrange
             var returnRequestId = Guid.NewGuid();
-            var request = new UpdateReturnRequestStateRequest { State = TypeRequestState.Completed };
+            var request = new RequestUpdateReturnRequestStateDto { State = TypeRequestState.Completed };
 
             _mockReturnRequestService
                 .Setup(service => service.CompleteReturnRequestAsync(returnRequestId, It.IsAny<Guid>()))
@@ -94,7 +95,7 @@ namespace AssetManagement.UnitTests.Controllers
         {
             // Arrange
             var returnRequestId = Guid.NewGuid();
-            var request = new UpdateReturnRequestStateRequest { State = TypeRequestState.Rejected };
+            var request = new RequestUpdateReturnRequestStateDto { State = TypeRequestState.Rejected };
 
             _mockReturnRequestService
                 .Setup(service => service.RejectReturnRequestAsync(returnRequestId, It.IsAny<Guid>()))

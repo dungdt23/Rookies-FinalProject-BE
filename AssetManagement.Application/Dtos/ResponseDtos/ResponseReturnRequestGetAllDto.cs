@@ -1,8 +1,8 @@
 ﻿using AssetManagement.Domain.Enums;
 
-namespace AssetManagement.Application.Dtos.ReturnRequest
+namespace AssetManagement.Application.Dtos.ResponseDtos
 {
-    public class ReturnRequestGetAllViewModel
+    public class ResponseReturnRequestGetAllDto
     {
         public Guid Id { get; set; }
 

@@ -15,7 +15,7 @@ public class AssignmentRepository : GenericRepository<Assignment>, IAssignmentRe
 	}
 	private IQueryable<Assignment> ApplyFilter(bool? own, AssignmentFilter filter, Guid userId, UserType userType, Guid locationId)
 	{
-		IQueryable<Assignment> query = _dbContext.Assignments.Where(x => !x.IsDeleted && x.Assigner.LocationId == locationId && !x.ActiveReturnRequestId.HasValue);
+		IQueryable<Assignment> query = _dbContext.Assignments.Where(x => !x.IsDeleted && x.Assigner.LocationId == locationId);
 		if (userType == UserType.Staff)
 		{
 			query = query.Where(x => x.AssigneeId == userId && x.State != Domain.Enums.TypeAssignmentState.Declined && x.AssignedDate.Date <= DateTime.Now.Date);
