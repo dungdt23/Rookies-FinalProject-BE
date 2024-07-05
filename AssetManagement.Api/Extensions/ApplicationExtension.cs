@@ -17,6 +17,7 @@ public static class ApplicationExtension
 	private static readonly int UserToGenerate = 200;
 	private static readonly int AssetToGenerate = 300;
 	private static readonly int CategoryToGenerate = 15;
+	private static readonly int MaxAssignmentHistory = 10;
 
 	public static async Task SeedDataAsync(this IApplicationBuilder app)
 	{
@@ -24,11 +25,15 @@ public static class ApplicationExtension
 		using (var scope = app.ApplicationServices.CreateScope())
 		{
 			var dbContext = scope.ServiceProvider.GetService<AssetManagementDBContext>();
-			await dbContext!.SeedReturnRequestsAsync();
 
-			await dbContext!.SeedAssignmentHistoriesAsync("Hà Nội");
-			await dbContext!.SeedAssignmentHistoriesAsync("Đà Nẵng");
-			await dbContext!.SeedAssignmentHistoriesAsync("Hồ Chí Minh");
+			if (dbContext!.ReturnRequests.Any())
+			{
+				await dbContext!.SeedReturnRequestsAsync();
+				await dbContext!.SeedAssignmentHistoriesAsync("Hà Nội");
+				await dbContext!.SeedAssignmentHistoriesAsync("Đà Nẵng");
+				await dbContext!.SeedAssignmentHistoriesAsync("Hồ Chí Minh");
+			}
+
 
 			var jwtInvalidationService = scope.ServiceProvider.GetService<IJwtInvalidationService>();
 			await jwtInvalidationService!.UpdateGlobalInvalidationTimeStampAsync(null);
@@ -423,7 +428,7 @@ public static class ApplicationExtension
 					dbContext.UpdateRange(declinedAssetToUpdates);
 					dbContext.SaveChanges();
 
-					
+
 
 				}
 				transaction.Commit();
@@ -504,7 +509,7 @@ public static class ApplicationExtension
 									   .RuleFor(a => a.Note, f => f.Lorem.Sentence(5))
 									   .RuleFor(a => a.IsDeleted, f => true)
 									   .RuleFor(a => a.DeletedAt, f => f.Date.Past(1))
-									   .Generate(random.Next(0, 11));
+									   .Generate(random.Next(0, MaxAssignmentHistory + 1));
 
 			foreach (var assignment in assignmentFaker)
 			{
@@ -534,20 +539,17 @@ public static class ApplicationExtension
 
 	public static async Task SeedReturnRequestsAsync(this AssetManagementDBContext dbContext)
 	{
-		if (dbContext.ReturnRequests.Any())
-		{
-			return;
-		}
 
-		var locations = await dbContext.Locations.ToListAsync();
-		var assignments = new List<Assignment>();
-		var returnRequests = new List<ReturnRequest>();
-		foreach (var location in locations)
-		{
-			var acceptedAssignments = await dbContext.Assignments
-			   .Where(a => a.State == TypeAssignmentState.Accepted && a.Asset.LocationId == location.Id)
-			   .Include(a => a.Asset)
-			   .ToListAsync();
+
+        var locations = await dbContext.Locations.ToListAsync();
+        var assignments = new List<Assignment>();
+        var returnRequests = new List<ReturnRequest>();
+        foreach (var location in locations)
+        {
+            var acceptedAssignments = await dbContext.Assignments
+               .Where(a => a.State == TypeAssignmentState.Accepted && a.Asset.LocationId == location.Id)
+               .Include(a => a.Asset)
+               .ToListAsync();
 
 			var random = new Random();
 			var requestStates = Enum.GetValues(typeof(TypeRequestState)).Cast<TypeRequestState>().ToArray();
@@ -608,6 +610,8 @@ public static class ApplicationExtension
 		{
 			await dbContext.ReturnRequests.AddRangeAsync(returnRequests);
 			dbContext.Assignments.UpdateRange(assignments);
+
+
 			await dbContext.SaveChangesAsync();
 			await dbContext.Database.CommitTransactionAsync();
 		}
