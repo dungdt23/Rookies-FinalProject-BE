@@ -267,7 +267,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 
         public async Task<ApiResponse> UpdateAsync(Guid id, RequestAssignmentDto request)
         {
-            var assignment = await _assignmentRepository.GetByCondition(a => a.Id == id)
+            var assignment = await _assignmentRepository.GetByCondition(a => a.Id == id && a.IsDeleted)
                                                         .FirstOrDefaultAsync();
             if (assignment == null)
             {
