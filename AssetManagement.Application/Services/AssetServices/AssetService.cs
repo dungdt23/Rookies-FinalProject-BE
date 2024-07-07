@@ -162,7 +162,7 @@ namespace AssetManagement.Application.Services.AssetServices
         public async Task<ApiResponse> GetByIdAysnc(Guid id)
         {
             var asset = await _assetRepository
-                .GetByCondition(x => x.Id == id)
+                .GetByCondition(x => x.Id == id && !x.IsDeleted)
                 .AsNoTracking()
                 .Include(x => x.Category)
                 .Include(x => x.Location)

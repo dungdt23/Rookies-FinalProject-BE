@@ -1,4 +1,5 @@
 using AssetManagement.Api.Extensions;
+using AssetManagement.Api.Hubs;
 using AssetManagement.Api.Middlewares;
 using AssetManagement.Api.ValidateModel;
 using AssetManagement.Application.IRepositories;
@@ -49,6 +50,7 @@ namespace AssetManagement.Api
             );
             builder.Services.AddDateOnlyTimeOnlyStringConverters();
 
+            builder.Services.AddSignalR();
             // The following line enables Application Insights telemetry collection.
             builder.Services.AddApplicationInsightsTelemetry();
 
@@ -79,9 +81,10 @@ namespace AssetManagement.Api
                 options.AddPolicy("AllowAllOrigins",
                     builder =>
                     {
-                        builder.AllowAnyOrigin()
+                        builder.SetIsOriginAllowed(origin => true)
                                .AllowAnyMethod()
-                               .AllowAnyHeader();
+                               .AllowAnyHeader()
+                               .AllowCredentials();
                     });
             });
 
@@ -151,15 +154,14 @@ namespace AssetManagement.Api
 
             app.UseHttpsRedirection();
             app.UseCors("AllowAllOrigins");
-
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseWhen(context => !context.Request.Path.StartsWithSegments("/users/change-password-first-time"), appBuilder =>
             {
                 appBuilder.UseMiddleware<ValidateUserMiddleware>();
             });
-
             app.MapControllers();
+            app.MapHub<SignalRHub>("/signalr-hub");
 
             if (app.Environment.IsDevelopment())
             {

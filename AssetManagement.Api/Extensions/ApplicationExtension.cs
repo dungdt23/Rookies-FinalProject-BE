@@ -513,8 +513,10 @@ public static class ApplicationExtension
 			.ToList();
 
 		var random = new Random();
+		int count = 0;
 		foreach (var asset in assets)
 		{
+			if (count == 50) break;
 			var assignmentFaker = new Faker<Assignment>()
 									   .RuleFor(a => a.AssetId, f => asset.Id)
 									   .RuleFor(a => a.AssignerId, f => f.PickRandom(assigner).Id)
@@ -548,6 +550,7 @@ public static class ApplicationExtension
 			//		State = randomState,
 			//		LocationId = location.Id,
 			//		CreatedAt = past,
+			count++;
 		}
 		await dBContext.SaveChangesAsync();
 	}
