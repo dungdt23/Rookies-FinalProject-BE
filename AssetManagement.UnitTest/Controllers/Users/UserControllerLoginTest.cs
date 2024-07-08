@@ -61,7 +61,7 @@ namespace AssetManagement.UnitTest.Controllers.Users
                 Data = new { tokenType = "Bearer", token = "mockToken", isFirstTimeLogin = false }
             };
 
-            _userServiceMock.Setup(us => us.LoginAsync(It.IsAny<RequestLoginDto>(), It.IsAny<byte[]>()))
+            _userServiceMock.Setup(us => us.LoginAsync(It.IsAny<RequestLoginDto>(), It.IsAny<byte[]>(), It.IsAny<int>()))
                             .ReturnsAsync(apiResponse);
 
             // Act
@@ -85,7 +85,7 @@ namespace AssetManagement.UnitTest.Controllers.Users
                 Data = UserApiResponseMessageConstant.UserLoginWrongPasswordOrUsername
             };
 
-            _userServiceMock.Setup(us => us.LoginAsync(It.IsAny<RequestLoginDto>(), It.IsAny<byte[]>()))
+            _userServiceMock.Setup(us => us.LoginAsync(It.IsAny<RequestLoginDto>(), It.IsAny<byte[]>(), It.IsAny<int>()))
                             .ReturnsAsync(apiResponse);
 
             // Act

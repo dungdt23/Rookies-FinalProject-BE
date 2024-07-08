@@ -12,6 +12,7 @@ public static class UserApiResponseMessageConstant
     public const string UserLoginSuccess = "User login successfully";
     public const string DisabledUser = "Your account has been disabled for admin. You can contact admin for solution!";
     public const string OldPasswordWrong = "Password is incorrect";
-    public const string ChangePasswordSuccess = "Password changed successfully";
+    public const string MatchOldPassword = "New password should not be the same as old password";
+	public const string ChangePasswordSuccess = "Password changed successfully";
 	public const string ChangePasswordFail = "Password changed failed";
 }

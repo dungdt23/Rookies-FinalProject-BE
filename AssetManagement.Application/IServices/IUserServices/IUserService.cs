@@ -8,7 +8,7 @@ namespace AssetManagement.Application.IServices.IUserServices;
 
 public interface IUserService
 {
-    Task<ApiResponse> LoginAsync(RequestLoginDto form, byte[] key);
+    Task<ApiResponse> LoginAsync(RequestLoginDto form, byte[] key,int duration);
     Task<ApiResponse> CreateAsync(RequestUserCreateDto form);
     Task<ApiResponse> UpdateAsync(Guid id, RequestUserEditDto form);
     User EncryptPassword(User user, string password);
