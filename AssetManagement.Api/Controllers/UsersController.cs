@@ -98,7 +98,8 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Login([FromBody] RequestLoginDto login)
     {
         var key = Encoding.ASCII.GetBytes(_applicationSettings.Secret);
-        var result = await _userService.LoginAsync(login, key);
+        var duration = _applicationSettings.Duration;
+        var result = await _userService.LoginAsync(login, key,duration);
         if (result.StatusCode == StatusCodes.Status400BadRequest)
         {
             return BadRequest(result);
