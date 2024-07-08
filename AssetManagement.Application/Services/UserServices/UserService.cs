@@ -335,7 +335,15 @@ public class UserService : IUserService
 			};
 		}
 
-
+		if (isFirstTime && CheckPassword(user, newPassword))
+		{
+			return new ApiResponse
+			{
+				StatusCode = StatusCodes.Status400BadRequest,
+				Message = UserApiResponseMessageConstant.MatchOldPassword,
+				Data = newPassword
+			};
+		}
 		user = EncryptPassword(user, newPassword);
 		user.TokenInvalidationTimestamp = DateTime.UtcNow;
 		user.IsPasswordChanged = true;
