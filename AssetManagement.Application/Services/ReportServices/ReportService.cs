@@ -71,13 +71,14 @@ namespace AssetManagement.Application.Services.ReportServices
         }
         public async Task<PagedResponse<ResponseReportDto>> GetReportData(Guid locationId, ReportFilter? filter, int? index, int? size)
         {
-            var query = _categoryRepository.GetByCondition(c => !c.IsDeleted && c.Assets.Any(a => a.LocationId == locationId))
+            var query = _categoryRepository.GetByCondition(c => !c.IsDeleted)
                                                  .Include(c => c.Assets.Where(a => a.LocationId == locationId))
                                                  .AsNoTracking();
             var totalCount = query.Count();
             if (totalCount == 0) return new PagedResponse<ResponseReportDto>
             {
                 TotalCount = totalCount,
+                Data = new List<ResponseReportDto>(),
                 Message = ReportApiResponseMessageConstant.ReportGetNotFound
             };
             if (filter != null)

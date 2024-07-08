@@ -131,9 +131,11 @@ namespace AssetManagement.Api
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["ApplicationSettings:Secret"])),
+                    ValidateLifetime = true,
+					ClockSkew = TimeSpan.Zero,
+					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["ApplicationSettings:Secret"])),
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
                 };
             });
 
