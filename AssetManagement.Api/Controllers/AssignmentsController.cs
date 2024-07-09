@@ -135,9 +135,9 @@ namespace AssetManagement.Api.Controllers
         }
         [HttpGet("asset-historical/{assetId}")]
         [Authorize(Roles = TypeNameConstants.TypeAdmin)]
-        public async Task<IActionResult> GetByAssetId(Guid assetId, bool isDateAscending, int index = PaginationConstant.DefaultIndex, int size = PaginationConstant.DefaultSize)
+        public async Task<IActionResult> GetByAssetId(Guid assetId, bool isDateDescending, int index = PaginationConstant.DefaultIndex, int size = PaginationConstant.DefaultSize)
         {
-            var result = await _assignmentService.GetByAssetIdAsync(assetId, isDateAscending, index, size);
+            var result = await _assignmentService.GetByAssetIdAsync(assetId, isDateDescending, index, size);
             return Ok(result);
         }
     }

@@ -329,7 +329,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 
 			}
 		}
-		public async Task<PagedResponse<ResponseHistoryAsmDto>> GetByAssetIdAsync(Guid assetId, bool isDateAscending, int index, int size)
+		public async Task<PagedResponse<ResponseHistoryAsmDto>> GetByAssetIdAsync(Guid assetId, bool isDateDescending, int index, int size)
 		{
 			var query = _assignmentRepository.GetByCondition(x => x.AssetId == assetId)
 				.Include(x => x.Asset)
@@ -337,13 +337,13 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				.Include(x => x.Assignee)
 				.Include(x => x.ReturnRequests);
 			var historicalAsm = new List<Assignment>();
-			if (isDateAscending) 
+			if (isDateDescending) 
 			{
-                historicalAsm = await query.OrderBy(x => x.AssignedDate)
+                historicalAsm = await query.OrderByDescending(x => x.AssignedDate)
 				.Skip((index - 1) * size).Take(size).ToListAsync();
             } else
 			{
-                historicalAsm = await query.OrderByDescending(x => x.AssignedDate)
+                historicalAsm = await query.OrderBy(x => x.AssignedDate)
                     .Skip((index - 1) * size).Take(size).ToListAsync();
             }
             var historicalAsmDto = _mapper.Map<IEnumerable<ResponseHistoryAsmDto>>(historicalAsm);
