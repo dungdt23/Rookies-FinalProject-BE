@@ -1,9 +1,11 @@
-﻿using AssetManagement.Application.Dtos.RequestDtos;
+﻿using AssetManagement.Api.Hubs;
+using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Filters;
 using AssetManagement.Application.IServices.IAssetServices;
 using AssetManagement.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace AssetManagement.Api.Controllers
 {
@@ -13,15 +15,17 @@ namespace AssetManagement.Api.Controllers
     {
         private readonly IAssetService _assetService;
         private readonly ILogger<AssetsController> _logger;
-        public AssetsController(IAssetService assetService, ILogger<AssetsController> logger)
+        private readonly IHubContext<SignalRHub> _hubContext;
+        public AssetsController(IAssetService assetService, ILogger<AssetsController> logger, IHubContext<SignalRHub> hubContext)
         {
             _assetService = assetService;
             _logger = logger;
+            _hubContext = hubContext;
         }
 
         [HttpGet]
         [Authorize(Roles = TypeNameConstants.TypeAdmin)]
-        public async Task<IActionResult> Get([FromQuery] AssetFilter filter, int index = 1, int size = 10)
+        public async Task<IActionResult> Get([FromQuery] AssetFilter filter, int index = PaginationConstant.DefaultIndex, int size = PaginationConstant.DefaultSize)
         {
             var locationIdClaim = HttpContext.GetClaim("locationId");
             var locationId = new Guid(locationIdClaim);
@@ -60,6 +64,7 @@ namespace AssetManagement.Api.Controllers
             {
                 return StatusCode(StatusCodes.Status409Conflict, result);
             }
+            await _hubContext.Clients.All.SendAsync("Deleted", id);
             return Ok(result);
         }
         [HttpPut("{id}")]

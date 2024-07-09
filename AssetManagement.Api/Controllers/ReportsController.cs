@@ -31,7 +31,7 @@ namespace AssetManagement.Api.Controllers
         }
         [HttpGet]
         [Authorize(Roles = TypeNameConstants.TypeAdmin)]
-        public async Task<IActionResult> Get([FromQuery] ReportFilter filter, int index = 1, int size = 10)
+        public async Task<IActionResult> Get([FromQuery] ReportFilter filter, int index = PaginationConstant.DefaultIndex, int size = PaginationConstant.DefaultSize)
         {
             var locationIdClaim = HttpContext.GetClaim("locationId");
             var locationId = new Guid(locationIdClaim);

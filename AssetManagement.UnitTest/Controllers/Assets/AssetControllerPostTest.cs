@@ -1,10 +1,12 @@
 ﻿using AssetManagement.Api.Controllers;
+using AssetManagement.Api.Hubs;
 using AssetManagement.Application.ApiResponses;
 using AssetManagement.Application.Dtos.RequestDtos;
 using AssetManagement.Application.Dtos.ResponseDtos;
 using AssetManagement.Application.IServices.IAssetServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -17,13 +19,16 @@ namespace AssetManagement.UnitTest.Controllers.Assets
         private AssetsController _assetsController;
         private Mock<ILogger<AssetsController>> _mockLogger;
         private Mock<RequestAssetDto> _requestAssetDto; 
-        private Mock<ResponseAssetDto> _responseAssetDto; 
+        private Mock<ResponseAssetDto> _responseAssetDto;
+        private Mock<IHubContext<SignalRHub>> _mockHubContext;
+
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             _mockAssetService = new Mock<IAssetService>();
             _mockLogger = new Mock<ILogger<AssetsController>>();
-            _assetsController = new AssetsController(_mockAssetService.Object, _mockLogger.Object);
+            _mockHubContext = new Mock<IHubContext<SignalRHub>>();
+            _assetsController = new AssetsController(_mockAssetService.Object, _mockLogger.Object, _mockHubContext.Object);
         }
         [SetUp] 
         public void SetUp()
