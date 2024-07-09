@@ -171,5 +171,33 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
             notFoundResult.StatusCode.Should().Be(StatusCodes.Status404NotFound);
             notFoundResult.Value.Should().BeEquivalentTo(response);
         }
+        [Test]
+        public async Task GetById_ShouldReturnOk_WhenRecordFound()
+        {
+            //Arrange
+            Guid id = Guid.NewGuid();
+            var historicalAsmDto = new List<ResponseHistoryAsmDto>
+            {
+                new ResponseHistoryAsmDto(),
+            };
+            var response = new PagedResponse<ResponseHistoryAsmDto>
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = AssignmentApiResponseMessageConstant.AssignmentNotFound,
+                Data = historicalAsmDto,
+                TotalCount = 1
+            };
+
+            _assignmentServiceMock.Setup(a => a.GetByAssetIdAsync(id,true,1,10)).ReturnsAsync(response);
+
+            //Act
+            var result = await _controller.GetByAssetId(id,true,1,10);
+
+            //Assert
+            var foundResult = result as OkObjectResult;
+            foundResult.Should().NotBeNull();
+            foundResult.StatusCode.Should().Be(StatusCodes.Status200OK);
+            foundResult.Value.Should().BeEquivalentTo(response);
+        }
     }
 }
