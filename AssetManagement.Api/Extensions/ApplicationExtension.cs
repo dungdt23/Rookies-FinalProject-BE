@@ -17,7 +17,8 @@ public static class ApplicationExtension
 	private static readonly int UserToGenerate = 200;
 	private static readonly int AssetToGenerate = 300;
 	private static readonly int CategoryToGenerate = 30;
-	private static readonly int MaxAssignmentHistory = 30;
+	private static readonly int MaxAssignmentHistory = 15;
+	private static readonly int MaxNumberOfAssetWithAsmHistory = 200;
 
 	public static async Task SeedDataAsync(this IApplicationBuilder app)
 	{
@@ -516,7 +517,7 @@ public static class ApplicationExtension
 		int count = 0;
 		foreach (var asset in assets)
 		{
-			if (count == 50) break;
+			if (count == MaxNumberOfAssetWithAsmHistory) break;
 			var assignmentFaker = new Faker<Assignment>()
 									   .RuleFor(a => a.AssetId, f => asset.Id)
 									   .RuleFor(a => a.AssignerId, f => f.PickRandom(assigner).Id)
@@ -540,6 +541,7 @@ public static class ApplicationExtension
 					.RuleFor(r => r.ResponderId, f => f.PickRandom(assigner).Id)
 					.RuleFor(r => r.ReturnedDate, (f, a) => a.RequestedDate.AddDays(random.Next(0, 50)))
 					.Generate(1);
+				assignment.ActiveReturnRequestId = returnRequestFaker[0].Id;
 				await dBContext.AddRangeAsync(returnRequestFaker);
 
 			}

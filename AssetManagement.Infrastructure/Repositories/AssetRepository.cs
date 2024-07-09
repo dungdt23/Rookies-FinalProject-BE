@@ -31,7 +31,11 @@ namespace AssetManagement.Infrastructure.Repositories
                                             IsDeleted = asset.IsDeleted,
                                             Location = asset.Location,
                                             Category = asset.Category,
-                                            Assignments = asset.Assignments.Take(HistoryAssignmentConstant.DefaultDisplay).Select(a => new Assignment
+                                            InstalledDate = asset.InstalledDate,
+                                            Specification = asset.Specification,
+                                            Assignments = asset.Assignments.Take(HistoryAssignmentConstant.DefaultDisplay)
+                                            .OrderByDescending(a => a.AssignedDate)
+                                            .Select(a => new Assignment
                                             {
                                                 Id = a.Id,
                                                 Assignee = new User { UserName = a.Assignee.UserName },
