@@ -35,7 +35,8 @@ namespace AssetManagement.Infrastructure.Repositories
                                             {
                                                 Id = a.Id,
                                                 Assignee = new User { UserName = a.Assignee.UserName },
-                                                Assigner = new User { UserName = a.Assigner.UserName }
+                                                Assigner = new User { UserName = a.Assigner.UserName },
+                                                AssignedDate = a.AssignedDate,
                                             }).ToList()
                                         });
 

@@ -329,21 +329,28 @@ namespace AssetManagement.Application.Services.AssignmentServices
 
 			}
 		}
-		public async Task<PagedResponse<ResponseHistoryAsmDto>> GetByAssetIdAsync(Guid assetId, int index, int size)
+		public async Task<PagedResponse<ResponseHistoryAsmDto>> GetByAssetIdAsync(Guid assetId, bool isDateAscending, int index, int size)
 		{
-			var historicalAsm = await _assignmentRepository.GetByCondition(x => x.AssetId == assetId)
+			var query = _assignmentRepository.GetByCondition(x => x.AssetId == assetId)
 				.Include(x => x.Asset)
 				.Include(x => x.Assigner)
 				.Include(x => x.Assignee)
-				.Include(x => x.ReturnRequests)
-				.OrderByDescending(x => x.CreatedAt)
-				.Skip((index - 1) * size).Take(size)
-				.ToListAsync();
-			var historicalAsmDto = _mapper.Map<IEnumerable<ResponseHistoryAsmDto>>(historicalAsm);
+				.Include(x => x.ReturnRequests);
+			var historicalAsm = new List<Assignment>();
+			if (isDateAscending) 
+			{
+                historicalAsm = await query.OrderBy(x => x.AssignedDate)
+				.Skip((index - 1) * size).Take(size).ToListAsync();
+            } else
+			{
+                historicalAsm = await query.OrderByDescending(x => x.AssignedDate)
+                    .Skip((index - 1) * size).Take(size).ToListAsync();
+            }
+            var historicalAsmDto = _mapper.Map<IEnumerable<ResponseHistoryAsmDto>>(historicalAsm);
 			return new PagedResponse<ResponseHistoryAsmDto>
 			{
 				Data = historicalAsmDto,
-				TotalCount = historicalAsm.Count()
+				TotalCount = query.Count()
 			};
 		}
 	}

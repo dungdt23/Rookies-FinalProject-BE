@@ -17,7 +17,7 @@ public static class ApplicationExtension
 	private static readonly int UserToGenerate = 200;
 	private static readonly int AssetToGenerate = 300;
 	private static readonly int CategoryToGenerate = 30;
-	private static readonly int MaxAssignmentHistory = 10;
+	private static readonly int MaxAssignmentHistory = 30;
 
 	public static async Task SeedDataAsync(this IApplicationBuilder app)
 	{

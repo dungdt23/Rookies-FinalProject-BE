@@ -88,5 +88,24 @@ namespace AssetManagement.UnitTest.Services.Assignments
 			result.Message.Should().Be(AssignmentApiResponseMessageConstant.AssignmentGetSuccess);
 			result.Data.Should().BeEquivalentTo(_assignmentDtoMock.Object);
 		}
+		[Test]
+		public async Task GetByAssetIdAsync_ReturnOk_ReturnAsmFoundWithAssetId()
+		{
+            //Arrange
+            var id = Guid.NewGuid();
+            var assignmentsMock = new List<Assignment> { _assignmentMock.Object };
+            var assignmentsQueryMock = assignmentsMock.AsQueryable().BuildMock();
+
+            _assignmentRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Assignment, bool>>>())).Returns(assignmentsQueryMock);
+            _mapperMock.Setup(m => m.Map<ResponseAssignmentDto>(It.IsAny<Assignment>())).Returns(_assignmentDtoMock.Object);
+
+            //Act
+            var result = await _assignmentService.GetByAssetIdAsync(id, true, 1, 10);
+
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType(typeof(PagedResponse<ResponseHistoryAsmDto>));
+            result.StatusCode.Should().Be(StatusCodes.Status200OK);
+        }
 	}
 }
