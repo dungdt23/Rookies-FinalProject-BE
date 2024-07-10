@@ -129,7 +129,7 @@ namespace AssetManagement.Application.Services
             var user = await _userRepository.GetByCondition(u => u.Id == requesterId)
                 .FirstOrDefaultAsync();
 
-            if (user.Type.TypeName == TypeNameConstants.TypeStaff && returnRequest.Assignment.AssigneeId != user.Id)
+            if (user.Type.TypeName == TypeNameConstants.TypeStaff && returnRequest.RequestorId != user.Id)
                 throw new UnauthorizedReturnRequestAccessException($"You do not have access to this return request.");
 
             if (returnRequest.LocationId != user!.LocationId)
@@ -173,7 +173,7 @@ namespace AssetManagement.Application.Services
             var user = await _userRepository.GetByCondition(u => u.Id == requesterId)
                 .FirstOrDefaultAsync();
 
-            if (user.Type.TypeName == TypeNameConstants.TypeStaff && returnRequest.Assignment.AssigneeId != user.Id)
+            if (user.Type.TypeName == TypeNameConstants.TypeStaff && returnRequest.RequestorId != user.Id)
                 throw new UnauthorizedReturnRequestAccessException($"You do not have access to this return request.");
 
             if (returnRequest.LocationId != user!.LocationId)

@@ -276,7 +276,7 @@ namespace AssetManagement.UnitTest.Services
         }
 
         [Fact]
-        public async Task CompleteReturnRequestAsync_ShouldThrowUnauthorizedReturnRequestAccessException_WhenStaffUserIsNotAssignmentAssignee()
+        public async Task CompleteReturnRequestAsync_ShouldThrowUnauthorizedReturnRequestAccessException_WhenStaffUserIsNotTheRequestor()
         {
             // Arrange
             var returnRequestId = Guid.NewGuid();
@@ -286,7 +286,8 @@ namespace AssetManagement.UnitTest.Services
                 Id = returnRequestId,
                 LocationId = Guid.NewGuid(),
                 State = TypeRequestState.WaitingForReturning,
-                Assignment = new Assignment { Asset = new Asset(), AssigneeId = Guid.NewGuid() }
+                RequestorId = Guid.NewGuid(),
+                Assignment = new Assignment { Asset = new Asset() }
             };
             var user = new User { Id = requesterId, LocationId = Guid.NewGuid(), Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
 
@@ -313,6 +314,7 @@ namespace AssetManagement.UnitTest.Services
                 Id = returnRequestId,
                 LocationId = Guid.NewGuid(),
                 State = TypeRequestState.WaitingForReturning,
+                RequestorId = requesterId,
                 Assignment = new Assignment { Asset = new Asset(), AssigneeId = requesterId }
             };
             var user = new User { Id = requesterId, LocationId = Guid.NewGuid(), Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
@@ -340,6 +342,7 @@ namespace AssetManagement.UnitTest.Services
                 Id = returnRequestId,
                 LocationId = Guid.NewGuid(),
                 State = TypeRequestState.Completed,
+                RequestorId = requesterId,
                 Assignment = new Assignment { Asset = new Asset(), AssigneeId = requesterId }
             };
             var user = new User { Id = requesterId, LocationId = returnRequest.LocationId, Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
@@ -367,6 +370,7 @@ namespace AssetManagement.UnitTest.Services
                 Id = returnRequestId,
                 LocationId = Guid.NewGuid(),
                 State = TypeRequestState.WaitingForReturning,
+                RequestorId = requesterId,
                 Assignment = new Assignment
                 {
                     Asset = new Asset(),
@@ -419,7 +423,7 @@ namespace AssetManagement.UnitTest.Services
         }
 
         [Fact]
-        public async Task RejectReturnRequestAsync_ShouldThrowUnauthorizedReturnRequestAccessException_WhenStaffUserIsNotAssignmentAssignee()
+        public async Task RejectReturnRequestAsync_ShouldThrowUnauthorizedReturnRequestAccessException_WhenStaffUserIsNotTheRequestor()
         {
             // Arrange
             var returnRequestId = Guid.NewGuid();
@@ -429,7 +433,8 @@ namespace AssetManagement.UnitTest.Services
                 Id = returnRequestId,
                 LocationId = Guid.NewGuid(),
                 State = TypeRequestState.WaitingForReturning,
-                Assignment = new Assignment { Asset = new Asset(), AssigneeId = Guid.NewGuid() }
+                RequestorId = Guid.NewGuid(),
+                Assignment = new Assignment { Asset = new Asset() }
             };
             var user = new User { Id = requesterId, LocationId = Guid.NewGuid(), Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
 
@@ -456,7 +461,8 @@ namespace AssetManagement.UnitTest.Services
                 Id = returnRequestId,
                 LocationId = Guid.NewGuid(),
                 State = TypeRequestState.WaitingForReturning,
-                Assignment = new Assignment { Asset = new Asset(), AssigneeId = requesterId }
+                RequestorId = requesterId,
+                Assignment = new Assignment { Asset = new Asset() }
             };
             var user = new User { Id = requesterId, LocationId = Guid.NewGuid(), Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
 
@@ -483,7 +489,8 @@ namespace AssetManagement.UnitTest.Services
                 Id = returnRequestId,
                 LocationId = Guid.NewGuid(),
                 State = TypeRequestState.Completed,
-                Assignment = new Assignment { Asset = new Asset(), AssigneeId = requesterId }
+                RequestorId = requesterId,
+                Assignment = new Assignment { Asset = new Asset() }
             };
             var user = new User { Id = requesterId, LocationId = returnRequest.LocationId, Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
 
@@ -510,6 +517,7 @@ namespace AssetManagement.UnitTest.Services
                 Id = returnRequestId,
                 LocationId = Guid.NewGuid(),
                 State = TypeRequestState.WaitingForReturning,
+                RequestorId = requesterId,
                 Assignment = new Assignment { Asset = new Asset(), AssigneeId = requesterId }
             };
             var user = new User { Id = requesterId, LocationId = returnRequest.LocationId, Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
