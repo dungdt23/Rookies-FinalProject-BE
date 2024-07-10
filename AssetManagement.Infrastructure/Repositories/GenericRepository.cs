@@ -62,7 +62,7 @@ namespace AssetManagement.Infrastructure.Repositories
         {
             try
             {
-                var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+                var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
                 if (entity == null) return RecordStatus.Invalid;
                 entity.DeletedAt = DateTime.UtcNow;
                 entity.IsDeleted = true;
@@ -78,7 +78,7 @@ namespace AssetManagement.Infrastructure.Repositories
 
         public virtual IQueryable<T> GetByCondition(Expression<Func<T, bool>> condition)
         {
-            return _dbSet.Where(condition);
+            return _dbSet.Where(t => !t.IsDeleted).Where(condition);
         }
 
     }

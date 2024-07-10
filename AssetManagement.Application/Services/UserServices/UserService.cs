@@ -288,7 +288,7 @@ public class UserService : IUserService
 
     public async Task<ApiResponse> GetById(Guid id)
     {
-        var user = await _userRepository.GetByCondition(x => x.Id == id && x.DeletedAt != null)
+        var user = await _userRepository.GetByCondition(x => x.Id == id)
             .Include(x => x.Type)
             .Include(x => x.Location)
             .FirstOrDefaultAsync();
@@ -313,7 +313,7 @@ public class UserService : IUserService
 
     public async Task<ApiResponse> ChangePasswordAsync(string? oldPassword, string newPassword, Guid userId, bool isFirstTime)
     {
-        var user = await _userRepository.GetByCondition(u => u.Id == userId && x.DeletedAt != null).FirstOrDefaultAsync();
+        var user = await _userRepository.GetByCondition(u => u.Id == userId && u.DeletedAt != null).FirstOrDefaultAsync();
 
         if (user == null)
         {

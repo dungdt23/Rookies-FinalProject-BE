@@ -66,7 +66,19 @@ namespace AssetManagement.Api.Controllers
         [Authorize]
         public async Task<IActionResult> Respond([FromBody] RequestAssignmentRespondDto request)
         {
-            var result = await _assignmentService.RespondAsync(request);
+			var userIdClaim = HttpContext.GetClaim("id");
+			Guid userIdGuid;
+			if (!Guid.TryParse(userIdClaim, out userIdGuid))
+			{
+				return Unauthorized();
+			}
+			var locationIdClaim = HttpContext.GetClaim("locationId");
+			Guid locationIdGuid;
+			if (!Guid.TryParse(locationIdClaim, out locationIdGuid))
+			{
+				return Unauthorized();
+			}
+			var result = await _assignmentService.RespondAsync(request, userIdGuid, locationIdGuid);
             if (result.StatusCode == StatusCodes.Status404NotFound)
             {
                 return NotFound(result);
