@@ -18,7 +18,7 @@ public static class ApplicationExtension
 	private static readonly int AssetToGenerate = 300;
 	private static readonly int CategoryToGenerate = 30;
 	private static readonly int MaxAssignmentHistory = 15;
-	private static readonly int MaxNumberOfAssetWithAsmHistory = 200;
+	private static readonly int MaxNumberOfAssetWithAsmHistory = 50;
 
 	public static async Task SeedDataAsync(this IApplicationBuilder app)
 	{
@@ -29,7 +29,7 @@ public static class ApplicationExtension
 
 			if (!dbContext!.ReturnRequests.Any())
 			{
-				await dbContext!.SeedReturnRequestsAsync();
+				//await dbContext!.SeedReturnRequestsAsync();
 
 				await dbContext!.SeedAssignmentHistoriesAsync("Hà Nội");
 				await dbContext!.SeedAssignmentHistoriesAsync("Đà Nẵng");
@@ -282,170 +282,170 @@ public static class ApplicationExtension
 				var assetCodes = new Dictionary<Guid, int>();
 				if (!dbContext.Assets.Any())
 				{
-					var assets = GenerateAsset(assetCodes, 200, dbContext);
+					var assets = GenerateAsset(assetCodes, 500, dbContext);
 				}
 
-				if (!dbContext.Assignments.Any())
-				{
-					var random = new Random();
-					var assigner = dbContext.Users.Where(a => a.StaffCode.Equals("SD0001")).AsNoTracking().FirstOrDefault();
-					var typeStaff = dbContext.Types.Where(a => a.TypeName == "Staff").AsNoTracking().FirstOrDefault();
-					var assignee = dbContext.Users.Where(a => a.TypeId == typeStaff.Id && a.LocationId == assigner.LocationId).AsNoTracking().ToList();
-					var assets = GenerateAsset(assetCodes, 100, dbContext, "Hà Nội");
-					dbContext.ChangeTracker.Clear();
+				//if (!dbContext.Assignments.Any())
+				//{
+				//	var random = new Random();
+				//	//var assigner = dbContext.Users.Where(a => a.StaffCode.Equals("SD0001")).AsNoTracking().FirstOrDefault();
+				//	//var typeStaff = dbContext.Types.Where(a => a.TypeName == "Staff").AsNoTracking().FirstOrDefault();
+				//	//var assignee = dbContext.Users.Where(a => a.TypeId == typeStaff.Id && a.LocationId == assigner.LocationId).AsNoTracking().ToList();
+				//	//var assets = GenerateAsset(assetCodes, 100, dbContext, "Hà Nội");
+				//	//dbContext.ChangeTracker.Clear();
 
-					for (int i = 0; i < assets.Count; i++)
-					{
-						var assignmentFaker = new Faker<Assignment>()
-										.RuleFor(a => a.AssetId, f => assets[i].Id)
-										.RuleFor(a => a.AssignerId, f => assigner.Id)
-										.RuleFor(a => a.AssigneeId, f => f.PickRandom(assignee).Id)
-										.RuleFor(a => a.State, f => f.PickRandom<TypeAssignmentState>())
-										.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
-										.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
-						var assignment = assignmentFaker.Generate(1).FirstOrDefault();
-						dbContext.Assignments.Add(assignment);
-					}
-					dbContext.SaveChanges();
+				//	//for (int i = 0; i < assets.Count; i++)
+				//	//{
+				//	//	var assignmentFaker = new Faker<Assignment>()
+				//	//					.RuleFor(a => a.AssetId, f => assets[i].Id)
+				//	//					.RuleFor(a => a.AssignerId, f => assigner.Id)
+				//	//					.RuleFor(a => a.AssigneeId, f => f.PickRandom(assignee).Id)
+				//	//					.RuleFor(a => a.State, f => f.PickRandom<TypeAssignmentState>())
+				//	//					.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
+				//	//					.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
+				//	//	var assignment = assignmentFaker.Generate(1).FirstOrDefault();
+				//	//	dbContext.Assignments.Add(assignment);
+				//	//}
+				//	//dbContext.SaveChanges();
 
-					//generate assignment for QC account in HN
-					var assignerHN = dbContext.Users
-						.Include(a => a.Location)
-						.Where(a => a.StaffCode.Equals("SD0001")).AsNoTracking().FirstOrDefault();
-					var assigneesHN = dbContext.Users.Where(a => a.UserName.Equals("trangm") || a.UserName.Equals("linhp")).AsNoTracking().ToList();
-					var assetsHN = GenerateAsset(assetCodes, 150, dbContext, "Hà Nội");
-					dbContext.ChangeTracker.Clear();
-					for (int i = 0; i < 100; i++)
-					{
+				//	////generate assignment for QC account in HN
+				//	//var assignerHN = dbContext.Users
+				//	//	.Include(a => a.Location)
+				//	//	.Where(a => a.StaffCode.Equals("SD0001")).AsNoTracking().FirstOrDefault();
+				//	//var assigneesHN = dbContext.Users.Where(a => a.UserName.Equals("trangm") || a.UserName.Equals("linhp")).AsNoTracking().ToList();
+				//	//var assetsHN = GenerateAsset(assetCodes, 150, dbContext, "Hà Nội");
+				//	//dbContext.ChangeTracker.Clear();
+				//	//for (int i = 0; i < 100; i++)
+				//	//{
 
-						var assignmentFaker = new Faker<Assignment>()
-										.RuleFor(a => a.AssetId, f => assetsHN[i].Id)
-										.RuleFor(a => a.AssignerId, f => assignerHN.Id)
-										.RuleFor(a => a.AssigneeId, f => f.PickRandom(assigneesHN).Id)
-										.RuleFor(a => a.State, f => f.PickRandom<TypeAssignmentState>())
-										.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
-										.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
-						var assignment = assignmentFaker.Generate(1).FirstOrDefault();
-						dbContext.Assignments.Add(assignment);
+				//	//	var assignmentFaker = new Faker<Assignment>()
+				//	//					.RuleFor(a => a.AssetId, f => assetsHN[i].Id)
+				//	//					.RuleFor(a => a.AssignerId, f => assignerHN.Id)
+				//	//					.RuleFor(a => a.AssigneeId, f => f.PickRandom(assigneesHN).Id)
+				//	//					.RuleFor(a => a.State, f => f.PickRandom<TypeAssignmentState>())
+				//	//					.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
+				//	//					.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
+				//	//	var assignment = assignmentFaker.Generate(1).FirstOrDefault();
+				//	//	dbContext.Assignments.Add(assignment);
 
-					}
-					//generate assignment with accepted to mock for return request
-					for (int i = 100; i < 150; i++)
-					{
+				//	//}
+				//	////generate assignment with accepted to mock for return request
+				//	//for (int i = 100; i < 150; i++)
+				//	//{
 
-						var assignmentFaker = new Faker<Assignment>()
-										.RuleFor(a => a.AssetId, f => assetsHN[i].Id)
-										.RuleFor(a => a.AssignerId, f => assignerHN.Id)
-										.RuleFor(a => a.AssigneeId, f => f.PickRandom(assigneesHN).Id)
-										.RuleFor(a => a.State, f => TypeAssignmentState.Accepted)
-										.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
-										.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
-						var assignment = assignmentFaker.Generate(1).FirstOrDefault();
-						dbContext.Assignments.Add(assignment);
-					}
-					dbContext.SaveChanges();
-					//generate assignment for QC account in DaNang
-					var assignerDN = dbContext.Users
-						.Include(a => a.Location)
-						.Where(a => a.UserName.Equals("dungdt")).AsNoTracking().FirstOrDefault();
-					var assigneeDN = dbContext.Users.Where(a => a.UserName.Equals("huongh")).AsNoTracking().FirstOrDefault();
-					var assetsDN = GenerateAsset(assetCodes, 150, dbContext, "Đà Nẵng");
-					dbContext.ChangeTracker.Clear();
-					for (int i = 0; i < 100; i++)
-					{
+				//	//	var assignmentFaker = new Faker<Assignment>()
+				//	//					.RuleFor(a => a.AssetId, f => assetsHN[i].Id)
+				//	//					.RuleFor(a => a.AssignerId, f => assignerHN.Id)
+				//	//					.RuleFor(a => a.AssigneeId, f => f.PickRandom(assigneesHN).Id)
+				//	//					.RuleFor(a => a.State, f => TypeAssignmentState.Accepted)
+				//	//					.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
+				//	//					.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
+				//	//	var assignment = assignmentFaker.Generate(1).FirstOrDefault();
+				//	//	dbContext.Assignments.Add(assignment);
+				//	//}
+				//	//dbContext.SaveChanges();
+				//	////generate assignment for QC account in DaNang
+				//	//var assignerDN = dbContext.Users
+				//	//	.Include(a => a.Location)
+				//	//	.Where(a => a.UserName.Equals("dungdt")).AsNoTracking().FirstOrDefault();
+				//	//var assigneeDN = dbContext.Users.Where(a => a.UserName.Equals("huongh")).AsNoTracking().FirstOrDefault();
+				//	//var assetsDN = GenerateAsset(assetCodes, 150, dbContext, "Đà Nẵng");
+				//	//dbContext.ChangeTracker.Clear();
+				//	//for (int i = 0; i < 100; i++)
+				//	//{
 
-						var assignmentFaker = new Faker<Assignment>()
-										.RuleFor(a => a.AssetId, f => assetsDN[i].Id)
-										.RuleFor(a => a.AssignerId, f => assignerDN.Id)
-										.RuleFor(a => a.AssigneeId, f => assigneeDN.Id)
-										.RuleFor(a => a.State, f => f.PickRandom<TypeAssignmentState>())
-										.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
-										.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
-						var assignment = assignmentFaker.Generate(1).FirstOrDefault();
-						dbContext.Assignments.Add(assignment);
+				//	//	var assignmentFaker = new Faker<Assignment>()
+				//	//					.RuleFor(a => a.AssetId, f => assetsDN[i].Id)
+				//	//					.RuleFor(a => a.AssignerId, f => assignerDN.Id)
+				//	//					.RuleFor(a => a.AssigneeId, f => assigneeDN.Id)
+				//	//					.RuleFor(a => a.State, f => f.PickRandom<TypeAssignmentState>())
+				//	//					.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
+				//	//					.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
+				//	//	var assignment = assignmentFaker.Generate(1).FirstOrDefault();
+				//	//	dbContext.Assignments.Add(assignment);
 
-					}
-					//generate assignment with accepted to mock for return request
-					for (int i = 100; i < 150; i++)
-					{
+				//	//}
+				//	////generate assignment with accepted to mock for return request
+				//	//for (int i = 100; i < 150; i++)
+				//	//{
 
-						var assignmentFaker = new Faker<Assignment>()
-										.RuleFor(a => a.AssetId, f => assetsDN[i].Id)
-										.RuleFor(a => a.AssignerId, f => assignerDN.Id)
-										.RuleFor(a => a.AssigneeId, f => assigneeDN.Id)
-										.RuleFor(a => a.State, f => TypeAssignmentState.Accepted)
-										.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
-										.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
-						var assignment = assignmentFaker.Generate(1).FirstOrDefault();
-						dbContext.Assignments.Add(assignment);
-					}
-					dbContext.SaveChanges();
-					//generate assignment for QC account in HCM
-					var assignerHCM = dbContext.Users
-						.Include(a => a.Location)
-						.Where(a => a.UserName.Equals("sonnvb")).AsNoTracking().FirstOrDefault();
-					var assigneeHCM = dbContext.Users.Where(a => a.UserName.Equals("quynhp")).AsNoTracking().FirstOrDefault();
-					var assetsHCM = GenerateAsset(assetCodes, 150, dbContext, "Hồ Chí Minh");
-					dbContext.ChangeTracker.Clear();
-					for (int i = 0; i < 100; i++)
-					{
-						int numberOfAssignments = new Random().Next(3, 5);
+				//	//	var assignmentFaker = new Faker<Assignment>()
+				//	//					.RuleFor(a => a.AssetId, f => assetsDN[i].Id)
+				//	//					.RuleFor(a => a.AssignerId, f => assignerDN.Id)
+				//	//					.RuleFor(a => a.AssigneeId, f => assigneeDN.Id)
+				//	//					.RuleFor(a => a.State, f => TypeAssignmentState.Accepted)
+				//	//					.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
+				//	//					.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
+				//	//	var assignment = assignmentFaker.Generate(1).FirstOrDefault();
+				//	//	dbContext.Assignments.Add(assignment);
+				//	//}
+				//	//dbContext.SaveChanges();
+				//	////generate assignment for QC account in HCM
+				//	//var assignerHCM = dbContext.Users
+				//	//	.Include(a => a.Location)
+				//	//	.Where(a => a.UserName.Equals("sonnvb")).AsNoTracking().FirstOrDefault();
+				//	//var assigneeHCM = dbContext.Users.Where(a => a.UserName.Equals("quynhp")).AsNoTracking().FirstOrDefault();
+				//	//var assetsHCM = GenerateAsset(assetCodes, 150, dbContext, "Hồ Chí Minh");
+				//	//dbContext.ChangeTracker.Clear();
+				//	//for (int i = 0; i < 100; i++)
+				//	//{
+				//	//	int numberOfAssignments = new Random().Next(3, 5);
 
-						var assignmentFaker = new Faker<Assignment>()
-										.RuleFor(a => a.AssetId, f => assetsHCM[i].Id)
-										.RuleFor(a => a.AssignerId, f => assignerHCM.Id)
-										.RuleFor(a => a.AssigneeId, f => assigneeHCM.Id)
-										.RuleFor(a => a.State, f => f.PickRandom<TypeAssignmentState>())
-										.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
-										.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
-						var assignment = assignmentFaker.Generate(1).FirstOrDefault();
-						dbContext.Assignments.Add(assignment);
-					}
-					//generate assignment with accepted to mock for return request
-					for (int i = 100; i < 150; i++)
-					{
+				//	//	var assignmentFaker = new Faker<Assignment>()
+				//	//					.RuleFor(a => a.AssetId, f => assetsHCM[i].Id)
+				//	//					.RuleFor(a => a.AssignerId, f => assignerHCM.Id)
+				//	//					.RuleFor(a => a.AssigneeId, f => assigneeHCM.Id)
+				//	//					.RuleFor(a => a.State, f => f.PickRandom<TypeAssignmentState>())
+				//	//					.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
+				//	//					.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
+				//	//	var assignment = assignmentFaker.Generate(1).FirstOrDefault();
+				//	//	dbContext.Assignments.Add(assignment);
+				//	//}
+				//	////generate assignment with accepted to mock for return request
+				//	//for (int i = 100; i < 150; i++)
+				//	//{
 
-						var assignmentFaker = new Faker<Assignment>()
-										.RuleFor(a => a.AssetId, f => assetsHCM[i].Id)
-										.RuleFor(a => a.AssignerId, f => assignerHCM.Id)
-										.RuleFor(a => a.AssigneeId, f => assigneeHCM.Id)
-										.RuleFor(a => a.State, f => TypeAssignmentState.Accepted)
-										.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
-										.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
-						var assignment = assignmentFaker.Generate(1).FirstOrDefault();
-						dbContext.Assignments.Add(assignment);
-					}
-					dbContext.SaveChanges();
+				//	//	var assignmentFaker = new Faker<Assignment>()
+				//	//					.RuleFor(a => a.AssetId, f => assetsHCM[i].Id)
+				//	//					.RuleFor(a => a.AssignerId, f => assignerHCM.Id)
+				//	//					.RuleFor(a => a.AssigneeId, f => assigneeHCM.Id)
+				//	//					.RuleFor(a => a.State, f => TypeAssignmentState.Accepted)
+				//	//					.RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
+				//	//					.RuleFor(a => a.Note, f => f.Lorem.Sentence(5));
+				//	//	var assignment = assignmentFaker.Generate(1).FirstOrDefault();
+				//	//	dbContext.Assignments.Add(assignment);
+				//	//}
+				//	dbContext.SaveChanges();
 
-					dbContext.ChangeTracker.Clear();
+				//	dbContext.ChangeTracker.Clear();
 
-					var assignmentsAssetId = await dbContext.Assignments
-						.Where(a => a.State == TypeAssignmentState.WaitingForAcceptance || a.State == TypeAssignmentState.Accepted)
-						.Select(a => a.AssetId)
-						.ToListAsync();
-					var assetToUpdates = await dbContext.Assets.Where(a => assignmentsAssetId.Contains(a.Id)).ToListAsync();
-					foreach (var asset in assetToUpdates)
-					{
-						asset.State = TypeAssetState.Assigned;
-					}
-					dbContext.UpdateRange(assetToUpdates);
-					dbContext.SaveChanges();
+				//	var assignmentsAssetId = await dbContext.Assignments
+				//		.Where(a => a.State == TypeAssignmentState.WaitingForAcceptance || a.State == TypeAssignmentState.Accepted)
+				//		.Select(a => a.AssetId)
+				//		.ToListAsync();
+				//	var assetToUpdates = await dbContext.Assets.Where(a => assignmentsAssetId.Contains(a.Id)).ToListAsync();
+				//	foreach (var asset in assetToUpdates)
+				//	{
+				//		asset.State = TypeAssetState.Assigned;
+				//	}
+				//	dbContext.UpdateRange(assetToUpdates);
+				//	dbContext.SaveChanges();
 
-					var declinedAssettIds = await dbContext.Assignments
-						.Where(a => a.State == TypeAssignmentState.Declined)
-						.Select(a => a.AssetId)
-						.ToListAsync();
-					var declinedAssetToUpdates = await dbContext.Assets.Where(a => declinedAssettIds.Contains(a.Id)).ToListAsync();
-					foreach (var asset in declinedAssetToUpdates)
-					{
-						asset.State = TypeAssetState.Available;
-					}
-					dbContext.UpdateRange(declinedAssetToUpdates);
-					dbContext.SaveChanges();
+				//	var declinedAssettIds = await dbContext.Assignments
+				//		.Where(a => a.State == TypeAssignmentState.Declined)
+				//		.Select(a => a.AssetId)
+				//		.ToListAsync();
+				//	var declinedAssetToUpdates = await dbContext.Assets.Where(a => declinedAssettIds.Contains(a.Id)).ToListAsync();
+				//	foreach (var asset in declinedAssetToUpdates)
+				//	{
+				//		asset.State = TypeAssetState.Available;
+				//	}
+				//	dbContext.UpdateRange(declinedAssetToUpdates);
+				//	dbContext.SaveChanges();
 
 
 
-				}
+				//}
 				transaction.Commit();
 			}
 			catch (Exception ex)
@@ -515,47 +515,102 @@ public static class ApplicationExtension
 
 		var random = new Random();
 		int count = 0;
+		bool isAvailableNow = false;
 		foreach (var asset in assets)
 		{
-			if (count == MaxNumberOfAssetWithAsmHistory) break;
-			var assignmentFaker = new Faker<Assignment>()
-									   .RuleFor(a => a.AssetId, f => asset.Id)
-									   .RuleFor(a => a.AssignerId, f => f.PickRandom(assigner).Id)
-									   .RuleFor(a => a.AssigneeId, f => f.PickRandom(assignee).Id)
-									   .RuleFor(a => a.State, f => TypeAssignmentState.Accepted)
-									   .RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
-									   .RuleFor(a => a.Note, f => f.Lorem.Sentence(5))
-									   .RuleFor(a => a.IsDeleted, f => true)
-									   .RuleFor(a => a.DeletedAt, f => f.Date.Past(1))
-									   .Generate(random.Next(0, MaxAssignmentHistory + 1));
-
-			foreach (var assignment in assignmentFaker)
+			var startDate = new DateTime(2022, 01, 01);
+			var daysIncrement = 0;
+			if (count == 100) break;
+			if (count >= MaxNumberOfAssetWithAsmHistory)
 			{
-				var returnRequestFaker = new Faker<ReturnRequest>()
-					.RuleFor(r => r.AssignmentId, f => assignment.Id)
-					.RuleFor(r => r.RequestorId, f => f.PickRandom(assigner).Id)
-					.RuleFor(r => r.RequestedDate, f => assignment.AssignedDate.AddDays(random.Next(0, 100)))
-					.RuleFor(r => r.LocationId, f => asset.LocationId)
-					.RuleFor(r => r.CreatedAt, (f, a) => a.RequestedDate)
-					.RuleFor(r => r.State, f => TypeRequestState.Completed)
-					.RuleFor(r => r.ResponderId, f => f.PickRandom(assigner).Id)
-					.RuleFor(r => r.ReturnedDate, (f, a) => a.RequestedDate.AddDays(random.Next(0, 50)))
-					.Generate(1);
-				assignment.ActiveReturnRequestId = returnRequestFaker[0].Id;
-				await dBContext.AddRangeAsync(returnRequestFaker);
+				//seeding data assignment that completed in past
+				var assignmentFaker = new Faker<Assignment>()
+										   .RuleFor(a => a.AssetId, f => asset.Id)
+										   .RuleFor(a => a.AssignerId, f => f.PickRandom(assigner).Id)
+										   .RuleFor(a => a.AssigneeId, f => f.PickRandom(assignee).Id)
+										   .RuleFor(a => a.State, f => TypeAssignmentState.Declined)
+										   .RuleFor(a => a.AssignedDate, f => startDate.AddDays(daysIncrement++))
+										   .RuleFor(a => a.Note, f => f.Lorem.Sentence(5))
+										   .RuleFor(a => a.IsDeleted, f => false)
+										   .Generate(random.Next(0, 5));
+                await dBContext.AddRangeAsync(assignmentFaker);
+                var recentDate = new DateTime(2024, 01, 01);
+                var recentAssignmentFaker = new Faker<Assignment>()
+                               .RuleFor(a => a.AssetId, f => asset.Id)
+                               .RuleFor(a => a.AssignerId, f => f.PickRandom(assigner).Id)
+                               .RuleFor(a => a.AssigneeId, f => f.PickRandom(assignee).Id)
+                               .RuleFor(a => a.State, f => TypeAssignmentState.WaitingForAcceptance)
+                               .RuleFor(a => a.AssignedDate, f => recentDate.AddDays(7))
+                               .RuleFor(a => a.Note, f => f.Lorem.Sentence(5))
+                               .Generate(1);
+                await dBContext.AddAsync(recentAssignmentFaker[0]);
+                await dBContext.SaveChangesAsync();
+            }
+            else
+			{
+				//seeding data assignment that completed in past
+				var assignmentFaker = new Faker<Assignment>()
+										   .RuleFor(a => a.AssetId, f => asset.Id)
+										   .RuleFor(a => a.AssignerId, f => f.PickRandom(assigner).Id)
+										   .RuleFor(a => a.AssigneeId, f => f.PickRandom(assignee).Id)
+										   .RuleFor(a => a.State, f => TypeAssignmentState.Accepted)
+										   .RuleFor(a => a.AssignedDate, f => startDate.AddDays(daysIncrement++))
+										   .RuleFor(a => a.Note, f => f.Lorem.Sentence(5))
+										   .RuleFor(a => a.IsDeleted, f => true)
+										   .RuleFor(a => a.DeletedAt, f => f.Date.Past(1))
+										   .Generate(random.Next(0, MaxAssignmentHistory + 1));
 
+				foreach (var assignment in assignmentFaker)
+				{
+					var returnRequestFaker = new Faker<ReturnRequest>()
+						.RuleFor(r => r.AssignmentId, f => assignment.Id)
+						.RuleFor(r => r.RequestorId, f => f.PickRandom(assigner).Id)
+						.RuleFor(r => r.RequestedDate, f => assignment.AssignedDate.AddDays(1))
+						.RuleFor(r => r.LocationId, f => asset.LocationId)
+						.RuleFor(r => r.CreatedAt, (f, a) => a.RequestedDate)
+						.RuleFor(r => r.State, f => TypeRequestState.Completed)
+						.RuleFor(r => r.ResponderId, f => f.PickRandom(assigner).Id)
+						.RuleFor(r => r.ReturnedDate, (f, a) => a.RequestedDate.AddDays(2))
+						.Generate(1);
+					assignment.ActiveReturnRequestId = returnRequestFaker[0].Id;
+					await dBContext.AddRangeAsync(returnRequestFaker);
+
+				}
+				await dBContext.AddRangeAsync(assignmentFaker);
+				if(count % 2 == 0)
+				{
+                    //seeding data assignment that is not completed
+                    var recentDate = new DateTime(2024, 01, 01);
+                    var recentAssignmentFaker = new Faker<Assignment>()
+                                   .RuleFor(a => a.AssetId, f => asset.Id)
+                                   .RuleFor(a => a.AssignerId, f => f.PickRandom(assigner).Id)
+                                   .RuleFor(a => a.AssigneeId, f => f.PickRandom(assignee).Id)
+                                   .RuleFor(a => a.State, f => TypeAssignmentState.Accepted)
+                                   .RuleFor(a => a.AssignedDate, f => recentDate.AddDays(7))
+                                   .RuleFor(a => a.Note, f => f.Lorem.Sentence(5))
+                                   .Generate(1);
+                    var recentReturnRequestFaker = new Faker<ReturnRequest>()
+                            .RuleFor(r => r.AssignmentId, f => recentAssignmentFaker[0].Id)
+                            .RuleFor(r => r.RequestorId, f => f.PickRandom(assigner).Id)
+                            .RuleFor(r => r.RequestedDate, f => recentAssignmentFaker[0].AssignedDate.AddDays(1))
+                            .RuleFor(r => r.LocationId, f => asset.LocationId)
+                            .RuleFor(r => r.CreatedAt, (f, a) => a.RequestedDate)
+                            .RuleFor(r => r.State, f => TypeRequestState.WaitingForReturning)
+                            .RuleFor(r => r.ResponderId, f => f.PickRandom(assigner).Id)
+                            .Generate(1);
+                    recentAssignmentFaker[0].ActiveReturnRequestId = recentReturnRequestFaker[0].Id;
+                    await dBContext.AddAsync(recentReturnRequestFaker[0]);
+                    await dBContext.AddAsync(recentAssignmentFaker[0]);
+                    await dBContext.SaveChangesAsync();
+                }
 			}
-			await dBContext.AddRangeAsync(assignmentFaker);
-			//		RequestorId = new Random().Next(2) == 0 ? assignment.AssigneeId : admin.Id,
-			//		AssignmentId = assignment.Id,
-			//		RequestedDate = past,
-			//		State = randomState,
-			//		LocationId = location.Id,
-			//		CreatedAt = past,
-			count++;
-		}
-		await dBContext.SaveChangesAsync();
-	}
+            count++;
+            dBContext.ChangeTracker.Clear();
+            asset.State = TypeAssetState.Assigned;
+            dBContext.Update(asset);
+            await dBContext.SaveChangesAsync();     
+        }
+    }
 
 	public static async Task SeedReturnRequestsAsync(this AssetManagementDBContext dbContext)
 	{
