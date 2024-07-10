@@ -53,23 +53,23 @@ namespace AssetManagement.Api.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new ResponseMessageDto(ex.Message));
             }
             catch (WrongLocationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ResponseMessageDto(ex.Message));
             }
             catch (AssignmentNotAcceptedException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ResponseMessageDto(ex.Message));
             }
             catch (UnauthorizedAssignmentAccessException ex)
             {
-                return Unauthorized(ex.Message);
+                return Unauthorized(new ResponseMessageDto(ex.Message));
             }
             catch (ActiveReturnRequestAlreadyExistsException ex)
             {
-                return Conflict(ex.Message);
+                return Conflict(new ResponseMessageDto(ex.Message));
             }
         }
 
@@ -95,15 +95,19 @@ namespace AssetManagement.Api.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new ResponseMessageDto(ex.Message));
+            }
+            catch (UnauthorizedReturnRequestAccessException ex)
+            {
+                return Unauthorized(new ResponseMessageDto(ex.Message));
             }
             catch (WrongLocationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ResponseMessageDto(ex.Message));
             }
             catch (ReturnRequestNotWaitingException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ResponseMessageDto(ex.Message));
             }
         }
     }

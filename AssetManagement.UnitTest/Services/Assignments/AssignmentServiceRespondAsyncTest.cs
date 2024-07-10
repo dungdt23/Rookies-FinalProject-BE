@@ -60,7 +60,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 			_assignmentRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Assignment, bool>>>())).Returns(assignmentsQueryMock);
 
 			//Act
-			var result = await _assignmentService.RespondAsync(_requestDtoMock.Object);
+			var result = await _assignmentService.RespondAsync(_requestDtoMock.Object, It.IsAny<Guid>(), It.IsAny<Guid>());
 
 			//Assert
 			result.Should().NotBeNull();
@@ -82,7 +82,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 			_assignmentRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Assignment, bool>>>())).Returns(assignmentsQueryMock);
 
 			//Act
-			var result = await _assignmentService.RespondAsync(_requestDtoMock.Object);
+			var result = await _assignmentService.RespondAsync(_requestDtoMock.Object, It.IsAny<Guid>(), It.IsAny<Guid>());
 
 			//Assert
 			result.Should().NotBeNull();
@@ -108,7 +108,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 			_mapperMock.Setup(m => m.Map<ResponseAssignmentDto>(It.IsAny<Assignment>())).Returns(_assignmentDtoMock.Object);
 
 			//Act
-			var result = await _assignmentService.RespondAsync(_requestDtoMock.Object);
+			var result = await _assignmentService.RespondAsync(_requestDtoMock.Object, It.IsAny<Guid>(), It.IsAny<Guid>());
 
 			//Assert
 			result.Should().NotBeNull();
@@ -132,7 +132,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 			_mapperMock.Setup(m => m.Map<ResponseAssignmentDto>(It.IsAny<Assignment>())).Returns(_assignmentDtoMock.Object);
 
 			//Act
-			var result = await _assignmentService.RespondAsync(_requestDtoMock.Object);
+			var result = await _assignmentService.RespondAsync(_requestDtoMock.Object, It.IsAny<Guid>(), It.IsAny<Guid>());
 
 			//Assert
 			result.Should().NotBeNull();

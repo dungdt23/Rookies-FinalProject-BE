@@ -87,7 +87,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status400BadRequest,
+					StatusCode = StatusCodes.Status404NotFound,
 					Message = AssignmentApiResponseMessageConstant.AssignmentNotFound,
 					Data = id
 				};
@@ -99,7 +99,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status400BadRequest,
+					StatusCode = StatusCodes.Status404NotFound,
 					Message = AssignmentApiResponseMessageConstant.AssetNotFound,
 					Data = assignment.AssetId
 				};
@@ -212,9 +212,9 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			};
 		}
 
-		public async Task<ApiResponse> RespondAsync(RequestAssignmentRespondDto request)
+		public async Task<ApiResponse> RespondAsync(RequestAssignmentRespondDto request, Guid userId, Guid locationId)
 		{
-			var assignment = await _assignmentRepository.GetByCondition(a => a.Id == request.AssignmentId && !a.IsDeleted)
+			var assignment = await _assignmentRepository.GetByCondition(a => a.Id == request.AssignmentId && !a.IsDeleted && a.Assignee.Id == userId && a.Asset.LocationId == locationId)
 														.Include(a => a.Assigner)
 														.Include(a => a.Assignee)
 														.Include(a => a.Asset)
@@ -273,11 +273,22 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status400BadRequest,
+					StatusCode = StatusCodes.Status404NotFound,
 					Message = AssignmentApiResponseMessageConstant.AssignmentNotFound,
 					Data = id
 				};
 			}
+
+			if (assignment.State == TypeAssignmentState.Accepted)
+			{
+				return new ApiResponse
+				{
+					StatusCode = StatusCodes.Status400BadRequest,
+					Message = AssignmentApiResponseMessageConstant.AssignmentUpdateStateAccepted,
+					Data = id
+				};
+			}
+
 
 			if (request.AssetId != assignment.AssetId)
 			{
@@ -337,16 +348,17 @@ namespace AssetManagement.Application.Services.AssignmentServices
 				.Include(x => x.Assignee)
 				.Include(x => x.ReturnRequests);
 			var historicalAsm = new List<Assignment>();
-			if (isDateDescending) 
+			if (isDateDescending)
 			{
-                historicalAsm = await query.OrderByDescending(x => x.AssignedDate)
+				historicalAsm = await query.OrderByDescending(x => x.AssignedDate)
 				.Skip((index - 1) * size).Take(size).ToListAsync();
-            } else
+			}
+			else
 			{
-                historicalAsm = await query.OrderBy(x => x.AssignedDate)
-                    .Skip((index - 1) * size).Take(size).ToListAsync();
-            }
-            var historicalAsmDto = _mapper.Map<IEnumerable<ResponseHistoryAsmDto>>(historicalAsm);
+				historicalAsm = await query.OrderBy(x => x.AssignedDate)
+					.Skip((index - 1) * size).Take(size).ToListAsync();
+			}
+			var historicalAsmDto = _mapper.Map<IEnumerable<ResponseHistoryAsmDto>>(historicalAsm);
 			return new PagedResponse<ResponseHistoryAsmDto>
 			{
 				Data = historicalAsmDto,

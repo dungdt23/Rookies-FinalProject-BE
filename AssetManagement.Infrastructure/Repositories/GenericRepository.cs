@@ -19,7 +19,7 @@ namespace AssetManagement.Infrastructure.Repositories
         }
 
 
-        public IQueryable<T> GetAllAsync(int? index, int? size)
+        public virtual IQueryable<T> GetAllAsync(int? index, int? size)
         {
             IQueryable<T> query = _dbSet.Where(x => !x.IsDeleted);
             if (index.HasValue && size.HasValue)
@@ -43,7 +43,7 @@ namespace AssetManagement.Infrastructure.Repositories
             }
         }
 
-        public async Task<int> UpdateAsync(T entity)
+        public virtual async Task<int> UpdateAsync(T entity)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace AssetManagement.Infrastructure.Repositories
         {
             try
             {
-                var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+                var entity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
                 if (entity == null) return RecordStatus.Invalid;
                 entity.DeletedAt = DateTime.UtcNow;
                 entity.IsDeleted = true;
@@ -76,9 +76,9 @@ namespace AssetManagement.Infrastructure.Repositories
             }
         }
 
-        public IQueryable<T> GetByCondition(Expression<Func<T, bool>> condition)
+        public virtual IQueryable<T> GetByCondition(Expression<Func<T, bool>> condition)
         {
-            return _dbSet.Where(condition);
+            return _dbSet.Where(t => !t.IsDeleted).Where(condition);
         }
 
     }

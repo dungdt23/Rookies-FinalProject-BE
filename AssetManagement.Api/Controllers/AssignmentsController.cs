@@ -29,7 +29,19 @@ namespace AssetManagement.Api.Controllers
             }
             request.AssignerId = userIdGuild;
             var result = await _assignmentService.CreateAsync(request);
-            if (result.StatusCode == StatusCodes.Status500InternalServerError)
+			if (result.StatusCode == StatusCodes.Status400BadRequest)
+			{
+				return BadRequest(result);
+			}
+			if (result.StatusCode == StatusCodes.Status404NotFound)
+			{
+				return NotFound(result);
+			}
+			if (result.StatusCode == StatusCodes.Status409Conflict)
+			{
+				return Conflict(result);
+			}
+			if (result.StatusCode == StatusCodes.Status500InternalServerError)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
             }
@@ -42,11 +54,15 @@ namespace AssetManagement.Api.Controllers
         public async Task<IActionResult> Put(Guid id, [FromBody] RequestAssignmentDto request)
         {
             var result = await _assignmentService.UpdateAsync(id, request);
-            if (result.StatusCode == StatusCodes.Status404NotFound)
+            if (result.StatusCode == StatusCodes.Status400BadRequest)
             {
-                return NotFound(result);
+                return BadRequest(result);
             }
-            if (result.StatusCode == StatusCodes.Status500InternalServerError)
+			if (result.StatusCode == StatusCodes.Status404NotFound)
+			{
+				return NotFound(result);
+			}
+			if (result.StatusCode == StatusCodes.Status500InternalServerError)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
             }
@@ -58,7 +74,19 @@ namespace AssetManagement.Api.Controllers
         [Authorize]
         public async Task<IActionResult> Respond([FromBody] RequestAssignmentRespondDto request)
         {
-            var result = await _assignmentService.RespondAsync(request);
+			var userIdClaim = HttpContext.GetClaim("id");
+			Guid userIdGuid;
+			if (!Guid.TryParse(userIdClaim, out userIdGuid))
+			{
+				return Unauthorized();
+			}
+			var locationIdClaim = HttpContext.GetClaim("locationId");
+			Guid locationIdGuid;
+			if (!Guid.TryParse(locationIdClaim, out locationIdGuid))
+			{
+				return Unauthorized();
+			}
+			var result = await _assignmentService.RespondAsync(request, userIdGuid, locationIdGuid);
             if (result.StatusCode == StatusCodes.Status404NotFound)
             {
                 return NotFound(result);
@@ -84,7 +112,11 @@ namespace AssetManagement.Api.Controllers
             {
                 return BadRequest(result);
             }
-            if (result.StatusCode == StatusCodes.Status500InternalServerError)
+			if (result.StatusCode == StatusCodes.Status404NotFound)
+			{
+				return NotFound(result);
+			}
+			if (result.StatusCode == StatusCodes.Status500InternalServerError)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
             }
@@ -114,10 +146,6 @@ namespace AssetManagement.Api.Controllers
                 return Unauthorized();
             }
             var result = await _assignmentService.GetAllAsync(own, filter, userIdGuid, (UserType)roleEnum, locationIdGuid, index, size);
-            if (result.StatusCode == StatusCodes.Status404NotFound)
-            {
-                return NotFound(result);
-            }
             return Ok(result);
         }
 

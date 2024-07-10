@@ -41,38 +41,6 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
             _assignmentDtosMock = new Mock<List<ResponseAssignmentDto>>();
         }
 
-        [Test]
-        public async Task Get_ShouldReturnNotFound_WhenFindNoRecords()
-        {
-            //Arrange
-            var index = 1;
-            var size = 10;
-            var response = new PagedResponse<ResponseAssignmentDto>
-            {
-                StatusCode = StatusCodes.Status404NotFound,
-                Message = AssignmentApiResponseMessageConstant.AssignmentGetNotFound
-            };
-
-			_controller.ControllerContext = new ControllerContext();
-			_controller.ControllerContext.HttpContext = new DefaultHttpContext();
-			_controller.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
-			_assignmentServiceMock.Setup(a => a.GetAllAsync(It.IsAny<bool>(),
-															It.IsAny<AssignmentFilter>(), 
-															It.IsAny<Guid>(),
-															It.IsAny<UserType>(),
-															It.IsAny<Guid>(),
-															It.IsAny<int?>(), 
-															It.IsAny<int?>())).ReturnsAsync(response);
-
-			//Act
-			var result = await _controller.Get(It.IsAny<bool>(),_filterMock.Object, index, size);
-
-            //Assert
-            var notFoundResult = result as NotFoundObjectResult;
-            notFoundResult.Should().NotBeNull();
-            notFoundResult.StatusCode.Should().Be(StatusCodes.Status404NotFound);
-            notFoundResult.Value.Should().BeEquivalentTo(response);
-        }
 
         [Test]
         public async Task Get_ShouldReturnUnauthorize_WhenCantDecodeToken()

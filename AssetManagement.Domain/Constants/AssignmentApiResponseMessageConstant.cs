@@ -13,6 +13,7 @@ namespace AssetManagement.Domain.Constants
 		public const string AssignmentCreateSuccess = "Assignment created successfully";
 		public const string AssignmentCreateFail = "There something went wrong while creating assignment, please try again later";
 		public const string AssignmentUpdateSuccess = "Assignment updated successfully";
+		public const string AssignmentUpdateStateAccepted = "Assignment is already accepted";
 		public const string AssignmentUpdateFail = "There something went wrong while updating assignment, please try again later";
 		public const string AssignmentNotFound = "No assignment found";
 		public const string AssignmentDeleteStateConfict = "Only assignment waiting for acceptance or declined can be deleted";

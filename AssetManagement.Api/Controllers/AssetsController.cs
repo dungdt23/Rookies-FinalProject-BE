@@ -62,7 +62,7 @@ namespace AssetManagement.Api.Controllers
             }
             if (result.StatusCode == StatusCodes.Status409Conflict)
             {
-                return StatusCode(StatusCodes.Status409Conflict, result);
+                return Conflict(result);
             }
             await _hubContext.Clients.All.SendAsync("Deleted", id);
             return Ok(result);

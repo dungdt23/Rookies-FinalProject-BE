@@ -33,6 +33,10 @@ public class UsersController : ControllerBase
         }
         createUserForm.LocationId = locationIdGuid;
         var result = await _userService.CreateAsync(createUserForm);
+        if(result.StatusCode == StatusCodes.Status400BadRequest)
+        {
+            return BadRequest(result);
+        }
         if (result.StatusCode == StatusCodes.Status500InternalServerError)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, result);
@@ -86,9 +90,13 @@ public class UsersController : ControllerBase
         {
             return StatusCode(StatusCodes.Status500InternalServerError, result);
         }
+        if (result.StatusCode == StatusCodes.Status404NotFound)
+        {
+            return NotFound();
+        }
         if (result.StatusCode == StatusCodes.Status409Conflict)
         {
-            return StatusCode(StatusCodes.Status409Conflict, result);
+            return Conflict();
         }
         return Ok(result);
     }
@@ -115,7 +123,11 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _userService.GetById(id);
-        if (result.StatusCode == StatusCodes.Status500InternalServerError)
+		if (result.StatusCode == StatusCodes.Status404NotFound)
+		{
+			return NotFound(result);
+		}
+		if (result.StatusCode == StatusCodes.Status500InternalServerError)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, result);
         }

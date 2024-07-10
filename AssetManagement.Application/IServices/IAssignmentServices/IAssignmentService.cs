@@ -17,7 +17,7 @@ namespace AssetManagement.Application.IServices.IAssignmentServices
         Task<ApiResponse> GetByIdAsync(Guid id);
         Task<ApiResponse> UpdateAsync(Guid id, RequestAssignmentDto request);
         Task<ApiResponse> DeleteAsync(Guid id);
-        Task<ApiResponse> RespondAsync(RequestAssignmentRespondDto request);
+        Task<ApiResponse> RespondAsync(RequestAssignmentRespondDto request, Guid userId, Guid locationId);
         Task<PagedResponse<ResponseHistoryAsmDto>> GetByAssetIdAsync(Guid assetId, bool isDateDescending, int index, int size);
 
 
