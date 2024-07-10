@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using AssetManagement.Application.Dtos.Common;
+using System.Net;
 using System.Text.Json;
 
 namespace AssetManagement.Api.Middlewares
@@ -32,7 +33,7 @@ namespace AssetManagement.Api.Middlewares
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            var response = new { error = "An unexpected error occurred. Please try again later." };
+            var response = new ResponseMessageDto("An unexpected error occurred. Please try again later.");
             var jsonResponse = JsonSerializer.Serialize(response);
 
             return context.Response.WriteAsync(jsonResponse);

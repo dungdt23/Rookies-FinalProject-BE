@@ -13,11 +13,11 @@ namespace AssetManagement.Api.Extensions;
 
 public static class ApplicationExtension
 {
-	private static readonly int UserToGenerate = 200;
-	private static readonly int AssetToGenerate = 300;
-	private static readonly int CategoryToGenerate = 30;
-	private static readonly int MaxAssignmentHistory = 15;
-	private static readonly int MaxNumberOfAssetWithAsmHistory = 200;
+    private static readonly int UserToGenerate = 200;
+    private static readonly int AssetToGenerate = 300;
+    private static readonly int CategoryToGenerate = 30;
+    private static readonly int MaxAssignmentHistory = 15;
+    private static readonly int MaxNumberOfAssetWithAsmHistory = 200;
 
     public static async Task SeedDataAsync(this IApplicationBuilder app)
     {
@@ -205,8 +205,8 @@ public static class ApplicationExtension
 
                     var staffUser4 = new RequestUserCreateDto
                     {
-                        FirstName = "Phung",
-                        LastName = "Linh",
+                        FirstName = "Linh",
+                        LastName = "Phum",
                         Type = "Staff",
                         LocationId = (dbContext.Locations.FirstOrDefault(l => l.LocationName == "Hà Nội")).Id,
                         DateOfBirth = new DateTime(2003, 01, 01),
@@ -512,49 +512,49 @@ public static class ApplicationExtension
             .AsNoTracking()
             .ToList();
 
-		var random = new Random();
-		int count = 0;
-		foreach (var asset in assets)
-		{
-			if (count == MaxNumberOfAssetWithAsmHistory) break;
-			var assignmentFaker = new Faker<Assignment>()
-									   .RuleFor(a => a.AssetId, f => asset.Id)
-									   .RuleFor(a => a.AssignerId, f => f.PickRandom(assigner).Id)
-									   .RuleFor(a => a.AssigneeId, f => f.PickRandom(assignee).Id)
-									   .RuleFor(a => a.State, f => TypeAssignmentState.Accepted)
-									   .RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
-									   .RuleFor(a => a.Note, f => f.Lorem.Sentence(5))
-									   .RuleFor(a => a.IsDeleted, f => true)
-									   .RuleFor(a => a.DeletedAt, f => f.Date.Past(1))
-									   .Generate(random.Next(0, MaxAssignmentHistory + 1));
+        var random = new Random();
+        int count = 0;
+        foreach (var asset in assets)
+        {
+            if (count == MaxNumberOfAssetWithAsmHistory) break;
+            var assignmentFaker = new Faker<Assignment>()
+                                       .RuleFor(a => a.AssetId, f => asset.Id)
+                                       .RuleFor(a => a.AssignerId, f => f.PickRandom(assigner).Id)
+                                       .RuleFor(a => a.AssigneeId, f => f.PickRandom(assignee).Id)
+                                       .RuleFor(a => a.State, f => TypeAssignmentState.Accepted)
+                                       .RuleFor(a => a.AssignedDate, f => f.Date.Past(1))
+                                       .RuleFor(a => a.Note, f => f.Lorem.Sentence(5))
+                                       .RuleFor(a => a.IsDeleted, f => true)
+                                       .RuleFor(a => a.DeletedAt, f => f.Date.Past(1))
+                                       .Generate(random.Next(0, MaxAssignmentHistory + 1));
 
-			foreach (var assignment in assignmentFaker)
-			{
-				var returnRequestFaker = new Faker<ReturnRequest>()
-					.RuleFor(r => r.AssignmentId, f => assignment.Id)
-					.RuleFor(r => r.RequestorId, f => f.PickRandom(assigner).Id)
-					.RuleFor(r => r.RequestedDate, f => assignment.AssignedDate.AddDays(random.Next(0, 100)))
-					.RuleFor(r => r.LocationId, f => asset.LocationId)
-					.RuleFor(r => r.CreatedAt, (f, a) => a.RequestedDate)
-					.RuleFor(r => r.State, f => TypeRequestState.Completed)
-					.RuleFor(r => r.ResponderId, f => f.PickRandom(assigner).Id)
-					.RuleFor(r => r.ReturnedDate, (f, a) => a.RequestedDate.AddDays(random.Next(0, 50)))
-					.Generate(1);
-				assignment.ActiveReturnRequestId = returnRequestFaker[0].Id;
-				await dBContext.AddRangeAsync(returnRequestFaker);
+            foreach (var assignment in assignmentFaker)
+            {
+                var returnRequestFaker = new Faker<ReturnRequest>()
+                    .RuleFor(r => r.AssignmentId, f => assignment.Id)
+                    .RuleFor(r => r.RequestorId, f => f.PickRandom(assigner).Id)
+                    .RuleFor(r => r.RequestedDate, f => assignment.AssignedDate.AddDays(random.Next(0, 100)))
+                    .RuleFor(r => r.LocationId, f => asset.LocationId)
+                    .RuleFor(r => r.CreatedAt, (f, a) => a.RequestedDate)
+                    .RuleFor(r => r.State, f => TypeRequestState.Completed)
+                    .RuleFor(r => r.ResponderId, f => f.PickRandom(assigner).Id)
+                    .RuleFor(r => r.ReturnedDate, (f, a) => a.RequestedDate.AddDays(random.Next(0, 50)))
+                    .Generate(1);
+                assignment.ActiveReturnRequestId = returnRequestFaker[0].Id;
+                await dBContext.AddRangeAsync(returnRequestFaker);
 
-			}
-			await dBContext.AddRangeAsync(assignmentFaker);
-			//		RequestorId = new Random().Next(2) == 0 ? assignment.AssigneeId : admin.Id,
-			//		AssignmentId = assignment.Id,
-			//		RequestedDate = past,
-			//		State = randomState,
-			//		LocationId = location.Id,
-			//		CreatedAt = past,
-			count++;
-		}
-		await dBContext.SaveChangesAsync();
-	}
+            }
+            await dBContext.AddRangeAsync(assignmentFaker);
+            //		RequestorId = new Random().Next(2) == 0 ? assignment.AssigneeId : admin.Id,
+            //		AssignmentId = assignment.Id,
+            //		RequestedDate = past,
+            //		State = randomState,
+            //		LocationId = location.Id,
+            //		CreatedAt = past,
+            count++;
+        }
+        await dBContext.SaveChangesAsync();
+    }
 
     public static async Task SeedReturnRequestsAsync(this AssetManagementDBContext dbContext)
     {
