@@ -15,6 +15,7 @@ using Moq;
 using System.Linq.Expressions;
 using Xunit;
 using Assert = Xunit.Assert;
+using User = AssetManagement.Domain.Entities.User;
 
 namespace AssetManagement.UnitTest.Services
 {
@@ -275,6 +276,34 @@ namespace AssetManagement.UnitTest.Services
         }
 
         [Fact]
+        public async Task CompleteReturnRequestAsync_ShouldThrowUnauthorizedReturnRequestAccessException_WhenStaffUserIsNotTheRequestor()
+        {
+            // Arrange
+            var returnRequestId = Guid.NewGuid();
+            var requesterId = Guid.NewGuid();
+            var returnRequest = new ReturnRequest
+            {
+                Id = returnRequestId,
+                LocationId = Guid.NewGuid(),
+                State = TypeRequestState.WaitingForReturning,
+                RequestorId = Guid.NewGuid(),
+                Assignment = new Assignment { Asset = new Asset() }
+            };
+            var user = new User { Id = requesterId, LocationId = Guid.NewGuid(), Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
+
+            var mockReturnRequests = new[] { returnRequest }.AsQueryable().BuildMock();
+            _mockReturnRequestRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<ReturnRequest, bool>>>()))
+                .Returns(mockReturnRequests);
+
+            var mockUsers = new[] { user }.AsQueryable().BuildMock();
+            _mockUserRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
+                .Returns(mockUsers);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<UnauthorizedReturnRequestAccessException>(() => _service.CompleteReturnRequestAsync(returnRequestId, requesterId));
+        }
+
+        [Fact]
         public async Task CompleteReturnRequestAsync_ShouldThrowWrongLocationException_WhenLocationMismatched()
         {
             // Arrange
@@ -285,9 +314,10 @@ namespace AssetManagement.UnitTest.Services
                 Id = returnRequestId,
                 LocationId = Guid.NewGuid(),
                 State = TypeRequestState.WaitingForReturning,
-                Assignment = new Assignment { Asset = new Asset() }
+                RequestorId = requesterId,
+                Assignment = new Assignment { Asset = new Asset(), AssigneeId = requesterId }
             };
-            var user = new User { Id = requesterId, LocationId = Guid.NewGuid() };
+            var user = new User { Id = requesterId, LocationId = Guid.NewGuid(), Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
 
             var mockReturnRequests = new[] { returnRequest }.AsQueryable().BuildMock();
             _mockReturnRequestRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<ReturnRequest, bool>>>()))
@@ -312,9 +342,10 @@ namespace AssetManagement.UnitTest.Services
                 Id = returnRequestId,
                 LocationId = Guid.NewGuid(),
                 State = TypeRequestState.Completed,
-                Assignment = new Assignment { Asset = new Asset() }
+                RequestorId = requesterId,
+                Assignment = new Assignment { Asset = new Asset(), AssigneeId = requesterId }
             };
-            var user = new User { Id = requesterId, LocationId = returnRequest.LocationId };
+            var user = new User { Id = requesterId, LocationId = returnRequest.LocationId, Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
 
             var mockReturnRequests = new[] { returnRequest }.AsQueryable().BuildMock();
             _mockReturnRequestRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<ReturnRequest, bool>>>()))
@@ -339,13 +370,15 @@ namespace AssetManagement.UnitTest.Services
                 Id = returnRequestId,
                 LocationId = Guid.NewGuid(),
                 State = TypeRequestState.WaitingForReturning,
+                RequestorId = requesterId,
                 Assignment = new Assignment
                 {
                     Asset = new Asset(),
+                    AssigneeId = requesterId,
                     IsDeleted = false
                 }
             };
-            var user = new User { Id = requesterId, LocationId = returnRequest.LocationId };
+            var user = new User { Id = requesterId, LocationId = returnRequest.LocationId, Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
 
             var mockReturnRequests = new[] { returnRequest }.AsQueryable().BuildMock();
             _mockReturnRequestRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<ReturnRequest, bool>>>()))
@@ -390,6 +423,34 @@ namespace AssetManagement.UnitTest.Services
         }
 
         [Fact]
+        public async Task RejectReturnRequestAsync_ShouldThrowUnauthorizedReturnRequestAccessException_WhenStaffUserIsNotTheRequestor()
+        {
+            // Arrange
+            var returnRequestId = Guid.NewGuid();
+            var requesterId = Guid.NewGuid();
+            var returnRequest = new ReturnRequest
+            {
+                Id = returnRequestId,
+                LocationId = Guid.NewGuid(),
+                State = TypeRequestState.WaitingForReturning,
+                RequestorId = Guid.NewGuid(),
+                Assignment = new Assignment { Asset = new Asset() }
+            };
+            var user = new User { Id = requesterId, LocationId = Guid.NewGuid(), Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
+
+            var mockReturnRequests = new[] { returnRequest }.AsQueryable().BuildMock();
+            _mockReturnRequestRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<ReturnRequest, bool>>>()))
+                .Returns(mockReturnRequests);
+
+            var mockUsers = new[] { user }.AsQueryable().BuildMock();
+            _mockUserRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
+                .Returns(mockUsers);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<UnauthorizedReturnRequestAccessException>(() => _service.RejectReturnRequestAsync(returnRequestId, requesterId));
+        }
+
+        [Fact]
         public async Task RejectReturnRequestAsync_ShouldThrowWrongLocationException_WhenLocationMismatched()
         {
             // Arrange
@@ -400,9 +461,10 @@ namespace AssetManagement.UnitTest.Services
                 Id = returnRequestId,
                 LocationId = Guid.NewGuid(),
                 State = TypeRequestState.WaitingForReturning,
+                RequestorId = requesterId,
                 Assignment = new Assignment { Asset = new Asset() }
             };
-            var user = new User { Id = requesterId, LocationId = Guid.NewGuid() };
+            var user = new User { Id = requesterId, LocationId = Guid.NewGuid(), Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
 
             var mockReturnRequests = new[] { returnRequest }.AsQueryable().BuildMock();
             _mockReturnRequestRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<ReturnRequest, bool>>>()))
@@ -427,9 +489,10 @@ namespace AssetManagement.UnitTest.Services
                 Id = returnRequestId,
                 LocationId = Guid.NewGuid(),
                 State = TypeRequestState.Completed,
+                RequestorId = requesterId,
                 Assignment = new Assignment { Asset = new Asset() }
             };
-            var user = new User { Id = requesterId, LocationId = returnRequest.LocationId };
+            var user = new User { Id = requesterId, LocationId = returnRequest.LocationId, Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
 
             var mockReturnRequests = new[] { returnRequest }.AsQueryable().BuildMock();
             _mockReturnRequestRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<ReturnRequest, bool>>>()))
@@ -454,9 +517,10 @@ namespace AssetManagement.UnitTest.Services
                 Id = returnRequestId,
                 LocationId = Guid.NewGuid(),
                 State = TypeRequestState.WaitingForReturning,
-                Assignment = new Assignment { Asset = new Asset() }
+                RequestorId = requesterId,
+                Assignment = new Assignment { Asset = new Asset(), AssigneeId = requesterId }
             };
-            var user = new User { Id = requesterId, LocationId = returnRequest.LocationId };
+            var user = new User { Id = requesterId, LocationId = returnRequest.LocationId, Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
 
             var mockReturnRequests = new[] { returnRequest }.AsQueryable().BuildMock();
             _mockReturnRequestRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<ReturnRequest, bool>>>()))
