@@ -33,6 +33,10 @@ namespace AssetManagement.Api.Controllers
 			{
 				return BadRequest(result);
 			}
+			if (result.StatusCode == StatusCodes.Status404NotFound)
+			{
+				return NotFound(result);
+			}
 			if (result.StatusCode == StatusCodes.Status409Conflict)
 			{
 				return Conflict(result);
@@ -54,7 +58,11 @@ namespace AssetManagement.Api.Controllers
             {
                 return BadRequest(result);
             }
-            if (result.StatusCode == StatusCodes.Status500InternalServerError)
+			if (result.StatusCode == StatusCodes.Status404NotFound)
+			{
+				return NotFound(result);
+			}
+			if (result.StatusCode == StatusCodes.Status500InternalServerError)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
             }
@@ -104,7 +112,11 @@ namespace AssetManagement.Api.Controllers
             {
                 return BadRequest(result);
             }
-            if (result.StatusCode == StatusCodes.Status500InternalServerError)
+			if (result.StatusCode == StatusCodes.Status404NotFound)
+			{
+				return NotFound(result);
+			}
+			if (result.StatusCode == StatusCodes.Status500InternalServerError)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
             }
