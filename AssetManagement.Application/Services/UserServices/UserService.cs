@@ -175,28 +175,28 @@ public class UserService : IUserService
                 Data = _mapper.Map<ResponseUserDto>(user)
             };
 
-        }
-        else
-        {
-            return new ApiResponse
-            {
-                StatusCode = StatusCodes.Status500InternalServerError,
-                Message = UserApiResponseMessageConstant.UserUpdateFail,
-                Data = _mapper.Map<ResponseUserDto>(user)
-            };
-        }
-    }
-    public async Task<ApiResponse> DisableUser(Guid id)
-    {
-        var user = await _userRepository.GetByCondition(x => x.Id == id && !x.IsDeleted)
-            .Include(x => x.ReceivedAssignments).FirstOrDefaultAsync();
-        if (user == null) return new ApiResponse
-        {
-            Message = "User not found or no long active!",
-            StatusCode = StatusCodes.Status500InternalServerError
-        };
-        var userValidAssignment = user.ReceivedAssignments
-            .Where(x => x.State != Domain.Enums.TypeAssignmentState.Declined && !x.IsDeleted);
+		}
+		else
+		{
+			return new ApiResponse
+			{
+				StatusCode = StatusCodes.Status500InternalServerError,
+				Message = UserApiResponseMessageConstant.UserUpdateFail,
+				Data = _mapper.Map<ResponseUserDto>(user)
+			};
+		}
+	}
+	public async Task<ApiResponse> DisableUser(Guid id)
+	{
+		var user = await _userRepository.GetByCondition(x => x.Id == id && !x.IsDeleted)
+			.Include(x => x.ReceivedAssignments).FirstOrDefaultAsync();
+		if (user == null) return new ApiResponse
+		{
+			Message = "User not found or no long active!",
+			StatusCode = StatusCodes.Status404NotFound,
+		};
+		var userValidAssignment = user.ReceivedAssignments
+			.Where(x => x.State != Domain.Enums.TypeAssignmentState.Declined && !x.IsDeleted);
 
         //check if user have any valid asignment
         if (userValidAssignment.Count() == 0)
