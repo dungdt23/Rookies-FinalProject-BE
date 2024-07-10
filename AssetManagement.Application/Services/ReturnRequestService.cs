@@ -63,7 +63,8 @@ namespace AssetManagement.Application.Services
             RequestCreateReturnRequestDto request,
             Guid userId)
         {
-            var assignment = await _assignmentRepository.GetByCondition(a => a.Id == request.AssignmentId)
+            var assignment = await _assignmentRepository.GetByCondition(a => a.Id == request.AssignmentId
+            && a.AssigneeId == userId)
                 .Include(a => a.Asset)
                 .FirstOrDefaultAsync();
 
@@ -118,7 +119,8 @@ namespace AssetManagement.Application.Services
 
         public async Task CompleteReturnRequestAsync(Guid returnRequestId, Guid requesterId)
         {
-            var returnRequest = await _returnRequestRepository.GetByCondition(rr => rr.Id == returnRequestId)
+            var returnRequest = await _returnRequestRepository.GetByCondition(rr => rr.Id == returnRequestId
+            && rr.Assignment.AssigneeId == requesterId)
                 .Include(rr => rr.Assignment)
                     .ThenInclude(a => a.Asset)
                 .FirstOrDefaultAsync();
@@ -159,7 +161,8 @@ namespace AssetManagement.Application.Services
 
         public async Task RejectReturnRequestAsync(Guid returnRequestId, Guid requesterId)
         {
-            var returnRequest = await _returnRequestRepository.GetByCondition(rr => rr.Id == returnRequestId)
+            var returnRequest = await _returnRequestRepository.GetByCondition(rr => rr.Id == returnRequestId
+            && rr.Assignment.AssigneeId == requesterId)
                 .Include(rr => rr.Assignment)
                     .ThenInclude(a => a.Asset)
                 .FirstOrDefaultAsync();

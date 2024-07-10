@@ -39,14 +39,14 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
         }
 
         [Test]
-        public async Task Put_ShouldReturnNotFound_WhenCantFoundAssignmentWithId()
+        public async Task Put_ShouldReturnBadRequest_WhenCantFoundAssignmentWithId()
         {
             //Arrange
             var id = Guid.NewGuid();
 
             var apiResponse = new ApiResponse
             {
-                StatusCode = StatusCodes.Status404NotFound,
+                StatusCode = StatusCodes.Status400BadRequest,
                 Message = AssignmentApiResponseMessageConstant.AssignmentNotFound,
                 Data = id
             };
@@ -57,10 +57,10 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
             var result = await _controller.Put(id, _requestDtoMock.Object);
 
             //Assert
-            var notFoundResult = result as NotFoundObjectResult;
-            notFoundResult.Should().NotBeNull();
-            notFoundResult.StatusCode.Should().Be(StatusCodes.Status404NotFound);
-            notFoundResult.Value.Should().BeEquivalentTo(apiResponse);
+            var badRequestResult = result as BadRequestObjectResult;
+			badRequestResult.Should().NotBeNull();
+			badRequestResult.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+			badRequestResult.Value.Should().BeEquivalentTo(apiResponse);
         }
 
         [Test]

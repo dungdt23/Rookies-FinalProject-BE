@@ -132,8 +132,8 @@ namespace AssetManagement.Api
                 {
                     ValidateIssuerSigningKey = true,
                     ValidateLifetime = true,
-					ClockSkew = TimeSpan.Zero,
-					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["ApplicationSettings:Secret"])),
+                    ClockSkew = TimeSpan.Zero,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["ApplicationSettings:Secret"])),
                     ValidateIssuer = false,
                     ValidateAudience = false,
                 };

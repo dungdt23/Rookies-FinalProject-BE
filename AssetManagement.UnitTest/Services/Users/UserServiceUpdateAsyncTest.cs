@@ -96,7 +96,7 @@ public class UserServiceUpdateAsyncTest
         // Assert
         result.Should().NotBeNull();
         result.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
-        result.Message.Should().Be(UserApiResponseMessageConstant.UserUpdateFail);
+        result.Message.Should().Be(UserApiResponseMessageConstant.TypeNotFound);
     }
 
     [Test]
