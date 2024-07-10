@@ -118,7 +118,7 @@ namespace AssetManagement.Application.Services
 
         public async Task CompleteReturnRequestAsync(Guid returnRequestId, Guid requesterId)
         {
-            var returnRequest = await _returnRequestRepository.GetByCondition(rr => rr.Id == returnRequestId)
+            var returnRequest = await _returnRequestRepository.GetByCondition(rr => rr.Id == returnRequestId && rr.DeletedAt != null)
                 .Include(rr => rr.Assignment)
                     .ThenInclude(a => a.Asset)
                 .FirstOrDefaultAsync();
@@ -159,7 +159,7 @@ namespace AssetManagement.Application.Services
 
         public async Task RejectReturnRequestAsync(Guid returnRequestId, Guid requesterId)
         {
-            var returnRequest = await _returnRequestRepository.GetByCondition(rr => rr.Id == returnRequestId)
+            var returnRequest = await _returnRequestRepository.GetByCondition(rr => rr.Id == returnRequestId && rr.DeletedAt != null)
                 .Include(rr => rr.Assignment)
                     .ThenInclude(a => a.Asset)
                 .FirstOrDefaultAsync();

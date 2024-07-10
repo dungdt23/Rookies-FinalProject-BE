@@ -79,7 +79,7 @@ namespace AssetManagement.Application.Services.AssetServices
         }
         public async Task<ApiResponse> UpdateAsync(Guid id, RequestAssetDto requestAssetDto)
         {
-            var asset = await _assetRepository.GetByCondition(x => x.Id == id)
+            var asset = await _assetRepository.GetByCondition(x => x.Id == id && x.DeletedAt != null)
                 .FirstOrDefaultAsync();
             if (asset == null)
             {
@@ -124,7 +124,7 @@ namespace AssetManagement.Application.Services.AssetServices
         }
         public async Task<ApiResponse> DeleteAsync(Guid id)
         {
-            var asset = await _assetRepository.GetByCondition(x => x.Id == id)
+            var asset = await _assetRepository.GetByCondition(x => x.Id == id && x.DeletedAt != null)
                 .Include(x => x.Assignments)
                 .FirstOrDefaultAsync();
             if (asset == null)
