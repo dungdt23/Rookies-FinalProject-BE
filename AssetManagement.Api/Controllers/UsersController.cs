@@ -92,11 +92,11 @@ public class UsersController : ControllerBase
         }
         if (result.StatusCode == StatusCodes.Status404NotFound)
         {
-            return StatusCode(StatusCodes.Status404NotFound, result);
+            return NotFound();
         }
         if (result.StatusCode == StatusCodes.Status409Conflict)
         {
-            return StatusCode(StatusCodes.Status409Conflict, result);
+            return Conflict();
         }
         return Ok(result);
     }
