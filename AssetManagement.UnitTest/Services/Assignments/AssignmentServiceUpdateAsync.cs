@@ -30,6 +30,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 		private Mock<ResponseAssignmentDto> _assignmentDtoMock;
 		private Mock<Assignment> _assignmentMock;
 		private Mock<RequestAssignmentDto> _requestDtoMock;
+		private Mock<Asset> _assetMock;
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
@@ -47,10 +48,11 @@ namespace AssetManagement.UnitTest.Services.Assignments
 			_assignmentMock = new Mock<Assignment>();
 			_assignmentDtoMock = new Mock<ResponseAssignmentDto>();
 			_requestDtoMock = new Mock<RequestAssignmentDto>();
+			_assetMock = new Mock<Asset>();
 		}
 
 		[Test]
-		public async Task UpdateAsync_ShouldReturnNotFound_WhenAssignmentNotFoundWithId()
+		public async Task UpdateAsync_ShouldReturnBadRequest_WhenAssignmentNotFoundWithId()
 		{
 			//Arrange
 			var id = Guid.NewGuid();
@@ -65,7 +67,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
 			//Assert
 			result.Should().NotBeNull();
 			result.Should().BeOfType(typeof(ApiResponse));
-			result.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+			result.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
 			result.Message.Should().Be(AssignmentApiResponseMessageConstant.AssignmentNotFound);
 			result.Data.Should().Be(id);
 		}
@@ -88,6 +90,10 @@ namespace AssetManagement.UnitTest.Services.Assignments
 					dest.AssignedDate = src.AssignedDate;
 					dest.Note = src.Note;
 				});
+
+			var assetsMock = new List<Asset> { _assetMock.Object };
+			var assetsQueryMock = assetsMock.AsQueryable().BuildMock();
+			_assetRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Asset, bool>>>())).Returns(assetsQueryMock);
 			_assignmentRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<Assignment>())).ReturnsAsync(0);
 			_mapperMock.Setup(m => m.Map<ResponseAssignmentDto>(It.IsAny<Assignment>())).Returns(_assignmentDtoMock.Object);
 
@@ -120,6 +126,9 @@ namespace AssetManagement.UnitTest.Services.Assignments
 					dest.AssignedDate = src.AssignedDate;
 					dest.Note = src.Note;
 				});
+			var assetsMock = new List<Asset> { _assetMock.Object };
+			var assetsQueryMock = assetsMock.AsQueryable().BuildMock();
+			_assetRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Asset, bool>>>())).Returns(assetsQueryMock);
 			_assignmentRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<Assignment>())).ReturnsAsync(1);
 			_mapperMock.Setup(m => m.Map<ResponseAssignmentDto>(It.IsAny<Assignment>())).Returns(_assignmentDtoMock.Object);
 

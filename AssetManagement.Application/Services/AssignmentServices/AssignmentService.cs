@@ -31,7 +31,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status404NotFound,
+					StatusCode = StatusCodes.Status400BadRequest,
 					Message = AssignmentApiResponseMessageConstant.AssetNotFound,
 					Data = $"Asset Id: {request.AssetId}"
 				};
