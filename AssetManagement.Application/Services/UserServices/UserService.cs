@@ -55,7 +55,7 @@ public class UserService : IUserService
 		{
 			return new ApiResponse
 			{
-				StatusCode = StatusCodes.Status404NotFound,
+				StatusCode = StatusCodes.Status400BadRequest,
 				Message = UserApiResponseMessageConstant.TypeNotFound,
 				Data = form.Type
 			};
@@ -137,7 +137,7 @@ public class UserService : IUserService
 			return new ApiResponse
 			{
 				StatusCode = StatusCodes.Status400BadRequest,
-				Message = UserApiResponseMessageConstant.UserUpdateFail,
+				Message = UserApiResponseMessageConstant.TypeNotFound,
 				Data = form.Type
 			};
 		}

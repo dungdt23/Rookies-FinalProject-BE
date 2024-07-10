@@ -87,7 +87,7 @@ public class UserServiceCreateAsyncTest
     }
 
     [Test]
-    public async Task CreateAsync_ShouldReturnNotFoundResponse_WhenTypeDoesNotExist()
+    public async Task CreateAsync_ShouldReturnBadRequestResponse_WhenTypeDoesNotExist()
     {
         // Arrange
         var invalidTypeName = "invalid";
@@ -104,7 +104,7 @@ public class UserServiceCreateAsyncTest
         // Assert
         result.Should().NotBeNull();
         result.Should().BeOfType<ApiResponse>();
-        result.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+        result.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
         result.Message.Should().Be(UserApiResponseMessageConstant.TypeNotFound);
         result.Data.Should().BeEquivalentTo(_createFormMock.Object.Type);
     }

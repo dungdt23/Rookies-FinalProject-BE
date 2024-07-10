@@ -33,6 +33,10 @@ public class UsersController : ControllerBase
         }
         createUserForm.LocationId = locationIdGuid;
         var result = await _userService.CreateAsync(createUserForm);
+        if(result.StatusCode == StatusCodes.Status400BadRequest)
+        {
+            return BadRequest(result);
+        }
         if (result.StatusCode == StatusCodes.Status500InternalServerError)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, result);
