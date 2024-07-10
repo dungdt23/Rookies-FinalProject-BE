@@ -63,8 +63,7 @@ namespace AssetManagement.Application.Services
             RequestCreateReturnRequestDto request,
             Guid userId)
         {
-            var assignment = await _assignmentRepository.GetByCondition(a => a.Id == request.AssignmentId
-            && a.AssigneeId == userId)
+            var assignment = await _assignmentRepository.GetByCondition(a => a.Id == request.AssignmentId)
                 .Include(a => a.Asset)
                 .FirstOrDefaultAsync();
 
@@ -119,8 +118,7 @@ namespace AssetManagement.Application.Services
 
         public async Task CompleteReturnRequestAsync(Guid returnRequestId, Guid requesterId)
         {
-            var returnRequest = await _returnRequestRepository.GetByCondition(rr => rr.Id == returnRequestId
-            && rr.Assignment.AssigneeId == requesterId)
+            var returnRequest = await _returnRequestRepository.GetByCondition(rr => rr.Id == returnRequestId)
                 .Include(rr => rr.Assignment)
                     .ThenInclude(a => a.Asset)
                 .FirstOrDefaultAsync();
@@ -131,8 +129,11 @@ namespace AssetManagement.Application.Services
             var user = await _userRepository.GetByCondition(u => u.Id == requesterId)
                 .FirstOrDefaultAsync();
 
+            if (user.Type.TypeName == TypeNameConstants.TypeStaff && returnRequest.Assignment.AssigneeId != user.Id)
+                throw new UnauthorizedReturnRequestAccessException($"You do not have access to this return request.");
+
             if (returnRequest.LocationId != user!.LocationId)
-                throw new WrongLocationException($"You do not have access to this assignment.");
+                throw new WrongLocationException($"You do not have access to this return request.");
 
             if (returnRequest.State != TypeRequestState.WaitingForReturning)
                 throw new ReturnRequestNotWaitingException("Return Request must be in a waiting state.");
@@ -161,8 +162,7 @@ namespace AssetManagement.Application.Services
 
         public async Task RejectReturnRequestAsync(Guid returnRequestId, Guid requesterId)
         {
-            var returnRequest = await _returnRequestRepository.GetByCondition(rr => rr.Id == returnRequestId
-            && rr.Assignment.AssigneeId == requesterId)
+            var returnRequest = await _returnRequestRepository.GetByCondition(rr => rr.Id == returnRequestId)
                 .Include(rr => rr.Assignment)
                     .ThenInclude(a => a.Asset)
                 .FirstOrDefaultAsync();
@@ -173,8 +173,11 @@ namespace AssetManagement.Application.Services
             var user = await _userRepository.GetByCondition(u => u.Id == requesterId)
                 .FirstOrDefaultAsync();
 
+            if (user.Type.TypeName == TypeNameConstants.TypeStaff && returnRequest.Assignment.AssigneeId != user.Id)
+                throw new UnauthorizedReturnRequestAccessException($"You do not have access to this return request.");
+
             if (returnRequest.LocationId != user!.LocationId)
-                throw new WrongLocationException($"You do not have access to this assignment.");
+                throw new WrongLocationException($"You do not have access to this return request.");
 
             if (returnRequest.State != TypeRequestState.WaitingForReturning)
                 throw new ReturnRequestNotWaitingException("Return Request must be in a waiting state.");

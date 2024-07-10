@@ -97,6 +97,10 @@ namespace AssetManagement.Api.Controllers
             {
                 return NotFound(new ResponseMessageDto(ex.Message));
             }
+            catch (UnauthorizedReturnRequestAccessException ex)
+            {
+                return Unauthorized(new ResponseMessageDto(ex.Message));
+            }
             catch (WrongLocationException ex)
             {
                 return BadRequest(new ResponseMessageDto(ex.Message));
