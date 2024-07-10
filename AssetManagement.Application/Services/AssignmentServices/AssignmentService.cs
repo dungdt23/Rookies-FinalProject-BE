@@ -31,7 +31,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status400BadRequest,
+					StatusCode = StatusCodes.Status404NotFound,
 					Message = AssignmentApiResponseMessageConstant.AssetNotFound,
 					Data = $"Asset Id: {request.AssetId}"
 				};
@@ -87,7 +87,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status400BadRequest,
+					StatusCode = StatusCodes.Status404NotFound,
 					Message = AssignmentApiResponseMessageConstant.AssignmentNotFound,
 					Data = id
 				};
@@ -99,7 +99,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status400BadRequest,
+					StatusCode = StatusCodes.Status404NotFound,
 					Message = AssignmentApiResponseMessageConstant.AssetNotFound,
 					Data = assignment.AssetId
 				};
@@ -273,7 +273,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 			{
 				return new ApiResponse
 				{
-					StatusCode = StatusCodes.Status400BadRequest,
+					StatusCode = StatusCodes.Status404NotFound,
 					Message = AssignmentApiResponseMessageConstant.AssignmentNotFound,
 					Data = id
 				};

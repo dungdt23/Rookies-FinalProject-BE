@@ -119,7 +119,11 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _userService.GetById(id);
-        if (result.StatusCode == StatusCodes.Status500InternalServerError)
+		if (result.StatusCode == StatusCodes.Status404NotFound)
+		{
+			return NotFound(result);
+		}
+		if (result.StatusCode == StatusCodes.Status500InternalServerError)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, result);
         }
