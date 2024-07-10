@@ -22,6 +22,7 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
 	[TestFixture]
 	public class AssignmentControllerRespondTest
 	{
+		private readonly string _authorizeHeaderMock = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbklkIjoiOGIwYTY0MjMtNjkxMy00ZDQ5LWJhMmYtOTQ2ZjZkOTMwOWYxIiwiaWQiOiI4YjBhNjQyMy02OTEzLTRkNDktYmEyZi05NDZmNmQ5MzA5ZjEiLCJyb2xlIjoiQWRtaW4iLCJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.z-W0nZeRlzWxzXa8XjXNNsr1h1jOI9jZsWN-q_5NrLU";
 		private AssignmentsController _controller;
 		private Mock<IAssignmentService> _assignmentServiceMock;
 		private Mock<RequestAssignmentRespondDto> _requestDtoMock;
@@ -50,8 +51,11 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
 				Message = AssignmentApiResponseMessageConstant.AssignmentNotFound,
 				Data = $"Request Id : {_requestDtoMock.Object.AssignmentId}"
 			};
+			_controller.ControllerContext = new ControllerContext();
+			_controller.ControllerContext.HttpContext = new DefaultHttpContext();
+			_controller.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
 
-			_assignmentServiceMock.Setup(s => s.RespondAsync(_requestDtoMock.Object)).ReturnsAsync(response);
+			_assignmentServiceMock.Setup(s => s.RespondAsync(_requestDtoMock.Object,It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(response);
 
 			//Act
 			var result = await _controller.Respond(_requestDtoMock.Object);
@@ -73,8 +77,11 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
 				Message = AssignmentApiResponseMessageConstant.AssignmentRespondFail,
 				Data = _assignmentDtoMock.Object
 			};
+			_controller.ControllerContext = new ControllerContext();
+			_controller.ControllerContext.HttpContext = new DefaultHttpContext();
+			_controller.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
 
-			_assignmentServiceMock.Setup(s => s.RespondAsync(_requestDtoMock.Object)).ReturnsAsync(response);
+			_assignmentServiceMock.Setup(s => s.RespondAsync(_requestDtoMock.Object, It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(response);
 
 			//Act
 			var result = await _controller.Respond(_requestDtoMock.Object);
@@ -96,8 +103,11 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
 				Message = AssignmentApiResponseMessageConstant.AssignmentRespondNotWaitingForAcceptance,
 				Data = TypeAssignmentState.Declined
 			};
+			_controller.ControllerContext = new ControllerContext();
+			_controller.ControllerContext.HttpContext = new DefaultHttpContext();
+			_controller.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
 
-			_assignmentServiceMock.Setup(s => s.RespondAsync(_requestDtoMock.Object)).ReturnsAsync(response);
+			_assignmentServiceMock.Setup(s => s.RespondAsync(_requestDtoMock.Object, It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(response);
 
 			//Act
 			var result = await _controller.Respond(_requestDtoMock.Object);
@@ -119,8 +129,11 @@ namespace AssetManagement.UnitTest.Controllers.Assignments
 				Message = AssignmentApiResponseMessageConstant.AssignmentRespondSuccess,
 				Data = _assignmentDtoMock.Object
 			};
+			_controller.ControllerContext = new ControllerContext();
+			_controller.ControllerContext.HttpContext = new DefaultHttpContext();
+			_controller.ControllerContext.HttpContext.Request.Headers.Add("Authorization", _authorizeHeaderMock);
 
-			_assignmentServiceMock.Setup(s => s.RespondAsync(_requestDtoMock.Object)).ReturnsAsync(response);
+			_assignmentServiceMock.Setup(s => s.RespondAsync(_requestDtoMock.Object, It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(response);
 
 			//Act
 			var result = await _controller.Respond(_requestDtoMock.Object);

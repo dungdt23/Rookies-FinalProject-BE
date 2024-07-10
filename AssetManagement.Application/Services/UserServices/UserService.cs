@@ -288,7 +288,7 @@ public class UserService : IUserService
 
     public async Task<ApiResponse> GetById(Guid id)
     {
-        var user = await _userRepository.GetByCondition(x => x.Id == id && x.DeletedAt != null)
+        var user = await _userRepository.GetByCondition(x => x.Id == id)
             .Include(x => x.Type)
             .Include(x => x.Location)
             .FirstOrDefaultAsync();
