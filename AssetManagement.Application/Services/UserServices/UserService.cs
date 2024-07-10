@@ -193,7 +193,7 @@ public class UserService : IUserService
 		if (user == null) return new ApiResponse
 		{
 			Message = "User not found or no long active!",
-			StatusCode = StatusCodes.Status500InternalServerError
+			StatusCode = StatusCodes.Status404NotFound,
 		};
 		var userValidAssignment = user.ReceivedAssignments
 			.Where(x => x.State != Domain.Enums.TypeAssignmentState.Declined && !x.IsDeleted);

@@ -86,6 +86,10 @@ public class UsersController : ControllerBase
         {
             return StatusCode(StatusCodes.Status500InternalServerError, result);
         }
+        if (result.StatusCode == StatusCodes.Status404NotFound)
+        {
+            return StatusCode(StatusCodes.Status404NotFound, result);
+        }
         if (result.StatusCode == StatusCodes.Status409Conflict)
         {
             return StatusCode(StatusCodes.Status409Conflict, result);
