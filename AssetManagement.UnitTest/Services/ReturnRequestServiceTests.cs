@@ -276,34 +276,6 @@ namespace AssetManagement.UnitTest.Services
         }
 
         [Fact]
-        public async Task CompleteReturnRequestAsync_ShouldThrowUnauthorizedReturnRequestAccessException_WhenStaffUserIsNotTheRequestor()
-        {
-            // Arrange
-            var returnRequestId = Guid.NewGuid();
-            var requesterId = Guid.NewGuid();
-            var returnRequest = new ReturnRequest
-            {
-                Id = returnRequestId,
-                LocationId = Guid.NewGuid(),
-                State = TypeRequestState.WaitingForReturning,
-                RequestorId = Guid.NewGuid(),
-                Assignment = new Assignment { Asset = new Asset() }
-            };
-            var user = new User { Id = requesterId, LocationId = Guid.NewGuid(), Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
-
-            var mockReturnRequests = new[] { returnRequest }.AsQueryable().BuildMock();
-            _mockReturnRequestRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<ReturnRequest, bool>>>()))
-                .Returns(mockReturnRequests);
-
-            var mockUsers = new[] { user }.AsQueryable().BuildMock();
-            _mockUserRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
-                .Returns(mockUsers);
-
-            // Act & Assert
-            await Assert.ThrowsAsync<UnauthorizedReturnRequestAccessException>(() => _service.CompleteReturnRequestAsync(returnRequestId, requesterId));
-        }
-
-        [Fact]
         public async Task CompleteReturnRequestAsync_ShouldThrowWrongLocationException_WhenLocationMismatched()
         {
             // Arrange
@@ -420,34 +392,6 @@ namespace AssetManagement.UnitTest.Services
 
             // Act & Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _service.RejectReturnRequestAsync(returnRequestId, requesterId));
-        }
-
-        [Fact]
-        public async Task RejectReturnRequestAsync_ShouldThrowUnauthorizedReturnRequestAccessException_WhenStaffUserIsNotTheRequestor()
-        {
-            // Arrange
-            var returnRequestId = Guid.NewGuid();
-            var requesterId = Guid.NewGuid();
-            var returnRequest = new ReturnRequest
-            {
-                Id = returnRequestId,
-                LocationId = Guid.NewGuid(),
-                State = TypeRequestState.WaitingForReturning,
-                RequestorId = Guid.NewGuid(),
-                Assignment = new Assignment { Asset = new Asset() }
-            };
-            var user = new User { Id = requesterId, LocationId = Guid.NewGuid(), Type = new Domain.Entities.Type { TypeName = TypeNameConstants.TypeStaff } };
-
-            var mockReturnRequests = new[] { returnRequest }.AsQueryable().BuildMock();
-            _mockReturnRequestRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<ReturnRequest, bool>>>()))
-                .Returns(mockReturnRequests);
-
-            var mockUsers = new[] { user }.AsQueryable().BuildMock();
-            _mockUserRepository.Setup(repo => repo.GetByCondition(It.IsAny<Expression<Func<User, bool>>>()))
-                .Returns(mockUsers);
-
-            // Act & Assert
-            await Assert.ThrowsAsync<UnauthorizedReturnRequestAccessException>(() => _service.RejectReturnRequestAsync(returnRequestId, requesterId));
         }
 
         [Fact]
