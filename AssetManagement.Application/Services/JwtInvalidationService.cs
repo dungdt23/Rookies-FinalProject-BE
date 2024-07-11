@@ -4,6 +4,7 @@ using AssetManagement.Application.IRepositories;
 using AssetManagement.Application.IServices;
 using AssetManagement.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace AssetManagement.Application.Services
@@ -49,9 +50,13 @@ namespace AssetManagement.Application.Services
             if (blTimestampClaim == null)
                 throw new WrongTokenFormatException("Wrong token format.");
 
-            DateTime tokenIssuedAt = DateTime.Parse(blTimestampClaim);
 
-            var globalInvalidationTimestamp = await GetGlobalInvalidationTimestampAsync();
+			DateTimeOffset dto = DateTimeOffset.ParseExact(blTimestampClaim, "yyyy-MM-ddTHH:mm:ss.fffffffzzz", CultureInfo.InvariantCulture);
+
+			// Convert DateTimeOffset to DateTime and set the kind to Unspecified
+			DateTime tokenIssuedAt = dto.DateTime;
+
+			var globalInvalidationTimestamp = await GetGlobalInvalidationTimestampAsync();
             var userInvalidationTimestamp = user.TokenInvalidationTimestamp;
             if (tokenIssuedAt <= globalInvalidationTimestamp || tokenIssuedAt <= userInvalidationTimestamp)
                 throw new TokenInvalidException("The token is invalid due to a global or user-specific invalidation timestamp.");
