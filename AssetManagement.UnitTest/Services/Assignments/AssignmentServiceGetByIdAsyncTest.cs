@@ -96,7 +96,7 @@ namespace AssetManagement.UnitTest.Services.Assignments
             var assignmentsMock = new List<Assignment> { _assignmentMock.Object };
             var assignmentsQueryMock = assignmentsMock.AsQueryable().BuildMock();
 
-            _assignmentRepositoryMock.Setup(r => r.GetByCondition(It.IsAny<Expression<Func<Assignment, bool>>>())).Returns(assignmentsQueryMock);
+            _assignmentRepositoryMock.Setup(r => r.GetHistoryByCondition(It.IsAny<Expression<Func<Assignment, bool>>>())).Returns(assignmentsQueryMock);
             _mapperMock.Setup(m => m.Map<ResponseAssignmentDto>(It.IsAny<Assignment>())).Returns(_assignmentDtoMock.Object);
 
             //Act

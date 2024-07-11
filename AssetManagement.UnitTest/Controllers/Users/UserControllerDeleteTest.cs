@@ -71,11 +71,10 @@ namespace AssetManagement.UnitTest.Controllers.Users
             });
 
             // Act
-            var result = await _usersController.Delete(userId) as ObjectResult;
+            var result = await _usersController.Delete(userId);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(StatusCodes.Status409Conflict, result.StatusCode);
+            Assert.IsInstanceOf<ConflictResult>(result);
         }
     }
 }

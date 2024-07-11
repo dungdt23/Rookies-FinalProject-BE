@@ -342,7 +342,7 @@ namespace AssetManagement.Application.Services.AssignmentServices
 		}
 		public async Task<PagedResponse<ResponseHistoryAsmDto>> GetByAssetIdAsync(Guid assetId, bool isDateDescending, int index, int size)
 		{
-			var query = _assignmentRepository.GetByCondition(x => x.AssetId == assetId)
+			var query = _assignmentRepository.GetHistoryByCondition(x => x.AssetId == assetId)
 				.Include(x => x.Asset)
 				.Include(x => x.Assigner)
 				.Include(x => x.Assignee)
