@@ -53,6 +53,14 @@ namespace AssetManagement.Application.Services.AssetServices
             var asset = _mapper.Map<Asset>(requestAssetDto);
             var category = await _categoryRepository.GetByCondition(x => x.Id == requestAssetDto.CategoryId)
                 .FirstOrDefaultAsync();
+            if (category == null)
+            {
+                return new ApiResponse
+                {
+                    Message = "Category not found",
+                    StatusCode = StatusCodes.Status404NotFound
+                };
+            }
             var assetCode = _assetRepository.CreateAssetCode(category.Prefix, category.Id);
             asset.AssetCode = assetCode;
             var status = await _assetRepository.AddAsync(asset);
@@ -86,6 +94,16 @@ namespace AssetManagement.Application.Services.AssetServices
                 return new ApiResponse
                 {
                     Message = "Asset doesn't exist",
+                    StatusCode = StatusCodes.Status404NotFound
+                };
+            }
+            var category = await _categoryRepository.GetByCondition(x => x.Id == requestAssetDto.CategoryId)
+                .FirstOrDefaultAsync();
+            if (category == null)
+            {
+                return new ApiResponse
+                {
+                    Message = "Category not found",
                     StatusCode = StatusCodes.Status404NotFound
                 };
             }

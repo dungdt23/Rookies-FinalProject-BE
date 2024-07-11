@@ -49,6 +49,10 @@ namespace AssetManagement.Api.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
             }
+            if (result.StatusCode == StatusCodes.Status404NotFound)
+            {
+                return NotFound(result);
+            }
             return Ok(result);
         }
         [HttpDelete("{id}")]
@@ -78,6 +82,10 @@ namespace AssetManagement.Api.Controllers
             if (result.StatusCode == StatusCodes.Status500InternalServerError)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, result);
+            }
+            if (result.StatusCode == StatusCodes.Status404NotFound)
+            {
+                return NotFound(result);
             }
             return Ok(result);
         }
