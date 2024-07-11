@@ -33,145 +33,141 @@ using System.Text;
 namespace AssetManagement.Api
 {
 
-    public class Program
-    {
-        public static async Task Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
-            ConfigurationManager configuration = builder.Configuration;
-            builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("ApplicationSettings"));
-            builder.Services.AddDbContext<AssetManagementDBContext>(
-                options =>
-                {
-                    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-                    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-                }
+	public class Program
+	{
+		public static async Task Main(string[] args)
+		{
+			var builder = WebApplication.CreateBuilder(args);
+			ConfigurationManager configuration = builder.Configuration;
+			builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("ApplicationSettings"));
+			builder.Services.AddDbContext<AssetManagementDBContext>(
+				options =>
+				{
+					options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+					options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+				}
 
-            );
-            builder.Services.AddDateOnlyTimeOnlyStringConverters();
+			);
+			builder.Services.AddDateOnlyTimeOnlyStringConverters();
 
-            builder.Services.AddSignalR();
-            // The following line enables Application Insights telemetry collection.
-            builder.Services.AddApplicationInsightsTelemetry();
+			builder.Services.AddSignalR();
+			// The following line enables Application Insights telemetry collection.
+			builder.Services.AddApplicationInsightsTelemetry();
 
-            // Add services to the container.
-            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddScoped<IAssetRepository, AssetRepository>();
-            builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
-            builder.Services.AddScoped<IReturnRequestRepository, ReturnRequestRepository>();
-            builder.Services.AddScoped<IGlobalSettingsRepository, GlobalSettinsgRepository>();
-            builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-
-
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<ICategoryService, CategoryService>();
-            builder.Services.AddScoped<ILocationService, LocationService>();
-            builder.Services.AddScoped<ITypeService, TypeService>();
-            builder.Services.AddScoped<IAssetService, AssetService>();
-            builder.Services.AddScoped<IReportService, ReportService>();
-            builder.Services.AddScoped<IAssignmentService, AssignmentService>();
-            builder.Services.AddScoped<IReturnRequestService, ReturnRequestService>();
-            builder.Services.AddScoped<IReportService, ReportService>();
-            builder.Services.AddScoped<IJwtInvalidationService, JwtInvalidationService>();
+			// Add services to the container.
+			builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+			builder.Services.AddScoped<IUserRepository, UserRepository>();
+			builder.Services.AddScoped<IAssetRepository, AssetRepository>();
+			builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+			builder.Services.AddScoped<IReturnRequestRepository, ReturnRequestRepository>();
+			builder.Services.AddScoped<IGlobalSettingsRepository, GlobalSettinsgRepository>();
+			builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
 
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAllOrigins",
-                    builder =>
-                    {
-                        builder.SetIsOriginAllowed(origin => true)
-                               .AllowAnyMethod()
-                               .AllowAnyHeader()
-                               .AllowCredentials();
-                    });
-            });
+			builder.Services.AddScoped<IUserService, UserService>();
+			builder.Services.AddScoped<ICategoryService, CategoryService>();
+			builder.Services.AddScoped<ILocationService, LocationService>();
+			builder.Services.AddScoped<ITypeService, TypeService>();
+			builder.Services.AddScoped<IAssetService, AssetService>();
+			builder.Services.AddScoped<IReportService, ReportService>();
+			builder.Services.AddScoped<IAssignmentService, AssignmentService>();
+			builder.Services.AddScoped<IReturnRequestService, ReturnRequestService>();
+			builder.Services.AddScoped<IReportService, ReportService>();
+			builder.Services.AddScoped<IJwtInvalidationService, JwtInvalidationService>();
 
 
-            //Add ValidationModelAsService
-            builder.Services.AddScoped<ValidateModelFilter>();
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy("AllowAllOrigins",
+					builder =>
+					{
+						builder.SetIsOriginAllowed(origin => true)
+							   .AllowAnyMethod()
+							   .AllowAnyHeader()
+							   .AllowCredentials();
+					});
+			});
 
-            builder.Services.AddControllers(options =>
-            {
-                //Add custom validation error
-                options.Filters.Add<ValidateModelFilter>();
 
-            })
-                .ConfigureApiBehaviorOptions(options =>
-                {
-                    options.SuppressModelStateInvalidFilter = true;
-                });
+			//Add ValidationModelAsService
+			builder.Services.AddScoped<ValidateModelFilter>();
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(options =>
-            {
-                options.UseDateOnlyTimeOnlyStringConverters();
-                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-                {
-                    In = ParameterLocation.Header,
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey
-                });
-                options.OperationFilter<SecurityRequirementsOperationFilter>();
-            });
+			builder.Services.AddControllers(options =>
+			{
+				//Add custom validation error
+				options.Filters.Add<ValidateModelFilter>();
 
-            // Mapping profile between dtos and entities
-            builder.Services.AddAutoMapper(typeof(MappingProfile));
-            builder.Services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }
-            ).AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["ApplicationSettings:Secret"])),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                };
-            });
+			})
+				.ConfigureApiBehaviorOptions(options =>
+				{
+					options.SuppressModelStateInvalidFilter = true;
+				});
 
-            var app = builder.Build();
 
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseMiddleware<ApiExceptionHandlingMiddleware>();
-            }
+			builder.Services.AddEndpointsApiExplorer();
+			builder.Services.AddSwaggerGen(options =>
+			{
+				options.UseDateOnlyTimeOnlyStringConverters();
+				options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+				{
+					In = ParameterLocation.Header,
+					Name = "Authorization",
+					Type = SecuritySchemeType.ApiKey
+				});
+				options.OperationFilter<SecurityRequirementsOperationFilter>();
+			});
 
-            // if (app.Environment.IsDevelopment())
-            // {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-            // }
+			// Mapping profile between dtos and entities
+			builder.Services.AddAutoMapper(typeof(MappingProfile));
+			builder.Services.AddAuthentication(x =>
+			{
+				x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			}
+			).AddJwtBearer(x =>
+			{
+				x.RequireHttpsMetadata = false;
+				x.SaveToken = true;
+				x.TokenValidationParameters = new TokenValidationParameters
+				{
+					ValidateIssuerSigningKey = true,
+					ValidateLifetime = true,
+					ClockSkew = TimeSpan.Zero,
+					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["ApplicationSettings:Secret"])),
+					ValidateIssuer = false,
+					ValidateAudience = false,
+				};
+			});
 
-            app.MigrationDatabase();
+			var app = builder.Build();
 
-            app.UseHttpsRedirection();
-            app.UseCors("AllowAllOrigins");
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.UseWhen(context => !context.Request.Path.StartsWithSegments("/users/change-password-first-time"), appBuilder =>
-            {
-                appBuilder.UseMiddleware<ValidateUserMiddleware>();
-            });
-            app.MapControllers();
-            app.MapHub<SignalRHub>("/signalr-hub");
+			if (!app.Environment.IsDevelopment())
+			{
+				app.UseMiddleware<ApiExceptionHandlingMiddleware>();
+			}
 
-            if (app.Environment.IsDevelopment())
-            {
-                //await app.DeleteAllDataAsync();
-                await app.SeedDataAsync();
-            }
+			app.UseSwagger();
+			app.UseSwaggerUI();
 
-            app.Run();
-        }
-    }
+			app.MigrationDatabase();
+
+			app.UseHttpsRedirection();
+			app.UseCors("AllowAllOrigins");
+			app.UseAuthentication();
+			app.UseAuthorization();
+			app.UseWhen(context => !context.Request.Path.StartsWithSegments("/users/change-password-first-time"), appBuilder =>
+			{
+				appBuilder.UseMiddleware<ValidateUserMiddleware>();
+			});
+			app.MapControllers();
+			app.MapHub<SignalRHub>("/signalr-hub");
+
+			if (app.Environment.IsDevelopment())
+			{
+				await app.SeedDataAsync();
+			}
+
+			app.Run();
+		}
+	}
 }
