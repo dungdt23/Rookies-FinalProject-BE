@@ -3,10 +3,11 @@ using AssetManagement.Application.IRepositories;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Infrastructure.Migrations;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace AssetManagement.Infrastructure.Repositories;
 
-public class AssignmentRepository : GenericRepository<Assignment>, IAssignmentRepository
+public class AssignmentRepository : GenericRepository<Assignment>, IAssignmentRepository   
 {
 	private readonly AssetManagementDBContext _dbContext;
 	public AssignmentRepository(AssetManagementDBContext dBContext) : base(dBContext)
@@ -61,4 +62,8 @@ public class AssignmentRepository : GenericRepository<Assignment>, IAssignmentRe
 		return assignments;
 	}
 
+    public IQueryable<Assignment> GetHistoryByCondition(Expression<Func<Assignment, bool>> condition)
+    {
+        return _dbContext.Assignments.Where(condition);
+    }
 }
