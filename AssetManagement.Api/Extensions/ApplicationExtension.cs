@@ -28,8 +28,6 @@ public static class ApplicationExtension
 
 			if (!dbContext!.ReturnRequests.Any())
 			{
-				//await dbContext!.SeedReturnRequestsAsync();
-
                 await dbContext!.SeedAssignmentHistoriesAsync("Hà Nội");
                 await dbContext!.SeedAssignmentHistoriesAsync("Đà Nẵng");
                 await dbContext!.SeedAssignmentHistoriesAsync("Hồ Chí Minh");
@@ -534,11 +532,8 @@ public static class ApplicationExtension
         using (var serviceScope = app.ApplicationServices.CreateScope())
         {
             var dbContext = serviceScope.ServiceProvider.GetRequiredService<AssetManagementDBContext>();
-
-            // Ensure the database is created
             await dbContext.Database.EnsureCreatedAsync();
 
-            // Delete seed data as needed
             if (dbContext.Users.Any())
             {
                 dbContext.Users.RemoveRange(dbContext.Users);
@@ -563,7 +558,6 @@ public static class ApplicationExtension
             {
                 dbContext.ReturnRequests.RemoveRange(dbContext.ReturnRequests);
             }
-            // Save changes to the database
             await dbContext.SaveChangesAsync();
             Console.WriteLine("Successfully delete the database records");
         }

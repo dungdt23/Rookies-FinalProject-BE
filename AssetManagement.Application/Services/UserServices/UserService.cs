@@ -142,7 +142,7 @@ public class UserService : IUserService
             };
         }
 
-        var user = _userRepository.GetByCondition(u => u.Id == id && u.DeletedAt != null)
+        var user = _userRepository.GetByCondition(u => u.Id == id)
                                     .Include(u => u.Type)
                                     .Include(u => u.Location)
                                     .FirstOrDefault();
