@@ -7,12 +7,12 @@ on:
     - main 
 
 env:
-  AZURE_WEBAPP_NAME: dungdt-rookies-be
+  AZURE_WEBAPP_NAME: dungdt-rookies-finalproject-be
   AZURE_WEBAPP_PACKAGE_PATH: "./publish"
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -24,13 +24,13 @@ jobs:
           include-prerelease: true 
 
       - name: Restore
-        run: dotnet restore "./AssetManagement.Api/AssetManagement.Api.csproj"
+        run: dotnet restore 
 
       - name: Build
-        run: dotnet build "./AssetManagement.Api/AssetManagement.Api.csproj" --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish "./AssetManagement.Api/AssetManagement.Api.csproj" --configuration Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+        run: dotnet publish --configuration Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
       
       - name: List published files
         run: ls -la ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}  
