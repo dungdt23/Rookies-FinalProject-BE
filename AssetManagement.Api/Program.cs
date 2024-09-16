@@ -147,7 +147,7 @@ namespace AssetManagement.Api
 
 			// Get the port from the environment, default to 80 if not set
 			var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
-			app.Urls.Add($"http://*:{port}");
+			app.Urls.Add($"https://*:{port}");
 
 			if (!app.Environment.IsDevelopment())
 			{
