@@ -24,13 +24,13 @@ jobs:
           include-prerelease: true 
 
       - name: Restore
-        run: dotnet restore 
+        run: dotnet restore Rookies_Group3_AssetManagement.sln
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build Rookies_Group3_AssetManagement.sln --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish --configuration Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+        run: dotnet publish Rookies_Group3_AssetManagement.sln --configuration Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
 
       - name: Deployment
         uses: azure/webapps-deploy@v2
