@@ -43,7 +43,12 @@ namespace AssetManagement.Api
 			builder.Services.AddDbContext<AssetManagementDBContext>(
 				options =>
 				{
-					options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+					var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+					if (!builder.Environment.IsDevelopment())
+					{
+						connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+					}
+					options.UseSqlServer(connectionString);
 					options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 				}
 
@@ -87,7 +92,6 @@ namespace AssetManagement.Api
 							   .AllowCredentials();
 					});
 			});
-
 
 			//Add ValidationModelAsService
 			builder.Services.AddScoped<ValidateModelFilter>();
@@ -161,12 +165,7 @@ namespace AssetManagement.Api
 			});
 			app.MapControllers();
 			app.MapHub<SignalRHub>("/signalr-hub");
-
-			if (app.Environment.IsDevelopment())
-			{
-				await app.SeedDataAsync();
-			}
-
+			await app.SeedDataAsync();
 			app.Run();
 		}
 	}
