@@ -24,13 +24,16 @@ jobs:
           include-prerelease: true 
 
       - name: Restore
-        run: dotnet restore Rookies_Group3_AssetManagement.sln
+        run: dotnet restore "./AssetManagement.Api/AssetManagement.Api.csproj"
 
       - name: Build
-        run: dotnet build Rookies_Group3_AssetManagement.sln --configuration Release --no-restore
+        run: dotnet build "./AssetManagement.Api/AssetManagement.Api.csproj" --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish Rookies_Group3_AssetManagement.sln --configuration Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+        run: dotnet publish "./AssetManagement.Api/AssetManagement.Api.csproj" --configuration Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+      
+      - name: List published files
+        run: ls -la ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}  
 
       - name: Deployment
         uses: azure/webapps-deploy@v2
