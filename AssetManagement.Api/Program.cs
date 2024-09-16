@@ -44,10 +44,10 @@ namespace AssetManagement.Api
 				options =>
 				{
 					var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-					if (!builder.Environment.IsDevelopment())
-					{
-						connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
-					}
+					// if (!builder.Environment.IsDevelopment())
+					// {
+					// 	connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+					// }
 					options.UseSqlServer(connectionString);
 					options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 				}
