@@ -121,7 +121,7 @@ namespace AssetManagement.Api
 				options.OperationFilter<SecurityRequirementsOperationFilter>();
 			});
 
-			// Mapping profile between dtos and entities
+			// Mapping profile between dtos and entities.
 			builder.Services.AddAutoMapper(typeof(MappingProfile));
 			builder.Services.AddAuthentication(x =>
 			{
