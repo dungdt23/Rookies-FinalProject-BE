@@ -32,6 +32,9 @@ jobs:
       - name: Publish
         run: dotnet publish --configuration Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
       
+      - name: List publish contents
+        run: dir ${{ env.AZURE_WEBAPP_PACKAGE_PATH }} /s
+        
       - name: Deployment
         uses: azure/webapps-deploy@v2
         with:
